@@ -1,0 +1,782 @@
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ; ПРОГРАММА ВЫВОДА НА ЖКИ ИНДИКАТОР 2х24 (русифицированный) 
+                      00002 
+                      00003 ;       Вывод осуществляется в 2 строки, причем
+                      00004 ;       Верхняя  строка - неподвижная  (вывод времени)
+                      00005 ;       Нижняя строка - бегущий текст из файла <texts.h> 
+                      00006 ;
+                      00007 ; Используем кварц = 4 МГц
+                      00008 ; ЖКИ с наклейкой 24200 NRB/R (куплен в магазине ЧИП И ДИП)
+                      00009 
+                      00010 ; Разаработал Пушкарев Олег /// oleg.omsk@usa.net
+                      00011 
+Warning[215]: Processor superseded by command line.  Verify processor symbol.
+                      00012                 LIST            P=16F84
+                      00013 
+                      00014 ; В файл <my_mac.inc> включены коды управления ЖКИ, кодировка русских
+                      00015 ; букв для ЖКИ и стандартый файл от Microchip для PIC16F84
+                      00016 
+Error[105]  : Cannot open file (Include File "my_mac.inc" not found)
+                      00017 #include <my_mac.inc>
+                      00018 
+                      00019 
+2007   3FF9           00020                 __config        h'3FF9'
+                      00021 
+  00000004            00022 place equ       .4 ; (1...23) где начало вывода в верхней строке
+                      00023  
+                      00024 #define _int    flag,0  ; флаг 'пpеpывание пpоизошло'
+                      00025 #define _bank   flag,1  ; флаг 'страница перед прерыванием'
+                      00026 
+                      00027 
+Error[113]  : Symbol not previously defined (PORTB)
+  00000000            00028 LCD_DATA         EQU     PORTB
+Error[113]  : Symbol not previously defined (TRISB)
+  FFFFFF80            00029 LCD_DATA_TRIS    EQU     TRISB-0x80
+                      00030 ;
+Error[113]  : Symbol not previously defined (PORTB)
+  00000000            00031 LCD_CNTL         EQU     PORTB
+Error[113]  : Symbol not previously defined (TRISB)
+  FFFFFF80            00032 LCD_CNTL_TRIS    EQU     TRISB-0x80
+                      00033 ;
+                      00034 ; LCD Display Commands and Control Signal names.
+                      00035 ;
+  00000001            00036 E       EQU     1       ; LCD Enable control line
+  00000002            00037 R_W     EQU     2       ; LCD Read/Write control line
+  00000003            00038 RS      EQU     3       ; LCD Register Select control line
+                      00039 
+                      00040 ; ++++++++++++++++++++++++++++ Подключение к ЖКИ +++++++++++++++++
+                      00041 ; РВ4...РВ7     - данные
+                      00042 ; РВ1           - Е
+                      00043 ; РВ2           - R/W
+                      00044 ; РВ3           - RS
+                      00045 
+                      00046         CBLOCK .12
+                      00047 
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  0000000C            00048 rab1    ; bcd
+  0000000D            00049 rab2    ; bcd, delay20, delay5
+  0000000E            00050 rab3    ; bcd, delay1 
+  0000000F            00051 rab4    ; 
+  00000010            00052 rab5    ; при выводе строки на LCD
+  00000011            00053 Temp    ; (LCD)-флаг busy и текущий адрес DDRAM
+  00000012            00054 Char    ; (LCD)-cохранение при выводе символа или команды
+  00000013            00055 t50ms   ; счетчики вpемени для часов 
+  00000014            00056 t1sec
+  00000015            00057 t1min   
+  00000016            00058 t1hour
+                      00059 
+  00000017            00060 push_W  ; Раб ячейки под сох W и STATUS пpи INT...
+  00000018            00061 push_S  
+  00000019            00062 flag
+                      00063         ENDC
+                      00064 
+                      00065  org     0x00
+0000   2???           00066                 goto    START
+                      00067  org     0x04
+0004   2???           00068                 goto    interrupt       
+                      00069 
+0005                  00070 Table:
+Error[113]  : Symbol not previously defined (PCL)
+0005   0780           00071         addwf   PCL,f           ; Jump to character
+Error[105]  : Cannot open file (Include File "texts.h" not found)
+                      00072         include "texts.h"
+0006                  00073 START   
+0006   2???           00074         call init_reg
+0007   2???           00075         call    LCD_Init        ; Set up the LCD Module
+Error[113]  : Symbol not previously defined (CLR_DISP)
+0008   3000           00076         movlw   CLR_DISP        ; добавим...
+0009   2???           00077         call    Send_Cmd
+000A   300F           00078         movlw   b'00001111'     ; Display on, cursor on, blink on
+000B   2???           00079         call    Send_Cmd
+000C   3006           00080         movlw   b'00000110'     ; Increment cursor (Entry_Set)
+000D   2???           00081         call    Send_Cmd
+Error[113]  : Symbol not previously defined (LINE2)
+000E   3017           00082         movlw   LINE2+.23       ; будем выводить в конец строки 1
+000F   2???           00083         call    Send_Cmd
+                      00084 
+0010                  00085 long
+0010   3000           00086         movlw   0               ; Table address (start of message)
+0011   2???           00087         call string
+0012   2???           00088         goto long
+                      00089  
+                      00090 ; ********************************************************
+                      00091 ; Вывод строки символов на дисплей из Table (смещение в W)
+                      00092 ; ********************************************************
+                      00093 
+0013                  00094 string                          
+0013   0090           00095         movwf   rab5       ; rab5 holds start of message address
+0014   2???           00096         call    Table
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0015   39FF           00097         andlw   0FFh            
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (Z)
+0016   1800           00098         btfsc   STATUS,Z   ; Check if at end of message (zero returned at end)
+0017   0008           00099         return             ; goto    out             
+0018   2???           00100         call    Send_Char  ; Display character
+                      00101 
+0019   2???           00102         call    delay100   ; задержка между выводом - определяет скорость сдвига
+                      00103 
+                      00104 ; Сдвигаем дисплей для того, чтобы получить "БЕГУЩУЮ СТРОКУ"
+001A   3018           00105         movlw b'00011000'
+001B   2???           00106         call scmd
+                      00107 
+                      00108 ; Получаем текущий адрес ОЗУ и не допускаем, чтобы текущий адрес попал 
+                      00109 ; в первую строку
+001C   2???           00110         call Wait_Busy          ; Чтение текущего адреса
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (Temp)
+001C   2???           00111         cmp Temp,0      ; Не попали ли мы в 1-ую строку?
+Warning[207]: Found label after column 1. (sz)
+001D                  00112         sz      
+001D   2???           00113         goto prod
+Error[113]  : Symbol not previously defined (LINE2)
+001E   3000           00114         movlw LINE2     ; Установили адрес во 2-ю строку
+001F   2???           00115         call scmd
+                      00116 
+0020                  00117 prod
+                      00118 
+                      00119 ; Без этой задержки, почему-то случайно сдвигается верхняя строка
+Error[113]  : Symbol not previously defined (d100mks)
+0020   2000           00120         call d100mks    ; ??? without it -> error...       ******???******
+                      00121                         ; причина осталась неясной...      ******???******
+                      00122 
+                      00123 ; Необходимо восстановить текущий адрес DDRAM ЖКИ
+                      00124 ; Это для того, чтобы во время сдвига во 2 строке переходить
+                      00125 ; в ПЕРВУЮ строку и организовать там НЕПОДВИЖНЫЙ текст
+                      00126 
+0021   2???           00127         call str1
+0022   0810           00128         movf    rab5,w     ; Point to next character
+0023   3E01           00129         addlw   1
+0024   2???           00130         goto    string
+                      00131 
+                      00132 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                      00133 ;          ВЫВОД В ПЕРВУЮ СТРОКУ      
+                      00134 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+0025                  00135 str1                            
+0025   2???           00136         call Wait_Busy     ; Чтение текущего адреса ОЗУ ЖКИ     
+Warning[207]: Found label after column 1. (movff)
+Error[122]  : Illegal opcode (Temp)
+0025   2???           00137         movff Temp,rab4    ; здесь храним пока
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (Temp)
+0025   2???           00138         cmp Temp,40+.24-place    ; - to right
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[207]: Found label after column 1. (sc)
+0026                  00139         sc              
+0026   2???           00140         goto mgr           ; Temp < границы
+                      00141 ; Temp > границы
+0027   3054           00142         movlw 0x40+.24-place       ; фиксированное положение вывода
+0028   0211           00143         subwf Temp,w       ; Адрес из 2-ой строки - смещ (для попадания в 1-ую)
+0029   2???           00144         goto combm
+002A                  00145 mgr
+002A   3040           00146         movlw 0x40         ; фиксированное положение вывода
+002B   0211           00147         subwf Temp,w       ; Адрес из 2-ой строки - смещ (для попадания в 1-ую)
+002C   3E14           00148         addlw .16+place    ; from 0 to middle of display
+002D   2???           00149         goto combm
+002E                  00150 combm
+002E   3880           00151         iorlw b'10000000'  ; for DD RAM Adress Set
+002F   2???           00152         call    Send_Cmd
+                      00153 ; Формируем неподвижный текст для 1-ой строки
+0030   3020           00154         movlw ' '       ; первым обязательно пробел для стирания
+0031   2???           00155         call sch_b
+                      00156 
+0032   3054           00157         movlw 'T'
+0033   2???           00158         call sch_b
+0034   3069           00159         movlw 'i'
+0035   2???           00160         call sch_b
+0036   306D           00161         movlw 'm'
+0037   2???           00162         call sch_b
+0038   3065           00163         movlw 'e'
+0039   2???           00164         call sch_b
+003A   3020           00165         movlw ' '
+003B   2???           00166         call sch_b
+003C   3069           00167         movlw 'i'
+003D   2???           00168         call sch_b
+003E   3073           00169         movlw 's'
+003F   2???           00170         call sch_b
+0040   3020           00171         movlw ' '
+0041   2???           00172         call sch_b
+                      00173 
+0042   2???           00174  call time                      ; вывод времени на LCD
+                      00175 
+0043   080F           00176         movf rab4,w             ; восстанавливаем положение курсора во 2 строке
+0044   3880           00177         iorlw b'10000000'       ; for DD RAM Adress Set
+0045   2???           00178         call    Send_Cmd
+0046   0008           00179         return
+                      00180 ;
+0047                  00181 sch_b                   ; вывод символа с проверкой перехода во 2 строку
+0047   2???           00182         call schar
+0048   2???           00183         call Wait_Busy          ; адрес ОЗУ ЖКИ?
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (Temp)
+0048   2???           00184         cmp Temp,0x40   ; Не попали ли мы во 2-ую строку?
+Warning[207]: Found label after column 1. (sz)
+Error[116]  : Address label duplicated or different in second pass (sz)
+0049                  00185         sz      
+0049   0008           00186         return
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Error[113]  : Symbol not previously defined (LINE1)
+004A   3000           00187         movlw LINE1     ; Установили адрес во 2-ю строку
+004B   2???           00188         call scmd
+004C   0008           00189         return
+                      00190 
+                      00191 ; ********************************************************************
+                      00192 ;              Вывод в ПЕРВУЮ строку времени с момента пуска
+                      00193 ; ********************************************************************
+                      00194 
+004D                  00195 time
+004D   0816           00196         movf t1hour,w   ; это число часов
+004E   2???           00197         call bcd        ; преобразуем в дес. вид
+004F   080D           00198         movf rab2,w
+0050   3E30           00199         addlw 0x30      ; код цифры
+0051   2???           00200         call sch_b      ; внимание, использует r1...r3
+                      00201 
+0052   0816           00202         movf t1hour,w
+0053   2???           00203         call bcd
+0054   3E30           00204         addlw 0x30      ; код цифры
+0055   2???           00205         call sch_b      ; use r1...r3
+                      00206 
+0056   302D           00207         movlw '-'
+0057   2???           00208         call sch_b      ; use r1...r3
+                      00209 
+0058   0815           00210         movf t1min,w
+0059   2???           00211         call bcd
+005A   080D           00212         movf rab2,w
+005B   3E30           00213         addlw 0x30      ; код цифры
+005C   2???           00214         call sch_b      ; use r1...r3
+                      00215 
+005D   0815           00216         movf t1min,w
+005E   2???           00217         call bcd
+005F   3E30           00218         addlw 0x30      ; код цифры
+0060   2???           00219         call sch_b      ; use r1...r3
+                      00220 
+0061   302D           00221         movlw '-'
+0062   2???           00222         call sch_b      ; use r1...r3
+                      00223 
+0063   0814           00224         movf t1sec,w
+0064   2???           00225         call bcd
+0065   080D           00226         movf rab2,w
+0066   3E30           00227         addlw 0x30      ; код цифры
+0067   2???           00228         call sch_b      ; use r1...r3
+                      00229 
+0068   0814           00230         movf t1sec,w
+0069   2???           00231         call bcd
+006A   3E30           00232         addlw 0x30      ; код цифры
+006B   2???           00233         call sch_b      ; use r1...r3
+006C   0008           00234         return
+                      00235 
+                      00236 ;
+                      00237 ;*******************************************************************
+                      00238 ;* The LCD Module Subroutines                                      *
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00239 ;*******************************************************************
+                      00240 ;
+                      00241 ;*******************************************************************
+                      00242 ;*SendChar - Sends character to LCD                                *
+                      00243 ;*This routine splits the character into the upper and lower       * 
+                      00244 ;*nibbles and sends them to the LCD, upper nibble first.           *
+                      00245 ;*******************************************************************
+                      00246 ;
+006D                  00247 schar
+006D                  00248 Send_Char
+006D   0092           00249         movwf   Char            ; Character to be sent is in W
+006E   2???           00250         call    Wait_Busy       ; Wait for LCD to be ready
+006F   300F           00251         movlw   0x0f
+0070   0580           00252         andwf   LCD_DATA,F      ; Clear the upper nibble
+0071   0812           00253         movf    Char,w          
+0072   39F0           00254         andlw   0xF0            ; Get upper nibble
+0073   0480           00255         iorwf   LCD_DATA,F      ; Send data to LCD
+0074   1100           00256         bcf     LCD_CNTL, R_W   ; Set LCD to write
+0075   1580           00257         bsf     LCD_CNTL, RS    ; Set LCD to data mode
+0076   1480           00258         bsf     LCD_CNTL, E     ; toggle E for LCD
+0077   1080           00259         bcf     LCD_CNTL, E
+0078   300F           00260         movlw   0x0f
+0079   0580           00261         andwf   LCD_DATA,F      ; Clear the upper nibble
+007A   0E12           00262         swapf   Char,W
+007B   39F0           00263         andlw   0xF0            ; Get lower nibble
+007C   0480           00264         iorwf   LCD_DATA,F      ; Send data to LCD
+007D   1480           00265         bsf     LCD_CNTL, E     ; toggle E for LCD
+007E   1080           00266         bcf     LCD_CNTL, E
+007F   0008           00267         return
+                      00268 
+                      00269 ;*******************************************************************
+                      00270 ;* Send_Cmd - Sends command to LCD                                 *
+                      00271 ;* This routine splits the command into the upper and lower        * 
+                      00272 ;* nibbles and sends them to the LCD, upper nibble first.          *
+                      00273 ;*******************************************************************
+0080                  00274 scmd
+0080                  00275 Send_Cmd
+0080   0092           00276         movwf   Char            ; Character to be sent is in W
+0081   2???           00277         call    Wait_Busy       ; Wait for LCD to be ready
+0082   300F           00278         movlw   0x0f
+0083   0580           00279         andwf   LCD_DATA,F      ; Clear the upper nibble
+0084   0812           00280         movf    Char,w          
+0085   39F0           00281         andlw   0xF0            ; Get upper nibble
+0086   0480           00282         iorwf   LCD_DATA,F      ; Send data to LCD
+0087   1100           00283         bcf     LCD_CNTL,R_W    ; Set LCD to write
+0088   1180           00284         bcf     LCD_CNTL,RS     ; Set LCD to command mode
+0089   1480           00285         bsf     LCD_CNTL,E      ; toggle E for LCD
+008A   1080           00286         bcf     LCD_CNTL,E
+008B   300F           00287         movlw   0x0f
+008C   0580           00288         andwf   LCD_DATA,F      ; Clear the upper nibble
+008D   0E12           00289         swapf   Char,W
+008E   39F0           00290         andlw   0xF0            ; Get lower nibble
+008F   0480           00291         iorwf   LCD_DATA,F      ; Send data to LCD
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0090   1480           00292         bsf     LCD_CNTL,E      ; toggle E for LCD
+0091   1080           00293         bcf     LCD_CNTL,E
+0092   0008           00294         return
+                      00295 ;
+                      00296 ;*******************************************************************
+                      00297 ;* This routine checks the busy flag, returns when not busy        *
+                      00298 ;*  Affects:                                                       *
+                      00299 ;*      Temp - Returned with busy/address                          *
+                      00300 ;*******************************************************************
+                      00301 ;  В оригинале была ошибка! - исправлено
+0093                  00302 Wait_Busy
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+0093   1400           00303         bsf     STATUS, RP0     ; Select Register page 1
+0094   30F0           00304         movlw   0xf0            ; Set port to input
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0095   0400           00305         iorwf   LCD_DATA_TRIS,W ; Only set upper half of port
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0096   0080           00306         movwf   LCD_DATA_TRIS
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+0097   1000           00307         bcf     STATUS, RP0     ; Select Register page 0
+0098   1180           00308         bcf     LCD_CNTL, RS    ; Set LCD for Command mode
+0099   1500           00309         bsf     LCD_CNTL, R_W   ; Setup to read busy flag
+                      00310 
+009A   1480           00311         bsf     LCD_CNTL, E     ; Set E high
+009B   0800           00312         movf    LCD_DATA, W     ; Read upper nibble busy flag, DDRam address
+009C   1080           00313         bcf     LCD_CNTL, E     ; Set E low
+                      00314 
+009D   39F0           00315         andlw   0xF0            ; Mask out lower nibble
+009E   0091           00316         movwf   Temp
+                      00317 
+009F   1480           00318         bsf     LCD_CNTL, E     ; Toggle E to get lower nibble
+00A0   0E00           00319         swapf   LCD_DATA, w     ; Read lower nibble busy flag, DDRam address
+00A1   1080           00320         bcf     LCD_CNTL, E
+                      00321 
+                      00322 
+00A2   390F           00323         andlw   0x0F            ; Mask out upper nibble
+00A3   0491           00324         iorwf   Temp,f          ; Combine nibbles, RES in Temp !!!!!!!!!!!!!!!
+00A4   1B91           00325         btfsc   Temp, 7         ; Check busy flag, high = busy
+00A5   2???           00326         goto    Wait_Busy       ; If busy, check again
+00A6   1100           00327         bcf     LCD_CNTL, R_W        
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00A7   1400           00328         bsf     STATUS, RP0     ; Select Register page 1
+00A8   300F           00329         movlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00A9   0500           00330         andwf   LCD_DATA_TRIS,W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00AA   0080           00331         movwf   LCD_DATA_TRIS   ; Set Port for output
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00AB   1000           00332         bcf     STATUS, RP0     ; Select Register page 0
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00AC   0008           00333         return
+                      00334 ;
+00AD                  00335 del10mks
+00AD   2???           00336         goto $+1
+00AE   2???           00337         goto $+1
+00AF   2???           00338         goto $+1
+00B0   2???           00339         goto $+1
+00B1   0008           00340         return
+                      00341 ;
+                      00342 ; Initilize the LCD Display Module
+                      00343 ;
+00B2                  00344 LCD_Init:
+                      00345 
+00B2   1080           00346         bcf     LCD_CNTL, E     ; Clear all controll lines
+00B3   1180           00347         bcf     LCD_CNTL, RS
+00B4   1100           00348         bcf     LCD_CNTL, R_W
+                      00349 
+00B5   2???           00350         call    delay20         ; Wait for 15ms for LCD to get powered up
+                      00351 
+00B6   300F           00352         movlw   0x0f
+00B7   0580           00353         andwf   LCD_DATA,F      ; Clear the upper nibble
+00B8   3030           00354         movlw   0x030           ; Command for 4-bit interface high nibble
+00B9   0480           00355         iorwf   LCD_DATA,F      ; Send data to LCD      
+                      00356 
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00BA   1400           00357         bsf     STATUS, RP0     ; Select Register page 1
+00BB   300F           00358         movlw   0x0F
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00BC   0500           00359         andwf   LCD_DATA_TRIS,W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00BD   0080           00360         movwf   LCD_DATA_TRIS   ; Set Port for output
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00BE   1000           00361         BCF     STATUS, RP0     ; Select Register page 0
+                      00362 
+00BF   1480           00363         bsf     LCD_CNTL, E     ; Clock the initalize command to LCD module
+00C0   1080           00364         bcf     LCD_CNTL, E
+                      00365 
+00C1   2???           00366         call    delay5          ; Delay for at least 4.1ms before continuing
+                      00367 
+00C2   1480           00368         bsf     LCD_CNTL, E     ; Clock the initalize command to LCD module
+00C3   1080           00369         bcf     LCD_CNTL, E
+                      00370         
+                      00371          
+Error[113]  : Symbol not previously defined (d100mks)
+00C4   2000           00372         call    d100mks        ; delay for at least 100usec before continuing
+                      00373 
+00C5   1480           00374         bsf     LCD_CNTL, E     ; Clock the initalize command to LCD module
+00C6   1080           00375         bcf     LCD_CNTL, E
+                      00376 
+00C7   2???           00377         call    Wait_Busy       ; From here on, the Busy Bit will be valid.
+                      00378 
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C8   300F           00379         movlw   0x0f
+00C9   0580           00380         andwf   LCD_DATA,F      ; Clear the upper nibble
+00CA   3020           00381         movlw   0x020           ; Command for 4-bit interface high nibble (Really an 8bit command but
+                      00382                                 ;   lower 4 bits are don't care at this point)
+00CB   0480           00383         iorwf   LCD_DATA,F      ; Send data to LCD      
+                      00384 
+00CC   1480           00385         bsf     LCD_CNTL, E     ; Clock the initalize command to LCD module
+00CD   1080           00386         bcf     LCD_CNTL, E
+                      00387 
+Error[113]  : Symbol not previously defined (FUNCTION_SET)
+00CE   3000           00388         movlw   FUNCTION_SET    ; Send the function set command 4-bit I/F, Font, Number of lines
+00CF   2???           00389         call    Send_Cmd        ; Can now use the Send_Cmd routine since Busy Bit Valid and in 4bit mode
+                            .
+                      00390 ; LCD Module is now initalized
+00D0   0008           00391         return
+                      00392 
+                      00393 
+                      00394 
+                      00395 ; --------------------------------------------------------------------
+                      00396 ; Подпрограммы задержек
+                      00397 ; --------------------------------------------------------------------
+                      00398 
+00D1   2???           00399 delay100        call delay20            ; задержка 100 мс
+00D2   2???           00400 delay80         call delay20
+00D3   2???           00401 delay60         call delay20
+00D4   2???           00402 delay40         call delay20
+                      00403 
+00D5   2???           00404 delay20         call delay5             ; задержка 20 мс
+00D6   2???           00405 delay15         call delay5
+00D7   2???           00406 delay10         call delay5
+                      00407 
+00D8   3005           00408 delay5  movlw d'5'
+00D9   008D           00409         movwf rab2              ; N x 1 ms
+Error[122]  : Illegal opcode (mvi)
+00D9   008D           00410 delay1  mvi rab3,.249
+00DA   0000           00411 d1m     nop
+00DB   0B8E           00412         decfsz rab3,f ; 4 x 250 = 1 ms
+00DC   2???           00413         goto d1m
+00DD   0B8D           00414         decfsz rab2,f
+Error[113]  : Symbol not previously defined (delay1)
+00DE   2800           00415         goto delay1
+00DF   0008           00416         return
+                      00417 
+Error[122]  : Illegal opcode (mvi)
+                      00418 d100mks mvi rab3,.25
+00E0   0000           00419 dll     nop             ; 4 x 25 = 100 mkc
+00E1   0B8E           00420         decfsz rab3,f
+00E2   2???           00421         goto dll
+00E3   0008           00422         return
+                      00423 
+                      00424 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+00E4                  00425 init_reg
+Error[113]  : Symbol not previously defined (STATUS)
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Error[113]  : Symbol not previously defined (RP0)
+00E4   1400           00426         bsf STATUS,RP0          ; страница 1
+00E5   3097           00427         movlw b'10010111'       ; ПРЕДДЕЛ НА 256, ЕСЛИ rb-ВХОД, ТО r на + нет
+Error[113]  : Symbol not previously defined (OPTION_REG)
+00E6   0080           00428         movwf OPTION_REG        ; счет от внут. ген, делитель к RTCC
+00E7   3000           00429         movlw b'00000000'       ; поpт В7...В0 - вывод 
+Error[113]  : Symbol not previously defined (PORTB)
+00E8   0080           00430         movwf PORTB
+00E9   30F8           00431         movlw   b'11111000'     ; A4,A3 - ввод, A2,A1,A0 - вывод
+Error[113]  : Symbol not previously defined (PORTA)
+00EA   0080           00432         movwf PORTA
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00EB   1000           00433         bcf STATUS,RP0          ; страница 0
+                      00434 
+                      00435                         ; уст нач знач пеpеменных вpемени
+00EC                  00436 settr   
+00EC   0196           00437         clrf t1hour     ; часы стартуют с показаниями 00-00-00
+00ED   0195           00438         clrf t1min
+00EE   0194           00439         clrf t1sec
+00EF   0193           00440         clrf t50ms
+00F0   0199           00441         clrf flag
+Error[113]  : Symbol not previously defined (PORTA)
+00F1   0180           00442         clrf PORTA
+Error[113]  : Symbol not previously defined (PORTB)
+00F2   0180           00443         clrf PORTB
+00F3   30A0           00444         movlw b'10100000'       ; pазpешение общих и таймеpных пpеpываний
+Error[113]  : Symbol not previously defined (INTCON)
+00F4   0080           00445         movwf INTCON
+00F5   0008           00446         return
+                      00447 
+                      00448 ;====   interrupt program    ====
+                      00449 ;==== обpаботчик пpеpываний  ====
+                      00450 ;
+                      00451 ; Введена коррекция времени
+                      00452 
+00F6                  00453 interrupt
+Error[113]  : Symbol not previously defined (INTCON)
+Error[113]  : Symbol not previously defined (T0IF)
+00F6   1000           00454         bcf INTCON,T0IF         ; очистка флага пpеpывания !вpучную!
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00F7   1C00           00455         btfss STATUS,RP0        ; какая страница была перед прерыванием?
+00F8   2???           00456         goto bank0
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+00F9   1000           00457         bcf STATUS,RP0  ; для отработки прерывания - в 0-ую страницу
+00FA   1499           00458         bsf _bank       ; запомним, что была страница 1
+00FB   2???           00459         goto c_pr
+00FC   1099           00460 bank0   bcf _bank       ; сбрасываем флаг (будет проверка при выходе)   
+00FD   0097           00461 c_pr    movwf push_W    ; сохpанение "W"
+00FE   0E97           00462         swapf push_W,f
+Error[113]  : Symbol not previously defined (STATUS)
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00FF   0E00           00463         swapf STATUS,w
+0100   0098           00464         movwf push_S ; сохpанение флагов STATUS (поменяны тетрады)
+0101   303D           00465         movlw   d'61'; коэффициент деления 256-61=195 (х256=49920)
+Error[113]  : Symbol not previously defined (TMR0)
+0102   0080           00466         movwf   TMR0 ; для кваpца 4 МГц
+0103   0A93           00467         incf t50ms,f
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (t50ms)
+0103   0A93           00468         cmp t50ms,d'20' ; 20 раз по 50 мСек = 1 секунда
+Warning[207]: Found label after column 1. (sz)
+Error[116]  : Address label duplicated or different in second pass (sz)
+0104                  00469         sz
+0104   2???           00470         goto ret_pr
+0105   0193           00471         clrf t50ms      ; насчитали секунду
+0106   0A94           00472         incf t1sec,f
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (t1sec)
+0106   0A94           00473         cmp t1sec,d'60' ; минута прошла?
+Warning[207]: Found label after column 1. (sz)
+Error[116]  : Address label duplicated or different in second pass (sz)
+0107                  00474         sz
+0107   2???           00475         goto ret_pr
+0108   0194           00476         clrf t1sec
+Warning[207]: Found label after column 1. (mvi)
+Error[122]  : Illegal opcode (t50ms)
+0108   0194           00477         mvi t50ms,d'254'; КОРРЕКЦИЯ ОТ "бегут" каждую минуту
+0109   0A95           00478         incf t1min,f
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (t1min)
+0109   0A95           00479         cmp t1min,d'60' ; час прошел?
+Warning[207]: Found label after column 1. (sz)
+Error[116]  : Address label duplicated or different in second pass (sz)
+010A                  00480         sz
+010A   2???           00481         goto ret_pr
+010B   0195           00482         clrf t1min
+                      00483 ; Дополнительная коррекция каждый час  (здесь - убираем отставаеие)
+                      00484 ; т.е. каждый час подводим часы чут-чуть вперед
+Warning[207]: Found label after column 1. (mvi)
+Error[122]  : Illegal opcode (t1sec)
+                      00485         mvi t1sec,1     ; подводим вперед на 1 секунду и...
+Warning[207]: Found label after column 1. (mvi)
+Error[122]  : Illegal opcode (t50ms)
+                      00486         mvi t50ms,d'3'  ; ...подводим вперед еще немного
+010C   0A96           00487         incf t1hour,f
+Warning[207]: Found label after column 1. (cmp)
+Error[122]  : Illegal opcode (t1hour)
+010C   0A96           00488         cmp t1hour,d'24'        ; сутки прошли?
+Warning[207]: Found label after column 1. (sz)
+Error[116]  : Address label duplicated or different in second pass (sz)
+010D                  00489         sz
+010D   2???           00490         goto ret_pr
+010E   0196           00491         clrf t1hour
+010F   1419           00492 ret_pr  bsf _int        ; установили флаг "было пpеpывание"
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0110   0E18           00493         swapf push_S,w  ; восстановили STATUS
+Error[113]  : Symbol not previously defined (STATUS)
+0111   0080           00494         movwf STATUS    ; при сохран тетрады были также обменяны
+0112   0E17           00495         swapf push_W,w  ; восстановили W
+0113   1899           00496         btfsc _bank     ; Проверяем, какая страница была перед прерыванием
+Error[113]  : Symbol not previously defined (STATUS)
+Error[113]  : Symbol not previously defined (RP0)
+0114   1400           00497         bsf STATUS,RP0
+0115   0009           00498         retfie
+                      00499 
+                      00500 
+                      00501 ;*********************************************************************
+                      00502 ;              8 Bit binary ---> 3  BCD Number.
+                      00503 ;*********************************************************************
+                      00504 ; преобразуем W в десятичный код
+                      00505 ;       на выходе 
+                      00506 ; rab1 - сотни, rab2 - десятки, rab3 - единицы, W - единицы тоже
+0116                  00507 bcd
+0116   018C           00508         clrf rab1       ; сотни
+0117   018D           00509         clrf rab2       ; десятки
+0118   008E           00510         movwf rab3      ; единицы
+0119   3064           00511 ghun    movlw .100
+011A   020E           00512         subwf rab3,w
+Error[113]  : Symbol not previously defined (STATUS)
+011B   1C00           00513         btfss STATUS,0  ; CARRY
+011C   2???           00514         goto gten
+011D   008E           00515         movwf rab3      ; остаток в R2
+011E   0A8C           00516         incf rab1,f     ; сотни
+011F   2???           00517         goto ghun
+0120   300A           00518 gten    movlw .10
+0121   020E           00519         subwf rab3,w
+Error[113]  : Symbol not previously defined (STATUS)
+0122   1C00           00520         btfss STATUS,0  ; CARRY
+0123   2???           00521         goto over
+0124   008E           00522         movwf rab3      ; остаток в R2
+0125   0A8D           00523         incf rab2,f     ; десятки
+0126   2???           00524         goto gten
+0127   080E           00525 over    movf rab3,w     ; дублируем единицы из R2 в W
+0128   0008           00526         return
+                      00527 
+3FF9                  00528         END
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+Char                              00000012
+E                                 00000001
+LCD_CNTL                          00000000
+LCD_CNTL_TRIS                     FFFFFF80
+LCD_DATA                          00000000
+LCD_DATA_TRIS                     FFFFFF80
+LCD_Init                          000000B2
+RS                                00000003
+R_W                               00000002
+START                             00000006
+Send_Char                         0000006D
+Send_Cmd                          00000080
+Table                             00000005
+Temp                              00000011
+Wait_Busy                         00000093
+_.org_1_00AD                      000000AD
+_.org_1_00AE                      000000AE
+_.org_1_00AF                      000000AF
+_.org_1_00B0                      000000B0
+__16F877                          00000001
+_bank                             flag,1
+_int                              flag,0
+bank0                             000000FC
+bcd                               00000116
+c_pr                              000000FD
+combm                             0000002E
+d1m                               000000DA
+del10mks                          000000AD
+delay10                           000000D7
+delay100                          000000D1
+delay15                           000000D6
+delay20                           000000D5
+delay40                           000000D4
+delay5                            000000D8
+delay60                           000000D3
+delay80                           000000D2
+dll                               000000E0
+flag                              00000019
+ghun                              00000119
+gten                              00000120
+init_reg                          000000E4
+interrupt                         000000F6
+long                              00000010
+mgr                               0000002A
+over                              00000127
+place                             00000004
+prod                              00000020
+push_S                            00000018
+push_W                            00000017
+rab1                              0000000C
+rab2                              0000000D
+rab3                              0000000E
+rab4                              0000000F
+MPASM 5.75                       LCD_PIC.ASM   9-30-2017  22:56:13         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+rab5                              00000010
+ret_pr                            0000010F
+sc                                00000026
+sch_b                             00000047
+schar                             0000006D
+scmd                              00000080
+settr                             000000EC
+str1                              00000025
+string                            00000013
+sz                                0000001D
+t1hour                            00000016
+t1min                             00000015
+t1sec                             00000014
+t50ms                             00000013
+time                              0000004D
+
+Errors   :    70
+Warnings :    19 reported,     0 suppressed
+Messages :     6 reported,     0 suppressed
+
+

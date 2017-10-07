@@ -1,0 +1,10 @@
+Warning[205] F:\VOR\LAB4\FISH2_4.ASM 2 : Found directive in column 1. (include)
+Warning[205] F:\VOR\LAB4\FISH2_4.ASM 3 : Found directive in column 1. (errorlevel)
+Warning[211] F:\VOR\LAB4\FISH2_4.ASM 304 : Extraneous arguments on the line.
+Warning[211] F:\VOR\LAB4\FISH2_4.ASM 311 : Extraneous arguments on the line.
+Message[305] F:\VOR\LAB4\FISH2_4.ASM 361 : Using default destination of 1 (file).
+Warning[211] F:\VOR\LAB4\FISH2_4.ASM 420 : Extraneous arguments on the line.
+Warning[211] F:\VOR\LAB4\FISH2_4.ASM 430 : Extraneous arguments on the line.
+Warning[211] F:\VOR\LAB4\FISH2_4.ASM 481 : Extraneous arguments on the line.
+Warning[211] F:\VOR\LAB4\FISH2_4.ASM 503 : Extraneous arguments on the line.
+Warning[205] F:\VOR\LAB4\FISH2_4.ASM 582 : Found directive in column 1. (end)
