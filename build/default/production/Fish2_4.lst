@@ -1,4 +1,4 @@
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  1
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ Warning[205]: Found directive in column 1. (errorlevel)
                       00039         ;ние которых приведено в комментариях
   0002                00040     constant   DS = .2
   0002                00041     constant   RST = .2
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  2
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -116,7 +116,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 000D   0087           00092     movwf TRISC
 000E   0089           00093     movwf TRISE
                       00094         ; конфигурирование  портов  В, С, Е
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  3
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -175,7 +175,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00145 ;при неподвижности видеопамяти относительно
                       00146 ;индикатора
 0031   300C           00147     movlw 0x0c
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  4
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +234,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00198 
 005B   3020           00199         movlw ' '
 005C   2???           00200         call write
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  5
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -293,7 +293,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0081   2???           00251         goto ten_clock
 0082   3032           00252         movlw 0x32                      ; if !=2
 0083   0631           00253         xorwf TIME_HH2, w;
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  6
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -352,7 +352,7 @@ Message[305]: Using default destination of 1 (file).
                       00302 ;которыми работает ПО, находятся в 0-ом бан-
                       00303 ;ке.
 00A2   3041           00304     movlw 'A'
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  7
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -411,7 +411,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00355 
                       00356 
 00C7                  00357 BD_Loop
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  8
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -470,7 +470,7 @@ Message[305]: Using default destination of 1 (file).
 00F1   2???           00407     goto exday
 00F2                  00408 friday          ;пятница
 00F2   3046           00409     movlw 'F'
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE  9
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -529,7 +529,7 @@ Warning[203]: Found opcode in column 1. (return)
                       00458     
 0119   1903           00459     btfsc STATUS,Z
 011A   2???           00460     goto col2
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 10
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -588,7 +588,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0140   0ABD           00511     incf Key3,F
 0141   1A05           00512     btfsc PORTA,4
 0142   0AC0           00513     incf Key6,F
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 11
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -610,7 +610,7 @@ Warning[203]: Found opcode in column 1. (goto)
 014B   0008           00526     return
 Warning[205]: Found directive in column 1. (end)
                       00527 end  ; конец программы
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 12
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 12
 
 
 SYMBOL TABLE
@@ -669,7 +669,7 @@ CHS1                              00000004
 CHS2                              00000005
 CKE                               00000006
 CKP                               00000004
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 13
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 13
 
 
 SYMBOL TABLE
@@ -728,7 +728,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BO                            00000000
 NOT_BOR                           00000000
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 14
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 14
 
 
 SYMBOL TABLE
@@ -787,7 +787,7 @@ RB2                               00000002
 RB3                               00000003
 RB4                               00000004
 RB5                               00000005
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 15
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 15
 
 
 SYMBOL TABLE
@@ -846,7 +846,7 @@ SSPCON                            00000014
 SSPCON2                           00000091
 SSPEN                             00000005
 SSPIE                             00000003
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 16
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 16
 
 
 SYMBOL TABLE
@@ -905,7 +905,7 @@ TRISA1                            00000001
 TRISA2                            00000002
 TRISA3                            00000003
 TRISA4                            00000004
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 17
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 17
 
 
 SYMBOL TABLE
@@ -964,7 +964,7 @@ Z                                 00000002
 _.org_0_014A                      0000014A
 _BODEN_OFF                        00003FBF
 _BODEN_ON                         00003FFF
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 18
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 18
 
 
 SYMBOL TABLE
@@ -1023,7 +1023,7 @@ friday                            000000F2
 monday                            000000D6
 saturday                          000000F9
 small_delay                       00000147
-MPASM 5.75                       FISH2_4.ASM   10-12-2017  22:09:13         PAGE 19
+MPASM 5.75                       FISH2_4.ASM   10-12-2017  23:55:02         PAGE 19
 
 
 SYMBOL TABLE

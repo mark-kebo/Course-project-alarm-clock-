@@ -503,7 +503,7 @@ col3
     andlw 0x38
     
     btfsc STATUS,Z
-    return
+    return	    ;hz
     movlw .250
     call small_delay
     
