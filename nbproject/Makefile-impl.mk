@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=KURS_VORDV.X
+PROJECTNAME=Course-project-alarm-clock-
 
 # Active Configuration
 DEFAULTCONF=default

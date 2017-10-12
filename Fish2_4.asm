@@ -24,18 +24,17 @@ DAY    	    equ	    0x36
 ALARM_HH1   equ	    0x37
 ALARM_HH2   equ	    0x38
 ALARM_MM1   equ	    0x39
-ALARM_MM2   equ	    0x40
-BUT1	    equ	    0x41
-BUT2	    equ	    0x42
-BUT3	    equ	    0x43
-BUT4	    equ	    0x44
-BUT5	    equ	    0x45
-BUT6	    equ	    0x46
-BUT7	    equ	    0x47
-BUT8	    equ	    0x48
-BUT9	    equ	    0x49
-NumPressKey equ	    0x50 
-Control     equ	    0x51 
+ALARM_MM2   equ	    0x3A
+Key1	    equ	    0x3B
+Key2	    equ	    0x3C
+Key3	    equ	    0x3D
+Key4	    equ	    0x3E
+Key5	    equ	    0x3F
+Key6	    equ	    0x40
+Key7	    equ	    0x41
+Key8	    equ	    0x42
+Key9	    equ	    0x43
+fCOUNTER1   equ     0x44
     ;вспомогательные  регистры,  назначе-
 	;ние которых приведено в комментариях
     constant   DS = .2
@@ -95,6 +94,10 @@ begin
 	; конфигурирование  портов  В, С, Е
     movlw b'11111000' 
     movwf TRISA 
+    movlw b'00000000'
+    movwf TRISD
+    movlw b'00001111'
+    movwf OPTION_REG
 	;конфигурирование  RD0  как  входа
 	;для  установки  на  нем  «1»  в  качестве
 	;исходного  состояния  интерфейса  «1-Wire»
@@ -102,17 +105,17 @@ begin
     bsf ADCON1,0x01 
     bsf ADCON1,0x02 
     bank0
-    clrf BUT1	 
-    clrf BUT2	    
-    clrf BUT3	    
-    clrf BUT4	    
-    clrf BUT5	   
-    clrf BUT6	    
-    clrf BUT7	   
-    clrf BUT8	   
-    clrf BUT9	    
+    clrf Key1	 
+    clrf Key2	    
+    clrf Key3	    
+    clrf Key4	    
+    clrf Key5	   
+    clrf Key6	    
+    clrf Key7	   
+    clrf Key8	   
+    clrf Key9	    
     clrf PORTC
-    clrf Control 
+    clrf PORTD
 ; подготовка к передаче команд на контроллер
 ;HD путем установки RC0=0
     movlw 0x01
@@ -168,6 +171,8 @@ begin
 	movwf	DAY
 
 START
+	call Keyboard
+
 	bcf PORTC, 0
 	movlw b'10000000'
 	call write
@@ -357,7 +362,6 @@ BD_Loop
     goto    BD_Loop
     return
 
-;==============================================
 DEC		addwf	PCL
 		goto monday
 		goto tuesday
@@ -426,5 +430,98 @@ sunday		;воскресенье
     call write
     exday
 return
+      
+    ;==============================================
+Keyboard
+    bcf STATUS, RP0
+    bcf STATUS, RP1
+    clrf Key1 
+    clrf Key2 
+    clrf Key3
+    clrf Key4 
+    clrf Key5 
+    clrf Key6
+    clrf Key7 
+    clrf Key8 
+    clrf Key9
+    
+col1
+    bsf PORTA,0
+    bcf PORTA,1
+    bcf PORTA,2
+    
+    movlw .24
+    call small_delay
+    
+    movf PORTA,W
+    andlw 0x38
+    
+    btfsc STATUS,Z
+    goto col2
+    movlw .250
+    call small_delay
+    
+    btfsc PORTA,3
+    incf Key1,F
+    btfsc PORTA,4
+    incf Key4,F
+    btfsc PORTA,5
+    incf Key7,F
+    
+col2
+    bcf PORTA,0
+    bsf PORTA,1
+    bcf PORTA,2
+    
+    movlw .24
+    call small_delay
+    
+    movf PORTA,W
+    andlw 0x38
+    
+    btfsc STATUS,Z
+    goto col3
+    movlw .250
+    call small_delay
+    
+    btfsc PORTA,3
+    incf Key2,F
+    btfsc PORTA,4
+    incf Key5,F
+    btfsc PORTA,5
+    incf Key8,F
+    
+col3
+    bcf PORTA,0
+    bcf PORTA,1
+    bsf PORTA,2
+    
+    movlw .24
+    call small_delay
+    
+    movf PORTA,W
+    andlw 0x38
+    
+    btfsc STATUS,Z
+    return
+    movlw .250
+    call small_delay
+    
+    btfsc PORTA,3
+    incf Key3,F
+    btfsc PORTA,4
+    incf Key6,F
+    btfsc PORTA,5
+    incf Key9,F
+    return
+;==============================================
+    
 goto START
+  
+small_delay:
+    movwf fCOUNTER1
+    clrwdt
+    decfsz fCOUNTER1,F
+    goto $-2
+    return
 end  ; конец программы
