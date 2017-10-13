@@ -35,6 +35,17 @@ Key7	    equ	    0x41
 Key8	    equ	    0x42
 Key9	    equ	    0x43
 fCOUNTER1   equ     0x44
+TEMP_TIME_HH1    equ	    0x45
+TEMP_TIME_HH2    equ	    0x46
+TEMP_TIME_MM1    equ	    0x47
+TEMP_TIME_MM2    equ	    0x48
+TEMP_TIME_SS1    equ	    0x49
+TEMP_TIME_SS2    equ	    0x4A
+TEMP_DAY    	 equ	    0x4B
+TEMP_ALARM_HH1   equ	    0x4C
+TEMP_ALARM_HH2   equ	    0x4D
+TEMP_ALARM_MM1   equ	    0x4E
+TEMP_ALARM_MM2   equ	    0x4F
     ;вспомогательные  регистры,  назначе-
 	;ние которых приведено в комментариях
     constant   DS = .2
@@ -156,7 +167,7 @@ begin
 	movwf	TIME_HH1
 	movlw 	0x32
 	movwf	TIME_HH2
-	movlw 	0x39
+	movlw 	0x30
 	movwf	TIME_MM1
 	movlw 	0x35
 	movwf	TIME_MM2
@@ -167,12 +178,26 @@ begin
 	movwf	ALARM_HH2
 	movwf	ALARM_MM1
 	movwf	ALARM_MM2
+	movwf	TEMP_TIME_HH1
+	movwf	TEMP_TIME_HH2
+	movwf	TEMP_TIME_MM1
+	movwf	TEMP_TIME_MM2
+	movwf	TEMP_TIME_SS1
+	movwf	TEMP_TIME_SS2
+	movwf	TEMP_ALARM_HH1
+	movwf	TEMP_ALARM_HH2
+	movwf	TEMP_ALARM_MM1
+	movwf	TEMP_ALARM_MM2
 	movlw 	.0
 	movwf	DAY
+	movwf	TEMP_DAY
 
 START
 	call Keyboard
-
+	btfsc Key1,0
+	call change_time
+	
+	
 	bcf PORTC, 0
 	movlw b'10000000'
 	call write
@@ -361,6 +386,42 @@ BD_Loop
     decfsz  fCOUNTER2, f
     goto    BD_Loop
     return
+    
+    ;---------
+    change_time
+    call Keyboard
+    movlw 0xff
+    call delay ;задержка крч
+    movlw 0xff
+    call delay ;задержка крч
+    btfsc Key1,0
+    incf TEMP_TIME_HH2,1
+    btfsc Key4,0
+    goto START
+    
+    bcf PORTC, 0
+    movlw b'10000000'
+    call write
+    bsf PORTC,0
+	;Отрисовка первой строки
+    movfw TEMP_TIME_HH2
+    call write
+    movfw TEMP_TIME_HH1
+    call write
+    movlw ':'
+    call write
+    movfw TEMP_TIME_MM2
+    call write
+    movfw TEMP_TIME_MM1
+    call write
+    movlw ':'
+    call write
+    movfw TEMP_TIME_SS2
+    call write
+    movfw TEMP_TIME_SS1
+    call write
+    goto change_time
+    ;---------
 
 DEC		addwf	PCL
 		goto monday
@@ -450,16 +511,16 @@ col1
     bcf PORTA,1
     bcf PORTA,2
     
-    movlw .24
-    call small_delay
+    ;movlw .24
+    ;call small_delay
     
     movf PORTA,W
     andlw 0x38
     
     btfsc STATUS,Z
     goto col2
-    movlw .250
-    call small_delay
+    ;movlw .250
+    ;call small_delay
     
     btfsc PORTA,3
     incf Key1,F
@@ -473,16 +534,16 @@ col2
     bsf PORTA,1
     bcf PORTA,2
     
-    movlw .24
-    call small_delay
+    ;movlw .24
+    ;sd
     
     movf PORTA,W
     andlw 0x38
     
     btfsc STATUS,Z
     goto col3
-    movlw .250
-    call small_delay
+    ;movlw .250
+    ;sd
     
     btfsc PORTA,3
     incf Key2,F
@@ -496,16 +557,16 @@ col3
     bcf PORTA,1
     bsf PORTA,2
     
-    movlw .24
-    call small_delay
+    ;movlw .24
+    ;sd
     
     movf PORTA,W
     andlw 0x38
     
     btfsc STATUS,Z
     return	    ;hz
-    movlw .250
-    call small_delay
+    ;movlw .250
+    ;sd
     
     btfsc PORTA,3
     incf Key3,F
