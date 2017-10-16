@@ -1,76 +1,84 @@
 MPLINK 5.08, LINKER
-Linker Map File - Created Fri Oct 13 07:14:39 2017
+Linker Map File - Created Mon Oct 16 21:51:24 2017
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
-                   .org_0       code   0x000000    program   0x0002d6
-                   .cinit    romdata   0x00016b    program   0x000004
+                   .org_0       code   0x000000    program   0x00030a
+                   .cinit    romdata   0x000185    program   0x000004
 
 
 
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x00016c      
-            365 out of 8454 program addresses used, program memory utilization is 4%
+                            0x000000    0x000186      
+            391 out of 8454 program addresses used, program memory utilization is 4%
 
 
 
                               Symbols - Sorted by Name
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                  BD_Loop   0x0000d4    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                      DEC   0x0000f8    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                 Keyboard   0x000132    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    START   0x000051    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-             _.org_0_0169   0x000169    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    begin   0x000004    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-              change_time   0x0000da    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                     col1   0x00013d    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                     col2   0x00014a    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                     col3   0x000157    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    delay   0x0000d0    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                end_clock   0x0000a4    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    exday   0x000131    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                   friday   0x00011d    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                   monday   0x000101    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                 saturday   0x000124    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-              small_delay   0x000166    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                   sunday   0x00012b    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                ten_clock   0x00009d    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                 thursday   0x000116    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                  tuesday   0x000108    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                wednesday   0x00010f    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    write   0x0000c8    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
+                  BD_Loop   0x0000d6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                      DEC   0x0000fc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                 Keyboard   0x000136    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    START   0x000051    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+             _.org_0_0183   0x000183    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    begin   0x000004    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                change_H2   0x00017c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+              change_time   0x0000dc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                     col1   0x000141    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                     col2   0x00014e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                     col3   0x00015b    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+               correct_H2   0x00016e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+           correct_T_plus   0x000169    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    delay   0x0000d2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                end_clock   0x0000a6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    exday   0x000135    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   friday   0x000121    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   monday   0x000105    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                 saturday   0x000128    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   save_T   0x000176    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+              small_delay   0x000180    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   sunday   0x00012f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                ten_clock   0x00009f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                 thursday   0x00011a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                  tuesday   0x00010c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                wednesday   0x000113    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    write   0x0000ca    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
 
 
 
                               Symbols - Sorted by Address
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                    begin   0x000004    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    START   0x000051    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                ten_clock   0x00009d    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                end_clock   0x0000a4    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    write   0x0000c8    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    delay   0x0000d0    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                  BD_Loop   0x0000d4    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-              change_time   0x0000da    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                      DEC   0x0000f8    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                   monday   0x000101    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                  tuesday   0x000108    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                wednesday   0x00010f    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                 thursday   0x000116    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                   friday   0x00011d    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                 saturday   0x000124    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                   sunday   0x00012b    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                    exday   0x000131    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                 Keyboard   0x000132    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                     col1   0x00013d    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                     col2   0x00014a    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-                     col3   0x000157    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-              small_delay   0x000166    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
-             _.org_0_0169   0x000169    program     static F:\Course-project-alarm-clock-\Fish2_4.asm
+                    begin   0x000004    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    START   0x000051    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                ten_clock   0x00009f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                end_clock   0x0000a6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    write   0x0000ca    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    delay   0x0000d2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                  BD_Loop   0x0000d6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+              change_time   0x0000dc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                      DEC   0x0000fc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   monday   0x000105    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                  tuesday   0x00010c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                wednesday   0x000113    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                 thursday   0x00011a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   friday   0x000121    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                 saturday   0x000128    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   sunday   0x00012f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                    exday   0x000135    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                 Keyboard   0x000136    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                     col1   0x000141    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                     col2   0x00014e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                     col3   0x00015b    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+           correct_T_plus   0x000169    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+               correct_H2   0x00016e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                   save_T   0x000176    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+                change_H2   0x00017c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+              small_delay   0x000180    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
+             _.org_0_0183   0x000183    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\Fish2_4.asm
 
 

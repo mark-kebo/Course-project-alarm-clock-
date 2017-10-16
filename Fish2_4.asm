@@ -46,6 +46,7 @@ TEMP_ALARM_HH1   equ	    0x4C
 TEMP_ALARM_HH2   equ	    0x4D
 TEMP_ALARM_MM1   equ	    0x4E
 TEMP_ALARM_MM2   equ	    0x4F
+NumPressKey	 equ	    0x50
     ;вспомогательные  регистры,  назначе-
 	;ние которых приведено в комментариях
     constant   DS = .2
@@ -187,12 +188,14 @@ begin
 	movwf	TEMP_ALARM_HH1
 	movwf	TEMP_ALARM_HH2
 	movwf	TEMP_ALARM_MM1
-	movwf	TEMP_ALARM_MM2
+	movwf	TEMP_ALARM_MM2 
 	movlw 	.0
 	movwf	DAY
 	movwf	TEMP_DAY
 
 START
+	movlw 	0x30
+	movwf	NumPressKey
 	call Keyboard
 	btfsc Key1,0
 	call change_time
@@ -388,14 +391,16 @@ BD_Loop
     return
     
     ;---------
-    change_time
+change_time
     call Keyboard
     movlw 0xff
     call delay ;задержка крч
     movlw 0xff
     call delay ;задержка крч
     btfsc Key1,0
-    incf TEMP_TIME_HH2,1
+    call correct_T_plus  ;если нажали кнопку 1 переходим в настройку времени (inc)
+    btfsc Key3,0
+    goto save_T		 ;сохранение и переход к другой цифре путем инкремента NPK
     btfsc Key4,0
     goto START
     
@@ -576,9 +581,37 @@ col3
     incf Key9,F
     return
 ;==============================================
+correct_T_plus
+    movlw 0x30			; если количество нажатий 0, то инкрементируем
+    xorwf NumPressKey, w;	; временную переменную Н2,
+    btfsc STATUS, 0x02		; и проводим проверку на != 3 этой переменной
+    call correct_H2
+    return
     
-goto START
-  
+correct_H2
+    incf TEMP_TIME_HH2,1
+    movlw 0x33			; if !=3
+    xorwf TEMP_TIME_HH2, w;
+    btfss STATUS, 0x02
+    return
+    movlw 	0x30
+    movwf	TEMP_TIME_HH2
+    return
+
+save_T
+    movlw 0x30			; записываем значение временной переменной в постоянную (NPK 
+    xorwf NumPressKey, w	; необходим для определения ячейки, в которую записываем
+    btfsc STATUS, 0x02		; значение)
+    call change_H2
+    incf NumPressKey,1		; NPK инкрементируем
+    goto START
+    
+change_H2
+    movfw TEMP_TIME_HH2
+    movwf TIME_HH2
+    return
+    
+    goto START  
 small_delay:
     movwf fCOUNTER1
     clrwdt
