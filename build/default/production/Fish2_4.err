@@ -2,8 +2,8 @@ Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 2 : Found directive in c
 Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 3 : Found directive in column 1. (errorlevel)
 Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 294 : Found label after column 1. (ten_clock)
 Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 299 : Using default destination of 1 (file).
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 433 : Using default destination of 1 (file).
-Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 499 : Found label after column 1. (exday)
-Warning[203] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 500 : Found opcode in column 1. (return)
-Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 531 : Found label after column 1. (col2)
-Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 800 : Found directive in column 1. (end)
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 428 : Using default destination of 1 (file).
+Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 494 : Found label after column 1. (exday)
+Warning[203] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 495 : Found opcode in column 1. (return)
+Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 574 : Found label after column 1. (col2)
+Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\FISH2_4.ASM 855 : Found directive in column 1. (end)

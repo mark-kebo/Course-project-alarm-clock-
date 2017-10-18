@@ -195,9 +195,9 @@ START
 	movwf	TEMP_DAY
 	call Keyboard		; читаем клавиатуру
 	btfsc Key1,0		; проверка нажатия клавиши "1",  если нажата, то переходим 
-	call change_time	; к изменению времени, нет - тогда проверяем клавишу 2
+	goto change_time	; к изменению времени, нет - тогда проверяем клавишу 2
 	btfsc Key2,0		; проверка нажатия клавиши "2",  если нажата, то переходим 
-	call change_day		; к изменению дня недели, нет - тогда проверяем клавишу 3
+	goto change_day		; к изменению дня недели, нет - тогда проверяем клавишу 3
 	
 	bcf PORTC, 0
 	movlw b'10000000'	; установка адреса
@@ -390,10 +390,6 @@ BD_Loop
 			    ;==============================================
 change_time		    ; функция изменения времени
     call Keyboard	    ; спрашиваем клавиатуру
-    movlw 0xff
-    call delay		    ; задержка крч
-    movlw 0xff
-    call delay		    ; задержка крч
     btfsc Key1,0
     call correct_T_plus	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное число (inc)
     btfsc Key2,0
@@ -426,8 +422,7 @@ change_time		    ; функция изменения времени
     call write
     goto change_time
     
-change_day		    ; функция изменения дня недели
-    goto change_day
+
 			    ;==============================================
 			    ; Процедура типа switch для выбора дня недели
 DEC		addwf	PCL
@@ -498,7 +493,55 @@ sunday			    ;воскресенье
     call write
     exday
 return
-      
+    
+change_day		    ; функция изменения дня недели
+    call Keyboard
+    btfsc Key1,0
+    goto plus_day_ch	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное число (inc)
+    btfsc Key2,0
+    goto minus_day_ch	    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбранное число (dec)
+    btfsc Key4,0	    ; выход из настройки времени в основной цикл без сохранения результата
+    goto START
+    
+    bcf PORTC, 0
+    movlw b'10001010'	; установка адреса
+    call write
+    bsf PORTC,0
+
+	;Отрисовка первой строки
+    movfw	TEMP_DAY				
+    call	DEC
+    
+    goto change_day
+    
+plus_day_ch
+    movlw 0xff
+    call delay		    ; задержка крч
+    movlw 0xff
+    call delay		    ; задержка крч
+    incf    TEMP_DAY,1
+    movlw 	.7			; inc переменной День
+    xorwf TEMP_DAY, w;
+    btfss STATUS, 0x02		; is not working 
+    goto change_day			; 
+    movlw 	.0
+    movwf	TEMP_DAY
+    goto change_day
+    
+minus_day_ch
+    movlw 0xff
+    call delay		    ; задержка крч
+    movlw 0xff
+    call delay		    ; задержка крч
+    incf    TEMP_DAY,1
+    movlw 	.0			; inc переменной День
+    xorwf TEMP_DAY, w;
+    btfss STATUS, 0x02		; is not working 
+    goto change_day			
+    movlw 	.6
+    movwf	TEMP_DAY
+    goto change_day
+    
 			    ;==============================================
 Keyboard		    ; драйвер клавиатуры для клавиш 1-4
     bcf STATUS, RP0	    ; переход в нулевой банк, для нормального вызова функции из тела программы
@@ -560,6 +603,10 @@ col3		    ; сканируем третий столбец, где нам нужна клавиша 3
     
 			    ;==============================================
 correct_T_plus			; функция типа switch для ввода отдельных символов(инкремент или прибавление)
+    movlw 0xff
+    call delay		    ; задержка крч
+    movlw 0xff
+    call delay		    ; задержка крч			    
     movlw 0x30			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
@@ -662,6 +709,10 @@ correct_S1			; функцию коррекции переменной S1.
     return
     
 correct_T_minus			; функция типа switch для ввода отдельных символов(декремент)
+    movlw 0xff
+    call delay		    ; задержка крч
+    movlw 0xff
+    call delay		    ; задержка крч
     movlw 0x30			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
@@ -765,6 +816,10 @@ correct_S1_minus			; функцию коррекции переменной S1.
     
     
 save_T				; функция проверки и сохранения времени
+    movlw 0xff
+    call delay		    ; задержка крч
+    movlw 0xff
+    call delay		    ; задержка крч
     movlw 0x36			; если происходит переполнение NumPressKey
     xorwf NumPressKey, w	; значит время заданно корректно во всех ячейках
     btfsc STATUS, 0x02		; и мы переходим в функцию записи переменных значений
