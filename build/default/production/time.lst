@@ -1,0 +1,2482 @@
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001     #include "main.asm"
+                      00001 ;*******************************************************************************
+                      00002 ;                                                                              *
+                      00003 ;    Filename:  ALARM CLOCK                                                    *
+                      00004 ;    Date:      19.10.17                                                       *
+                      00005 ;    File Version:   1.4.2                                                     *
+                      00006 ;    Author:         Dmitry Vorozhbicky                                        *
+                      00007 ;    Company:        GrSU                                                      *
+                      00008 ;                                                                              *
+                      00009 ;*******************************************************************************  
+                      00010 ;processor    PIC16F877
+Warning[205]: Found directive in column 1. (include)
+                      00011 include  <P16F877.INC>
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Jul 02 2017
+                      00005 ;  MPASM PIC16F877 processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00541         LIST
+Warning[205]: Found directive in column 1. (errorlevel)
+                      00012 errorlevel   -302
+                      00013         ;  директивы  типа  контроллера,  под-
+                      00014         ;ключения  заголовочного  файла  и  вы-
+                      00015         ;вода сообщений об ошибках
+                      00016 #define   bank0  bcf STATUS,  RP0
+                      00017 #define   bank1  bsf STATUS,  RP0
+                      00018 ; директивы, позволяющие заменять в
+                      00019         ;теле  ПО  команды,  указанные  после
+                      00020         ;этой  директивы  (bcf  ,  bsf)  –  метками
+                      00021         ;bank0, bank1. Обратную замену произ-
+                      00022         ;водит компилятор
+  00000020            00023 WAIT                equ     0x20
+  00000026            00024 fCOUNTER            equ     0x26
+  00000027            00025 fCOUNTER2           equ     0x27
+  00000030            00026 TIME_HH1            equ     0x30
+  00000031            00027 TIME_HH2            equ     0x31
+  00000032            00028 TIME_MM1            equ     0x32
+  00000033            00029 TIME_MM2            equ     0x33
+  00000034            00030 TIME_SS1            equ     0x34
+  00000035            00031 TIME_SS2            equ     0x35
+  00000036            00032 DAY                 equ     0x36
+  00000037            00033 ALARM_HH1           equ     0x37
+  00000038            00034 ALARM_HH2           equ     0x38
+  00000039            00035 ALARM_MM1           equ     0x39
+  0000003A            00036 ALARM_MM2           equ     0x3A
+  0000003B            00037 Key1                equ     0x3B
+  0000003C            00038 Key2                equ     0x3C
+  0000003D            00039 Key3                equ     0x3D
+  0000003E            00040 Key4                equ     0x3E
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  0000003F            00041 Key5                equ     0x3F
+  00000040            00042 Key6                equ     0x40
+  00000041            00043 Key7                equ     0x41
+  00000042            00044 Key8                equ     0x42
+  00000043            00045 Key9                equ     0x43
+  00000044            00046 fCOUNTER1           equ     0x44
+  00000045            00047 TEMP_TIME_HH1       equ     0x45
+  00000046            00048 TEMP_TIME_HH2       equ     0x46
+  00000047            00049 TEMP_TIME_MM1       equ     0x47
+  00000048            00050 TEMP_TIME_MM2       equ     0x48
+  00000049            00051 TEMP_TIME_SS1       equ     0x49
+  0000004A            00052 TEMP_TIME_SS2       equ     0x4A
+  0000004B            00053 TEMP_DAY            equ     0x4B
+  0000004C            00054 TEMP_ALARM_HH1      equ     0x4C
+  0000004D            00055 TEMP_ALARM_HH2      equ     0x4D
+  0000004E            00056 TEMP_ALARM_MM1      equ     0x4E
+  0000004F            00057 TEMP_ALARM_MM2      equ     0x4F
+  00000050            00058 NumPressKey         equ     0x50
+  00000051            00059 Blink               equ     0x51
+                      00060     ;вспомогательные  регистры,  назначе-
+                      00061         ;ние которых приведено в комментариях
+  0002                00062     constant   DS = .2
+  0002                00063     constant   RST = .2
+                      00064         ;  директивы,  ставящие в  соответствие
+                      00065         ;меткам DS  и  RST  значение  0.  Анало-
+                      00066         ;гия директив equ для имен регистров.
+                      00067 
+                      00068 wait  macro     time
+                      00069     movlw    (time/5)-1
+                      00070     movwf    WAIT
+                      00071     call    wait5u
+                      00072     endm
+                      00073         ;макрос паузы с именем wait. Особен-
+                      00074         ;ность этого макроса состоит в том, что
+                      00075         ;у  него  имеется  параметр  –  time.  При
+                      00076         ;вызове  макроса  значение  параметра
+                      00077         ;указывается  после  имени  макроса  в
+                      00078         ;виде  целого  десятичного  числа  крат-
+                      00079         ;ного  5  (в  данном  примере).  В  теле
+                      00080         ;макроса  это  число  подставляется  в
+                      00081         ;«переменную» time и далее использу-
+                      00082         ;ется вычисленное значение (которое в
+                      00083         ;данном случае  выступает  в  роли  кон-
+                      00084         ;станты, записываемой в W). Вместе с
+                      00085         ;процедурой  wait5u  длительность  за-
+                      00086         ;держки,  обеспечиваемая  макросом
+                      00087         ;равна time микросекунд
+                      00088 
+                      00089     org 0x0000
+0000   0183           00090     clrf STATUS
+0001   3000           00091     movlw 0x00
+0002   008A           00092     movwf PCLATH
+0003   2???           00093     goto begin
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00094         ;выбор нулевой страницы памяти ко-
+                      00095         ;манд и размещение на ней откомпили-
+                      00096         ;рованного кода
+                      00097 
+0004                  00098 begin
+0004   1683           00099     bank1  ; выбор первого банка памяти. Для вы-
+                      00100         ;зова используется метка bank1, объяв-
+                      00101         ;ленная выше директивой #define
+0005   308F           00102     movlw 0x8F
+0006   0081           00103     movwf OPTION_REG
+0007   0064           00104     clrwdt
+                      00105         ;установка  максимального  времени
+                      00106         ;срабатывания  сторожевого  таймера  и
+                      00107         ;его сброс
+0008   018B           00108     clrf INTCON
+0009   018C           00109     clrf PIE1
+000A   018D           00110     clrf PIE2
+                      00111         ;отключение  прерываний  и  их  обработки
+000B   3000           00112     movlw .0
+000C   0086           00113     movwf TRISB
+000D   0087           00114     movwf TRISC
+000E   0089           00115     movwf TRISE
+                      00116         ; конфигурирование  портов  В, С, Е
+000F   30F8           00117     movlw b'11111000' 
+0010   0085           00118     movwf TRISA 
+0011   3000           00119     movlw b'00000000'
+0012   0088           00120     movwf TRISD
+0013   300F           00121     movlw b'00001111'
+0014   0081           00122     movwf OPTION_REG
+                      00123         ;конфигурирование  RD0  как  входа
+                      00124         ;для  установки  на  нем  «1»  в  качестве
+                      00125         ;исходного  состояния  интерфейса  «1-Wire»
+0015   019F           00126     clrf ADCON1 
+0016   149F           00127     bsf ADCON1,0x01 
+0017   151F           00128     bsf ADCON1,0x02 
+0018   1283           00129     bank0
+0019   01BB           00130     clrf Key1    
+001A   01BC           00131     clrf Key2       
+001B   01BD           00132     clrf Key3       
+001C   01BE           00133     clrf Key4              
+001D   01C3           00134     clrf Key9               
+001E   0187           00135     clrf PORTC
+001F   0188           00136     clrf PORTD
+                      00137 ; подготовка к передаче команд на контроллер
+                      00138 ;HD путем установки RC0=0
+0020   3001           00139     movlw 0x01
+0021   2???           00140     call write
+0022   300F           00141     movlw 0x0f
+0023   2???           00142     call delay
+                      00143 ; передача команды Clear  Display для очистки
+                      00144 ;дисплея и установки счетчика адреса видеопа-
+                      00145 ;мяти  на  нулевой  адрес  (первое  знакоместо  в
+                      00146 ;верхней строке), с необходимой задержкой
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0024   0064           00147     clrwdt
+0025   3038           00148     movlw 0x38
+0026   2???           00149     call write
+0027   300F           00150     movlw 0x0f
+0028   2???           00151     call delay
+                      00152 
+                      00153 ; передача команды Function Set для установки
+                      00154 ;режима  2-х  строчного  индикатора,  размера
+                      00155 ;знакоместа 5х7 и 8 разрядной шины данных
+0029   3006           00156     movlw 0x06
+002A   2???           00157     call write
+002B   300F           00158     movlw 0x0f
+002C   2???           00159     call delay
+                      00160 ;передача  команды  Entry  Mode  Set  для  уста-
+                      00161 ;новки режима увеличения счетчика адреса ви-
+                      00162 ;деопамяти, после каждой записи символа в нее,
+                      00163 ;при неподвижности видеопамяти относительно
+                      00164 ;индикатора
+002D   300C           00165     movlw 0x0c
+002E   2???           00166     call write
+002F   300F           00167     movlw 0x0f
+0030   2???           00168     call delay
+                      00169 ;  передача  команды  Display  ON/OFF  control
+                      00170 ;для включения дисплея с отключенным курсо-
+                      00171 ;ром.  На  этом  этап инициализации дисплея за-
+                      00172 ;кончен.
+0031   3030           00173     movlw       0x30
+0032   00B0           00174     movwf       TIME_HH1
+0033   00B1           00175     movwf       TIME_HH2
+0034   00B2           00176     movwf       TIME_MM1
+0035   00B3           00177     movwf       TIME_MM2
+0036   00B4           00178     movwf       TIME_SS1
+0037   00B5           00179     movwf       TIME_SS2
+0038   00B7           00180     movwf       ALARM_HH1
+0039   00B8           00181     movwf       ALARM_HH2
+003A   00B9           00182     movwf       ALARM_MM1
+003B   00BA           00183     movwf       ALARM_MM2
+003C   3000           00184     movlw       .0
+003D   00B6           00185     movwf       DAY
+003E   3000           00186     movlw       b'00000000'
+003F   00D1           00187     movwf       Blink
+                      00188 
+0040                  00189 START
+0040   0831           00190     movfw TIME_HH2              ; записываем значения постоянныx переменных в  временныe 
+0041   00C6           00191     movwf TEMP_TIME_HH2         
+0042   0830           00192     movfw TIME_HH1              
+0043   00C5           00193     movwf TEMP_TIME_HH1
+0044   0833           00194     movfw TIME_MM2              
+0045   00C8           00195     movwf TEMP_TIME_MM2
+0046   0832           00196     movfw TIME_MM1              
+0047   00C7           00197     movwf TEMP_TIME_MM1
+0048   0835           00198     movfw TIME_SS2              
+0049   00CA           00199     movwf TEMP_TIME_SS2
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+004A   0834           00200     movfw TIME_SS1              
+004B   00C9           00201     movwf TEMP_TIME_SS1
+004C   0836           00202     movfw DAY
+004D   00CB           00203     movwf TEMP_DAY
+004E   3030           00204     movlw 0x30
+004F   00D0           00205     movwf NumPressKey           ; NPK каждый раз устанавливаем в начальное значение
+                      00206     
+0050   2???           00207     call Keyboard               ; читаем клавиатуру
+0051   183B           00208     btfsc Key1,0                ; проверка нажатия клавиши "1",  если нажата, то переходим 
+Error[113]  : Symbol not previously defined (change_time)
+0052   2800           00209     goto change_time            ; к изменению времени, нет - тогда проверяем клавишу 2
+0053   183C           00210     btfsc Key2,0                ; проверка нажатия клавиши "2",  если нажата, то переходим 
+0054   2???           00211     goto change_day             ; к изменению дня недели, нет - тогда проверяем клавишу 3
+                      00212         
+0055   2???           00213     call LCD_one                ;Отрисовка первой строки                
+                      00214 
+                      00215         ;Счет десятков секунд (0-6) - TIME_SS1
+0056   0AB4           00216     incf TIME_SS1,1
+0057   303A           00217     movlw 0x3A                  ; if !=10
+0058   0634           00218     xorwf TIME_SS1, w;
+0059   1D03           00219     btfss STATUS, 0x02
+005A   2???           00220     goto end_clock
+                      00221         ;обнуление TIME_MM1
+005B   3030           00222     movlw 0x30
+005C   00B4           00223     movwf       TIME_SS1
+                      00224 
+                      00225         ;Счет десятков секунд (0-6) - TIME_SS2
+005D   0AB5           00226     incf TIME_SS2,1
+005E   3036           00227     movlw 0x36                  ; if !=6
+005F   0635           00228     xorwf TIME_SS2, w;
+0060   1D03           00229     btfss STATUS, 0x02
+0061   2???           00230     goto end_clock
+                      00231         ;обнуление TIME_MM2
+0062   3030           00232     movlw 0x30
+0063   00B5           00233     movwf       TIME_SS2
+                      00234         
+                      00235         ;Счет десятков минут (0-6) - TIME_MM1
+0064   0AB2           00236     incf TIME_MM1,1
+0065   303A           00237     movlw 0x3A                  ; if !=10
+0066   0632           00238     xorwf TIME_MM1, w;
+0067   1D03           00239     btfss STATUS, 0x02
+0068   2???           00240     goto end_clock
+                      00241         ;обнуление TIME_MM1
+0069   3030           00242     movlw 0x30
+006A   00B2           00243     movwf       TIME_MM1
+                      00244 
+                      00245         ;Счет десятков минут (0-6) - TIME_MM2
+006B   0AB3           00246     incf TIME_MM2,1
+006C   3036           00247     movlw 0x36                  ; if !=6
+006D   0633           00248     xorwf TIME_MM2, w;
+006E   1D03           00249     btfss STATUS, 0x02
+006F   2???           00250     goto end_clock
+                      00251         ;обнуление TIME_MM2
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0070   3030           00252     movlw 0x30
+0071   00B3           00253     movwf       TIME_MM2
+                      00254 
+                      00255         ;Счет десятков единиц часов - TIME_НН2, TIME_НН1
+0072   0AB0           00256     incf TIME_HH1,1
+0073   3034           00257     movlw 0x34                  ; if !=4
+0074   0630           00258     xorwf TIME_HH1, w;
+0075   1D03           00259     btfss STATUS, 0x02
+0076   2???           00260     goto ten_clock
+0077   3032           00261     movlw 0x32                  ; if !=2
+0078   0631           00262     xorwf TIME_HH2, w;
+0079   1D03           00263     btfss STATUS, 0x02
+007A   2???           00264     goto ten_clock
+007B   3030           00265     movlw 0x30
+007C   00B0           00266     movwf       TIME_HH1
+007D   00B1           00267     movwf       TIME_HH2
+007E   0AB6           00268     incf    DAY,1
+007F   3007           00269     movlw       .7                      ; inc переменной День
+0080   0636           00270     xorwf DAY, w;
+0081   1D03           00271     btfss STATUS, 0x02                  ; Обнуление переменной при достижении воскресенья, 
+0082   2???           00272     goto end_clock                      ; что бы при 00:00:00 перейти в понедельник
+0083   3000           00273     movlw       .0
+0084   00B6           00274     movwf       DAY
+                      00275 
+                      00276         
+0085                  00277 ten_clock
+0085   303A           00278     movlw 0x3A                  ; if !=10 
+0086   0630           00279     xorwf TIME_HH1, w;          ; подпрограмма для работы с форматом 24 часа
+0087   1D03           00280     btfss STATUS, 0x02          ; т.к. 18 часов может быть, а 28 нет, то надо
+0088   2???           00281     goto end_clock              ; ограничить единицы при десятках = 2
+Message[305]: Using default destination of 1 (file).
+0089   0AB1           00282     incf    TIME_HH2
+008A   3030           00283     movlw 0x30
+008B   00B0           00284     movwf       TIME_HH1
+                      00285         
+008C                  00286 end_clock
+008C   0064           00287     clrwdt
+                      00288 
+008D   30FF           00289     movlw 0xff
+008E   2???           00290     call delay ;задержка крч
+008F   30FF           00291     movlw 0xff
+0090   2???           00292     call delay ;задержка крч
+0091   30FF           00293     movlw 0xff
+0092   2???           00294     call delay ;задержка крч
+                      00295 
+0093   2???           00296     call LCD_two                ;Отрисовка второй строки
+                      00297     
+                      00298     ; ТУТ ОБРАБОТКА БУДИЛЬНИКА БУДЕТ
+                      00299     
+0094   2???           00300     goto START          ; конец основного цикла (должен быть = 1сек)
+                      00301 
+                      00302     ;--------------------------------------------------------
+                      00303     ;--------------------------------------------------------
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00304     ;--------------------------------------------------------
+                      00305     
+0095                  00306 write    ; процедура записи байта к контроллер HD
+0095   1303           00307     bcf STATUS, RP1
+0096   1283           00308     bcf STATUS, RP0
+0097   0086           00309     movwf PORTB
+0098   1507           00310     bsf PORTC, 2
+0099   3001           00311     movlw 0x01
+009A   2???           00312     call delay
+009B   1107           00313     bcf PORTC, 2
+009C   0008           00314     return
+                      00315     
+                      00316         ; перед вызовом этой процедуры в W помеща-
+                      00317         ;ется байт, который надо записать в HD. Далее
+                      00318         ;он передается в PORTB и формируется отрица-
+                      00319         ;тельный перепад на RC2, путем предваритель-
+                      00320         ;ной  его  установки  в  «1»,  удержания  этого
+                      00321         ;уровня в течение некоторого времени (опреде-
+                      00322         ;ляемого временем задержки delay  при  W=1) и
+                      00323         ;сброса его в «0».
+                      00324 
+                      00325         ;  процедура  задержки,  время  которой  можно
+                      00326         ;регулировать, задавая число в W
+009D                  00327 delay
+009D   1303           00328     bcf   STATUS, RP1
+009E   1283           00329     bcf   STATUS, RP0
+009F   00A7           00330     movwf   fCOUNTER2
+00A0   01A6           00331     clrf    fCOUNTER
+                      00332     
+00A1                  00333 BD_Loop
+00A1   0064           00334     clrwdt
+00A2   0BA6           00335     decfsz  fCOUNTER, f
+00A3   2???           00336     goto    BD_Loop
+00A4   0BA7           00337     decfsz  fCOUNTER2, f
+00A5   2???           00338     goto    BD_Loop
+00A6   0008           00339     return
+                      00340 
+                      00341     ;==========================================
+                      00342     
+00A7                  00343 LCD_one
+00A7   1007           00344     bcf PORTC, 0
+00A8   3080           00345     movlw b'10000000'   ; установка адреса
+00A9   2???           00346     call write
+00AA   1407           00347     bsf PORTC,0
+                      00348     ;Отрисовка первой строки
+                      00349     
+00AB   3030           00350     movlw 0x30                  ; если NumPressKey = 0, то вызываем
+00AC   0650           00351     xorwf NumPressKey, w;       
+00AD   1903           00352     btfsc STATUS, 0x02          
+00AE   0AD1           00353     incf Blink,1
+00AF   0831           00354     movfw TIME_HH2
+00B0   1851           00355     btfsc Blink, 0              
+00B1   3020           00356     movlw ' '
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00B2   0831           00357     movfw TIME_HH2
+00B3   2???           00358     call write
+                      00359     
+00B4   0830           00360     movfw TIME_HH1
+00B5   2???           00361     call write
+00B6   303A           00362     movlw ':'
+00B7   2???           00363     call write
+00B8   0833           00364     movfw TIME_MM2
+00B9   2???           00365     call write
+00BA   0832           00366     movfw TIME_MM1
+00BB   2???           00367     call write
+00BC   303A           00368     movlw ':'
+00BD   2???           00369     call write
+00BE   0835           00370     movfw TIME_SS2
+00BF   2???           00371     call write
+00C0   0834           00372     movfw TIME_SS1
+00C1   2???           00373     call write
+                      00374 
+00C2   3020           00375     movlw ' '
+00C3   2???           00376     call write
+00C4   3020           00377     movlw ' '
+00C5   2???           00378     call write
+00C6   0836           00379     movfw       DAY                             
+00C7   2???           00380     call        DEC
+00C8   0008           00381     return
+                      00382     
+                      00383     ;==========================================   
+                      00384     
+00C9                  00385 LCD_two
+00C9   1007           00386     bcf PORTC, 0
+00CA   30C4           00387     movlw b'11000100'
+00CB   2???           00388     call write
+                      00389 ; Установка RC0=0, для последующей передачи
+                      00390 ;команды  на  контроллер  HD.  Передается  ко-
+                      00391 ;манда Set DDRAM address,  устанавливающая
+                      00392 ;счетчик  адреса  видеопамяти  на  начало  2-ой
+                      00393 ;строки:  ячейку  с  адресом  (0х40  =  0100  0000).
+                      00394 ;Это  необходимо  для  вывода  фразы  «TEM-
+                      00395 ;PERATURA =» на второй строке индикатора.
+                      00396 
+00CC   1407           00397     bsf PORTC,0  ; установка RC0=1, для последующей передачи
+                      00398 ;кодов символов второй строки на дисплей. Об-
+                      00399 ;ратите внимание на то, что нигде не требуется
+                      00400 ;изменения  банков  памяти: т.к. все регистры, с
+                      00401 ;которыми работает ПО, находятся в 0-ом бан-
+                      00402 ;ке.
+00CD   3041           00403     movlw 'A'
+00CE   2???           00404     call write
+00CF   304C           00405     movlw 'L'
+00D0   2???           00406     call write
+00D1   3041           00407     movlw 'A'
+00D2   2???           00408     call write
+00D3   3052           00409     movlw 'R'
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00D4   2???           00410     call write
+00D5   304D           00411     movlw 'M'
+00D6   2???           00412     call write
+00D7   3020           00413     movlw ' '
+00D8   2???           00414     call write
+00D9   3020           00415     movlw ' '
+00DA   2???           00416     call write
+00DB   0838           00417     movfw ALARM_HH2
+00DC   2???           00418     call write
+00DD   0837           00419     movfw ALARM_HH1
+00DE   2???           00420     call write
+00DF   303A           00421     movlw ':'
+00E0   2???           00422     call write
+00E1   083A           00423     movfw ALARM_MM2
+00E2   2???           00424     call write
+00E3   0839           00425     movfw ALARM_MM1
+00E4   2???           00426     call write
+00E5   0008           00427     return
+                      00428  
+                      00429      ;==========================================
+                      00430      
+                      00431      ; Процедура типа switch для выбора дня недели
+Message[305]: Using default destination of 1 (file).
+00E6   0782           00432 DEC addwf PCL
+00E7   2???           00433     goto monday
+00E8   2???           00434     goto tuesday
+00E9   2???           00435     goto wednesday      
+00EA   2???           00436     goto thursday    
+00EB   2???           00437     goto friday         
+00EC   2???           00438     goto saturday               
+00ED   2???           00439     goto sunday         
+00EE   0008           00440     return
+                      00441 ;Отрисовка дней недели
+00EF                  00442 monday                      ;понедельник
+00EF   304D           00443     movlw 'M'
+00F0   2???           00444     call write
+00F1   304F           00445     movlw 'O'
+00F2   2???           00446     call write
+00F3   304E           00447     movlw 'N'
+00F4   2???           00448     call write
+00F5   2???           00449     goto exday
+00F6                  00450 tuesday                     ;вторник
+00F6   3054           00451     movlw 'T'
+00F7   2???           00452     call write
+00F8   3055           00453     movlw 'U'
+00F9   2???           00454     call write
+00FA   3045           00455     movlw 'E'
+00FB   2???           00456     call write
+00FC   2???           00457     goto exday
+00FD                  00458 wednesday                   ;среда
+00FD   3057           00459     movlw 'W'
+00FE   2???           00460     call write
+00FF   3045           00461     movlw 'E'
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0100   2???           00462     call write
+0101   3044           00463     movlw 'D'
+0102   2???           00464     call write
+0103   2???           00465     goto exday
+0104                  00466 thursday                    ;четверг
+0104   3054           00467     movlw 'T'
+0105   2???           00468     call write
+0106   3048           00469     movlw 'H'
+0107   2???           00470     call write
+0108   3055           00471     movlw 'U'
+0109   2???           00472     call write
+010A   2???           00473     goto exday
+010B                  00474 friday                      ;пятница
+010B   3046           00475     movlw 'F'
+010C   2???           00476     call write
+010D   3052           00477     movlw 'R'
+010E   2???           00478     call write
+010F   3049           00479     movlw 'I'
+0110   2???           00480     call write
+0111   2???           00481     goto exday
+0112                  00482 saturday                    ;суббота
+0112   3053           00483     movlw 'S'
+0113   2???           00484     call write
+0114   3041           00485     movlw 'A'
+0115   2???           00486     call write
+0116   3054           00487     movlw 'T'
+0117   2???           00488     call write
+0118   2???           00489     goto exday
+0119                  00490 sunday                      ;воскресенье
+0119   3053           00491     movlw 'S'
+011A   2???           00492     call write
+011B   3055           00493     movlw 'U'
+011C   2???           00494     call write
+011D   304E           00495     movlw 'N'
+011E   2???           00496     call write
+Warning[207]: Found label after column 1. (exday)
+011F                  00497     exday
+011F   0008           00498     return
+                      00499     ;==========================================
+                      00500     
+0120                  00501 Keyboard                    ; драйвер клавиатуры для клавиш 1-4, 9
+0120   1283           00502     bcf STATUS, RP0         ; переход в нулевой банк, для нормального вызова функции из тела программы
+0121   1303           00503     bcf STATUS, RP1
+0122   01BB           00504     clrf Key1               ; обнуление кодов клавиш
+0123   01BC           00505     clrf Key2 
+0124   01BD           00506     clrf Key3
+0125   01BE           00507     clrf Key4  
+0126   01C3           00508     clrf Key9  
+0127                  00509 col1                        ; сканируем первый столбец, где нам нужны клавиши 1, 4
+0127   1405           00510     bsf PORTA,0             ; подача питания
+0128   1085           00511     bcf PORTA,1
+0129   1105           00512     bcf PORTA,2 
+                      00513     ;movlw .24
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00514     ;call small_delay
+012A   0805           00515     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+012B   3938           00516     andlw 0x38
+012C   1903           00517     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col2
+012D   2???           00518     goto col2               ; для сканирования второго столбца клавиатуры. Если Z=0, то пропускаем строк
+                            у
+                      00519     ;movlw .250
+                      00520     ;call small_delay  
+012E   1985           00521     btfsc PORTA,3           ; определяем нажатия клавиши "1", проводя опрос первой строки
+012F   0ABB           00522     incf Key1,F
+0130   1A05           00523     btfsc PORTA,4           ; определяем нажатия клавиши "4", проводя опрос второй строки
+0131   0ABE           00524     incf Key4,F
+Warning[207]: Found label after column 1. (col2)
+0132                  00525     col2                    ; сканируем второй столбец, где нам нужна клавиша 2
+0132   1005           00526     bcf PORTA,0             ; подача питания
+0133   1485           00527     bsf PORTA,1
+0134   1105           00528     bcf PORTA,2 
+                      00529     ;movlw .24
+                      00530     ;sd
+0135   0805           00531     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+0136   3938           00532     andlw 0x38
+0137   1903           00533     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col3
+0138   2???           00534     goto col3               ; для сканирования третьего столбца клавиатуры. Если Z=0, то пропускаем стро
+                            ку
+                      00535     ;movlw .250
+                      00536     ;sd
+0139   1985           00537     btfsc PORTA,3           ; определяем нажатия клавиши "2", проводя опрос первой строки
+013A   0ABC           00538     incf Key2,F
+013B                  00539 col3                ; сканируем третий столбец, где нам нужна клавиша 3
+013B   1005           00540     bcf PORTA,0             ; подача питания
+013C   1085           00541     bcf PORTA,1
+013D   1505           00542     bsf PORTA,2
+                      00543     ;movlw .24
+                      00544     ;sd
+013E   0805           00545     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+013F   3938           00546     andlw 0x38
+0140   1903           00547     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
+0141   0008           00548     return                  ; если Z=0, то пропускаем строку
+                      00549     ;movlw .250
+                      00550     ;sd
+0142   1985           00551     btfsc PORTA,3           ; определяем нажатия клавиши "3", проводя опрос первой строки
+0143   0ABD           00552     incf Key3,F
+0144   1A85           00553     btfsc PORTA,5           ; определяем нажатия клавиши "9", проводя опрос третей строки
+0145   0AC3           00554     incf Key9,F
+0146   0008           00555     return                  ; выход из функции
+                      00556     
+                      00557 ;==============================================
+                      00558 
+                      00559     #include "time.asm"
+                      00002     #include "main.asm"
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00560 ;*******************************************************************************
+                      00561 ;                                                                              *
+                      00562 ;    Filename:  ALARM CLOCK                                                    *
+                      00563 ;    Date:      19.10.17                                                       *
+                      00564 ;    File Version:   1.4.2                                                     *
+                      00565 ;    Author:         Dmitry Vorozhbicky                                        *
+                      00566 ;    Company:        GrSU                                                      *
+                      00567 ;                                                                              *
+                      00568 ;*******************************************************************************  
+                      00569 ;processor    PIC16F877
+Warning[205]: Found directive in column 1. (include)
+                      00570 include  <P16F877.INC>
+                      00542         LIST
+                      00543 
+                      00544 ;==========================================================================
+                      00545 ; Build date : Jul 02 2017
+                      00546 ;  MPASM PIC16F877 processor include
+                      00547 ; 
+                      00548 ;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
+                      00549 ;==========================================================================
+                      00550 
+Message[310]: Superseding current maximum RAM and RAM map.
+                      01082         LIST
+Warning[205]: Found directive in column 1. (errorlevel)
+                      00571 errorlevel   -302
+                      00572         ;  директивы  типа  контроллера,  под-
+                      00573         ;ключения  заголовочного  файла  и  вы-
+                      00574         ;вода сообщений об ошибках
+Error[115]  : Duplicate label ("bank0" or redefining symbol that cannot be redefined)
+                      00575 #define   bank0  bcf STATUS,  RP0
+Error[115]  : Duplicate label ("bank1" or redefining symbol that cannot be redefined)
+                      00576 #define   bank1  bsf STATUS,  RP0
+                      00577 ; директивы, позволяющие заменять в
+                      00578         ;теле  ПО  команды,  указанные  после
+                      00579         ;этой  директивы  (bcf  ,  bsf)  –  метками
+                      00580         ;bank0, bank1. Обратную замену произ-
+                      00581         ;водит компилятор
+  00000020            00582 WAIT                equ     0x20
+  00000026            00583 fCOUNTER            equ     0x26
+  00000027            00584 fCOUNTER2           equ     0x27
+  00000030            00585 TIME_HH1            equ     0x30
+  00000031            00586 TIME_HH2            equ     0x31
+  00000032            00587 TIME_MM1            equ     0x32
+  00000033            00588 TIME_MM2            equ     0x33
+  00000034            00589 TIME_SS1            equ     0x34
+  00000035            00590 TIME_SS2            equ     0x35
+  00000036            00591 DAY                 equ     0x36
+  00000037            00592 ALARM_HH1           equ     0x37
+  00000038            00593 ALARM_HH2           equ     0x38
+  00000039            00594 ALARM_MM1           equ     0x39
+  0000003A            00595 ALARM_MM2           equ     0x3A
+  0000003B            00596 Key1                equ     0x3B
+  0000003C            00597 Key2                equ     0x3C
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  0000003D            00598 Key3                equ     0x3D
+  0000003E            00599 Key4                equ     0x3E
+  0000003F            00600 Key5                equ     0x3F
+  00000040            00601 Key6                equ     0x40
+  00000041            00602 Key7                equ     0x41
+  00000042            00603 Key8                equ     0x42
+  00000043            00604 Key9                equ     0x43
+  00000044            00605 fCOUNTER1           equ     0x44
+  00000045            00606 TEMP_TIME_HH1       equ     0x45
+  00000046            00607 TEMP_TIME_HH2       equ     0x46
+  00000047            00608 TEMP_TIME_MM1       equ     0x47
+  00000048            00609 TEMP_TIME_MM2       equ     0x48
+  00000049            00610 TEMP_TIME_SS1       equ     0x49
+  0000004A            00611 TEMP_TIME_SS2       equ     0x4A
+  0000004B            00612 TEMP_DAY            equ     0x4B
+  0000004C            00613 TEMP_ALARM_HH1      equ     0x4C
+  0000004D            00614 TEMP_ALARM_HH2      equ     0x4D
+  0000004E            00615 TEMP_ALARM_MM1      equ     0x4E
+  0000004F            00616 TEMP_ALARM_MM2      equ     0x4F
+  00000050            00617 NumPressKey         equ     0x50
+  00000051            00618 Blink               equ     0x51
+                      00619     ;вспомогательные  регистры,  назначе-
+                      00620         ;ние которых приведено в комментариях
+  0002                00621     constant   DS = .2
+  0002                00622     constant   RST = .2
+                      00623         ;  директивы,  ставящие в  соответствие
+                      00624         ;меткам DS  и  RST  значение  0.  Анало-
+                      00625         ;гия директив equ для имен регистров.
+                      00626 
+Warning[206]: Found call to macro in column 1. (wait)
+Error[136]  : Duplicate macro name (wait)
+                      00627 wait  macro     time
+Error[113]  : Symbol not previously defined (time)
+0147   30FF           00628     movlw    (time/5)-1
+0148   00A0           00629     movwf    WAIT
+Error[113]  : Symbol not previously defined (wait5u)
+0149   2000           00630     call    wait5u
+Error[145]  : Unmatched ENDM
+                      00631     endm
+                      00632         ;макрос паузы с именем wait. Особен-
+                      00633         ;ность этого макроса состоит в том, что
+                      00634         ;у  него  имеется  параметр  –  time.  При
+                      00635         ;вызове  макроса  значение  параметра
+                      00636         ;указывается  после  имени  макроса  в
+                      00637         ;виде  целого  десятичного  числа  крат-
+                      00638         ;ного  5  (в  данном  примере).  В  теле
+                      00639         ;макроса  это  число  подставляется  в
+                      00640         ;«переменную» time и далее использу-
+                      00641         ;ется вычисленное значение (которое в
+                      00642         ;данном случае  выступает  в  роли  кон-
+                      00643         ;станты, записываемой в W). Вместе с
+                      00644         ;процедурой  wait5u  длительность  за-
+                      00645         ;держки,  обеспечиваемая  макросом
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00646         ;равна time микросекунд
+                      00647 
+                      00648     org 0x0000
+0000   0183           00649     clrf STATUS
+0001   3000           00650     movlw 0x00
+0002   008A           00651     movwf PCLATH
+0003   2???           00652     goto begin
+                      00653         ;выбор нулевой страницы памяти ко-
+                      00654         ;манд и размещение на ней откомпили-
+                      00655         ;рованного кода
+                      00656 
+0004                  00657 begin
+0004   1683           00658     bank1  ; выбор первого банка памяти. Для вы-
+                      00659         ;зова используется метка bank1, объяв-
+                      00660         ;ленная выше директивой #define
+0005   308F           00661     movlw 0x8F
+0006   0081           00662     movwf OPTION_REG
+0007   0064           00663     clrwdt
+                      00664         ;установка  максимального  времени
+                      00665         ;срабатывания  сторожевого  таймера  и
+                      00666         ;его сброс
+0008   018B           00667     clrf INTCON
+0009   018C           00668     clrf PIE1
+000A   018D           00669     clrf PIE2
+                      00670         ;отключение  прерываний  и  их  обработки
+000B   3000           00671     movlw .0
+000C   0086           00672     movwf TRISB
+000D   0087           00673     movwf TRISC
+000E   0089           00674     movwf TRISE
+                      00675         ; конфигурирование  портов  В, С, Е
+000F   30F8           00676     movlw b'11111000' 
+0010   0085           00677     movwf TRISA 
+0011   3000           00678     movlw b'00000000'
+0012   0088           00679     movwf TRISD
+0013   300F           00680     movlw b'00001111'
+0014   0081           00681     movwf OPTION_REG
+                      00682         ;конфигурирование  RD0  как  входа
+                      00683         ;для  установки  на  нем  «1»  в  качестве
+                      00684         ;исходного  состояния  интерфейса  «1-Wire»
+0015   019F           00685     clrf ADCON1 
+0016   149F           00686     bsf ADCON1,0x01 
+0017   151F           00687     bsf ADCON1,0x02 
+0018   1283           00688     bank0
+0019   01BB           00689     clrf Key1    
+001A   01BC           00690     clrf Key2       
+001B   01BD           00691     clrf Key3       
+001C   01BE           00692     clrf Key4              
+001D   01C3           00693     clrf Key9               
+001E   0187           00694     clrf PORTC
+001F   0188           00695     clrf PORTD
+                      00696 ; подготовка к передаче команд на контроллер
+                      00697 ;HD путем установки RC0=0
+0020   3001           00698     movlw 0x01
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0021   2???           00699     call write
+0022   300F           00700     movlw 0x0f
+0023   2???           00701     call delay
+                      00702 ; передача команды Clear  Display для очистки
+                      00703 ;дисплея и установки счетчика адреса видеопа-
+                      00704 ;мяти  на  нулевой  адрес  (первое  знакоместо  в
+                      00705 ;верхней строке), с необходимой задержкой
+0024   0064           00706     clrwdt
+0025   3038           00707     movlw 0x38
+0026   2???           00708     call write
+0027   300F           00709     movlw 0x0f
+0028   2???           00710     call delay
+                      00711 
+                      00712 ; передача команды Function Set для установки
+                      00713 ;режима  2-х  строчного  индикатора,  размера
+                      00714 ;знакоместа 5х7 и 8 разрядной шины данных
+0029   3006           00715     movlw 0x06
+002A   2???           00716     call write
+002B   300F           00717     movlw 0x0f
+002C   2???           00718     call delay
+                      00719 ;передача  команды  Entry  Mode  Set  для  уста-
+                      00720 ;новки режима увеличения счетчика адреса ви-
+                      00721 ;деопамяти, после каждой записи символа в нее,
+                      00722 ;при неподвижности видеопамяти относительно
+                      00723 ;индикатора
+002D   300C           00724     movlw 0x0c
+002E   2???           00725     call write
+002F   300F           00726     movlw 0x0f
+0030   2???           00727     call delay
+                      00728 ;  передача  команды  Display  ON/OFF  control
+                      00729 ;для включения дисплея с отключенным курсо-
+                      00730 ;ром.  На  этом  этап инициализации дисплея за-
+                      00731 ;кончен.
+0031   3030           00732     movlw       0x30
+0032   00B0           00733     movwf       TIME_HH1
+0033   00B1           00734     movwf       TIME_HH2
+0034   00B2           00735     movwf       TIME_MM1
+0035   00B3           00736     movwf       TIME_MM2
+0036   00B4           00737     movwf       TIME_SS1
+0037   00B5           00738     movwf       TIME_SS2
+0038   00B7           00739     movwf       ALARM_HH1
+0039   00B8           00740     movwf       ALARM_HH2
+003A   00B9           00741     movwf       ALARM_MM1
+003B   00BA           00742     movwf       ALARM_MM2
+003C   3000           00743     movlw       .0
+003D   00B6           00744     movwf       DAY
+003E   3000           00745     movlw       b'00000000'
+003F   00D1           00746     movwf       Blink
+                      00747 
+0040                  00748 START
+0040   0831           00749     movfw TIME_HH2              ; записываем значения постоянныx переменных в  временныe 
+0041   00C6           00750     movwf TEMP_TIME_HH2         
+0042   0830           00751     movfw TIME_HH1              
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0043   00C5           00752     movwf TEMP_TIME_HH1
+0044   0833           00753     movfw TIME_MM2              
+0045   00C8           00754     movwf TEMP_TIME_MM2
+0046   0832           00755     movfw TIME_MM1              
+0047   00C7           00756     movwf TEMP_TIME_MM1
+0048   0835           00757     movfw TIME_SS2              
+0049   00CA           00758     movwf TEMP_TIME_SS2
+004A   0834           00759     movfw TIME_SS1              
+004B   00C9           00760     movwf TEMP_TIME_SS1
+004C   0836           00761     movfw DAY
+004D   00CB           00762     movwf TEMP_DAY
+004E   3030           00763     movlw 0x30
+004F   00D0           00764     movwf NumPressKey           ; NPK каждый раз устанавливаем в начальное значение
+                      00765     
+0050   2???           00766     call Keyboard               ; читаем клавиатуру
+0051   183B           00767     btfsc Key1,0                ; проверка нажатия клавиши "1",  если нажата, то переходим 
+Error[113]  : Symbol not previously defined (change_time)
+0052   2800           00768     goto change_time            ; к изменению времени, нет - тогда проверяем клавишу 2
+0053   183C           00769     btfsc Key2,0                ; проверка нажатия клавиши "2",  если нажата, то переходим 
+0054   2???           00770     goto change_day             ; к изменению дня недели, нет - тогда проверяем клавишу 3
+                      00771         
+0055   2???           00772     call LCD_one                ;Отрисовка первой строки                
+                      00773 
+                      00774         ;Счет десятков секунд (0-6) - TIME_SS1
+0056   0AB4           00775     incf TIME_SS1,1
+0057   303A           00776     movlw 0x3A                  ; if !=10
+0058   0634           00777     xorwf TIME_SS1, w;
+0059   1D03           00778     btfss STATUS, 0x02
+005A   2???           00779     goto end_clock
+                      00780         ;обнуление TIME_MM1
+005B   3030           00781     movlw 0x30
+005C   00B4           00782     movwf       TIME_SS1
+                      00783 
+                      00784         ;Счет десятков секунд (0-6) - TIME_SS2
+005D   0AB5           00785     incf TIME_SS2,1
+005E   3036           00786     movlw 0x36                  ; if !=6
+005F   0635           00787     xorwf TIME_SS2, w;
+0060   1D03           00788     btfss STATUS, 0x02
+0061   2???           00789     goto end_clock
+                      00790         ;обнуление TIME_MM2
+0062   3030           00791     movlw 0x30
+0063   00B5           00792     movwf       TIME_SS2
+                      00793         
+                      00794         ;Счет десятков минут (0-6) - TIME_MM1
+0064   0AB2           00795     incf TIME_MM1,1
+0065   303A           00796     movlw 0x3A                  ; if !=10
+0066   0632           00797     xorwf TIME_MM1, w;
+0067   1D03           00798     btfss STATUS, 0x02
+0068   2???           00799     goto end_clock
+                      00800         ;обнуление TIME_MM1
+0069   3030           00801     movlw 0x30
+006A   00B2           00802     movwf       TIME_MM1
+                      00803 
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 17
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00804         ;Счет десятков минут (0-6) - TIME_MM2
+006B   0AB3           00805     incf TIME_MM2,1
+006C   3036           00806     movlw 0x36                  ; if !=6
+006D   0633           00807     xorwf TIME_MM2, w;
+006E   1D03           00808     btfss STATUS, 0x02
+006F   2???           00809     goto end_clock
+                      00810         ;обнуление TIME_MM2
+0070   3030           00811     movlw 0x30
+0071   00B3           00812     movwf       TIME_MM2
+                      00813 
+                      00814         ;Счет десятков единиц часов - TIME_НН2, TIME_НН1
+0072   0AB0           00815     incf TIME_HH1,1
+0073   3034           00816     movlw 0x34                  ; if !=4
+0074   0630           00817     xorwf TIME_HH1, w;
+0075   1D03           00818     btfss STATUS, 0x02
+0076   2???           00819     goto ten_clock
+0077   3032           00820     movlw 0x32                  ; if !=2
+0078   0631           00821     xorwf TIME_HH2, w;
+0079   1D03           00822     btfss STATUS, 0x02
+007A   2???           00823     goto ten_clock
+007B   3030           00824     movlw 0x30
+007C   00B0           00825     movwf       TIME_HH1
+007D   00B1           00826     movwf       TIME_HH2
+007E   0AB6           00827     incf    DAY,1
+007F   3007           00828     movlw       .7                      ; inc переменной День
+0080   0636           00829     xorwf DAY, w;
+0081   1D03           00830     btfss STATUS, 0x02                  ; Обнуление переменной при достижении воскресенья, 
+0082   2???           00831     goto end_clock                      ; что бы при 00:00:00 перейти в понедельник
+0083   3000           00832     movlw       .0
+0084   00B6           00833     movwf       DAY
+                      00834 
+                      00835         
+0085                  00836 ten_clock
+0085   303A           00837     movlw 0x3A                  ; if !=10 
+0086   0630           00838     xorwf TIME_HH1, w;          ; подпрограмма для работы с форматом 24 часа
+0087   1D03           00839     btfss STATUS, 0x02          ; т.к. 18 часов может быть, а 28 нет, то надо
+0088   2???           00840     goto end_clock              ; ограничить единицы при десятках = 2
+Message[305]: Using default destination of 1 (file).
+0089   0AB1           00841     incf    TIME_HH2
+008A   3030           00842     movlw 0x30
+008B   00B0           00843     movwf       TIME_HH1
+                      00844         
+008C                  00845 end_clock
+008C   0064           00846     clrwdt
+                      00847 
+008D   30FF           00848     movlw 0xff
+008E   2???           00849     call delay ;задержка крч
+008F   30FF           00850     movlw 0xff
+0090   2???           00851     call delay ;задержка крч
+0091   30FF           00852     movlw 0xff
+0092   2???           00853     call delay ;задержка крч
+                      00854 
+0093   2???           00855     call LCD_two                ;Отрисовка второй строки
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 18
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00856     
+                      00857     ; ТУТ ОБРАБОТКА БУДИЛЬНИКА БУДЕТ
+                      00858     
+0094   2???           00859     goto START          ; конец основного цикла (должен быть = 1сек)
+                      00860 
+                      00861     ;--------------------------------------------------------
+                      00862     ;--------------------------------------------------------
+                      00863     ;--------------------------------------------------------
+                      00864     
+0095                  00865 write    ; процедура записи байта к контроллер HD
+0095   1303           00866     bcf STATUS, RP1
+0096   1283           00867     bcf STATUS, RP0
+0097   0086           00868     movwf PORTB
+0098   1507           00869     bsf PORTC, 2
+0099   3001           00870     movlw 0x01
+009A   2???           00871     call delay
+009B   1107           00872     bcf PORTC, 2
+009C   0008           00873     return
+                      00874     
+                      00875         ; перед вызовом этой процедуры в W помеща-
+                      00876         ;ется байт, который надо записать в HD. Далее
+                      00877         ;он передается в PORTB и формируется отрица-
+                      00878         ;тельный перепад на RC2, путем предваритель-
+                      00879         ;ной  его  установки  в  «1»,  удержания  этого
+                      00880         ;уровня в течение некоторого времени (опреде-
+                      00881         ;ляемого временем задержки delay  при  W=1) и
+                      00882         ;сброса его в «0».
+                      00883 
+                      00884         ;  процедура  задержки,  время  которой  можно
+                      00885         ;регулировать, задавая число в W
+009D                  00886 delay
+009D   1303           00887     bcf   STATUS, RP1
+009E   1283           00888     bcf   STATUS, RP0
+009F   00A7           00889     movwf   fCOUNTER2
+00A0   01A6           00890     clrf    fCOUNTER
+                      00891     
+00A1                  00892 BD_Loop
+00A1   0064           00893     clrwdt
+00A2   0BA6           00894     decfsz  fCOUNTER, f
+00A3   2???           00895     goto    BD_Loop
+00A4   0BA7           00896     decfsz  fCOUNTER2, f
+00A5   2???           00897     goto    BD_Loop
+00A6   0008           00898     return
+                      00899 
+                      00900     ;==========================================
+                      00901     
+00A7                  00902 LCD_one
+00A7   1007           00903     bcf PORTC, 0
+00A8   3080           00904     movlw b'10000000'   ; установка адреса
+00A9   2???           00905     call write
+00AA   1407           00906     bsf PORTC,0
+                      00907     ;Отрисовка первой строки
+                      00908     
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 19
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00AB   3030           00909     movlw 0x30                  ; если NumPressKey = 0, то вызываем
+00AC   0650           00910     xorwf NumPressKey, w;       
+00AD   1903           00911     btfsc STATUS, 0x02          
+00AE   0AD1           00912     incf Blink,1
+00AF   0831           00913     movfw TIME_HH2
+00B0   1851           00914     btfsc Blink, 0              
+00B1   3020           00915     movlw ' '
+00B2   0831           00916     movfw TIME_HH2
+00B3   2???           00917     call write
+                      00918     
+00B4   0830           00919     movfw TIME_HH1
+00B5   2???           00920     call write
+00B6   303A           00921     movlw ':'
+00B7   2???           00922     call write
+00B8   0833           00923     movfw TIME_MM2
+00B9   2???           00924     call write
+00BA   0832           00925     movfw TIME_MM1
+00BB   2???           00926     call write
+00BC   303A           00927     movlw ':'
+00BD   2???           00928     call write
+00BE   0835           00929     movfw TIME_SS2
+00BF   2???           00930     call write
+00C0   0834           00931     movfw TIME_SS1
+00C1   2???           00932     call write
+                      00933 
+00C2   3020           00934     movlw ' '
+00C3   2???           00935     call write
+00C4   3020           00936     movlw ' '
+00C5   2???           00937     call write
+00C6   0836           00938     movfw       DAY                             
+00C7   2???           00939     call        DEC
+00C8   0008           00940     return
+                      00941     
+                      00942     ;==========================================   
+                      00943     
+00C9                  00944 LCD_two
+00C9   1007           00945     bcf PORTC, 0
+00CA   30C4           00946     movlw b'11000100'
+00CB   2???           00947     call write
+                      00948 ; Установка RC0=0, для последующей передачи
+                      00949 ;команды  на  контроллер  HD.  Передается  ко-
+                      00950 ;манда Set DDRAM address,  устанавливающая
+                      00951 ;счетчик  адреса  видеопамяти  на  начало  2-ой
+                      00952 ;строки:  ячейку  с  адресом  (0х40  =  0100  0000).
+                      00953 ;Это  необходимо  для  вывода  фразы  «TEM-
+                      00954 ;PERATURA =» на второй строке индикатора.
+                      00955 
+00CC   1407           00956     bsf PORTC,0  ; установка RC0=1, для последующей передачи
+                      00957 ;кодов символов второй строки на дисплей. Об-
+                      00958 ;ратите внимание на то, что нигде не требуется
+                      00959 ;изменения  банков  памяти: т.к. все регистры, с
+                      00960 ;которыми работает ПО, находятся в 0-ом бан-
+                      00961 ;ке.
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 20
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00CD   3041           00962     movlw 'A'
+00CE   2???           00963     call write
+00CF   304C           00964     movlw 'L'
+00D0   2???           00965     call write
+00D1   3041           00966     movlw 'A'
+00D2   2???           00967     call write
+00D3   3052           00968     movlw 'R'
+00D4   2???           00969     call write
+00D5   304D           00970     movlw 'M'
+00D6   2???           00971     call write
+00D7   3020           00972     movlw ' '
+00D8   2???           00973     call write
+00D9   3020           00974     movlw ' '
+00DA   2???           00975     call write
+00DB   0838           00976     movfw ALARM_HH2
+00DC   2???           00977     call write
+00DD   0837           00978     movfw ALARM_HH1
+00DE   2???           00979     call write
+00DF   303A           00980     movlw ':'
+00E0   2???           00981     call write
+00E1   083A           00982     movfw ALARM_MM2
+00E2   2???           00983     call write
+00E3   0839           00984     movfw ALARM_MM1
+00E4   2???           00985     call write
+00E5   0008           00986     return
+                      00987  
+                      00988      ;==========================================
+                      00989      
+                      00990      ; Процедура типа switch для выбора дня недели
+Message[305]: Using default destination of 1 (file).
+00E6   0782           00991 DEC addwf PCL
+00E7   2???           00992     goto monday
+00E8   2???           00993     goto tuesday
+00E9   2???           00994     goto wednesday      
+00EA   2???           00995     goto thursday    
+00EB   2???           00996     goto friday         
+00EC   2???           00997     goto saturday               
+00ED   2???           00998     goto sunday         
+00EE   0008           00999     return
+                      01000 ;Отрисовка дней недели
+00EF                  01001 monday                      ;понедельник
+00EF   304D           01002     movlw 'M'
+00F0   2???           01003     call write
+00F1   304F           01004     movlw 'O'
+00F2   2???           01005     call write
+00F3   304E           01006     movlw 'N'
+00F4   2???           01007     call write
+00F5   2???           01008     goto exday
+00F6                  01009 tuesday                     ;вторник
+00F6   3054           01010     movlw 'T'
+00F7   2???           01011     call write
+00F8   3055           01012     movlw 'U'
+00F9   2???           01013     call write
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 21
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00FA   3045           01014     movlw 'E'
+00FB   2???           01015     call write
+00FC   2???           01016     goto exday
+00FD                  01017 wednesday                   ;среда
+00FD   3057           01018     movlw 'W'
+00FE   2???           01019     call write
+00FF   3045           01020     movlw 'E'
+0100   2???           01021     call write
+0101   3044           01022     movlw 'D'
+0102   2???           01023     call write
+0103   2???           01024     goto exday
+0104                  01025 thursday                    ;четверг
+0104   3054           01026     movlw 'T'
+0105   2???           01027     call write
+0106   3048           01028     movlw 'H'
+0107   2???           01029     call write
+0108   3055           01030     movlw 'U'
+0109   2???           01031     call write
+010A   2???           01032     goto exday
+010B                  01033 friday                      ;пятница
+010B   3046           01034     movlw 'F'
+010C   2???           01035     call write
+010D   3052           01036     movlw 'R'
+010E   2???           01037     call write
+010F   3049           01038     movlw 'I'
+0110   2???           01039     call write
+0111   2???           01040     goto exday
+0112                  01041 saturday                    ;суббота
+0112   3053           01042     movlw 'S'
+0113   2???           01043     call write
+0114   3041           01044     movlw 'A'
+0115   2???           01045     call write
+0116   3054           01046     movlw 'T'
+0117   2???           01047     call write
+0118   2???           01048     goto exday
+0119                  01049 sunday                      ;воскресенье
+0119   3053           01050     movlw 'S'
+011A   2???           01051     call write
+011B   3055           01052     movlw 'U'
+011C   2???           01053     call write
+011D   304E           01054     movlw 'N'
+011E   2???           01055     call write
+Warning[207]: Found label after column 1. (exday)
+011F                  01056     exday
+011F   0008           01057     return
+                      01058     ;==========================================
+                      01059     
+0120                  01060 Keyboard                    ; драйвер клавиатуры для клавиш 1-4, 9
+0120   1283           01061     bcf STATUS, RP0         ; переход в нулевой банк, для нормального вызова функции из тела программы
+0121   1303           01062     bcf STATUS, RP1
+0122   01BB           01063     clrf Key1               ; обнуление кодов клавиш
+0123   01BC           01064     clrf Key2 
+0124   01BD           01065     clrf Key3
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 22
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0125   01BE           01066     clrf Key4  
+0126   01C3           01067     clrf Key9  
+0127                  01068 col1                        ; сканируем первый столбец, где нам нужны клавиши 1, 4
+0127   1405           01069     bsf PORTA,0             ; подача питания
+0128   1085           01070     bcf PORTA,1
+0129   1105           01071     bcf PORTA,2 
+                      01072     ;movlw .24
+                      01073     ;call small_delay
+012A   0805           01074     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+012B   3938           01075     andlw 0x38
+012C   1903           01076     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col2
+012D   2???           01077     goto col2               ; для сканирования второго столбца клавиатуры. Если Z=0, то пропускаем строк
+                            у
+                      01078     ;movlw .250
+                      01079     ;call small_delay  
+012E   1985           01080     btfsc PORTA,3           ; определяем нажатия клавиши "1", проводя опрос первой строки
+012F   0ABB           01081     incf Key1,F
+0130   1A05           01082     btfsc PORTA,4           ; определяем нажатия клавиши "4", проводя опрос второй строки
+0131   0ABE           01083     incf Key4,F
+Warning[207]: Found label after column 1. (col2)
+0132                  01084     col2                    ; сканируем второй столбец, где нам нужна клавиша 2
+0132   1005           01085     bcf PORTA,0             ; подача питания
+0133   1485           01086     bsf PORTA,1
+0134   1105           01087     bcf PORTA,2 
+                      01088     ;movlw .24
+                      01089     ;sd
+0135   0805           01090     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+0136   3938           01091     andlw 0x38
+0137   1903           01092     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col3
+0138   2???           01093     goto col3               ; для сканирования третьего столбца клавиатуры. Если Z=0, то пропускаем стро
+                            ку
+                      01094     ;movlw .250
+                      01095     ;sd
+0139   1985           01096     btfsc PORTA,3           ; определяем нажатия клавиши "2", проводя опрос первой строки
+013A   0ABC           01097     incf Key2,F
+013B                  01098 col3                ; сканируем третий столбец, где нам нужна клавиша 3
+013B   1005           01099     bcf PORTA,0             ; подача питания
+013C   1085           01100     bcf PORTA,1
+013D   1505           01101     bsf PORTA,2
+                      01102     ;movlw .24
+                      01103     ;sd
+013E   0805           01104     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+013F   3938           01105     andlw 0x38
+0140   1903           01106     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
+0141   0008           01107     return                  ; если Z=0, то пропускаем строку
+                      01108     ;movlw .250
+                      01109     ;sd
+0142   1985           01110     btfsc PORTA,3           ; определяем нажатия клавиши "3", проводя опрос первой строки
+0143   0ABD           01111     incf Key3,F
+0144   1A85           01112     btfsc PORTA,5           ; определяем нажатия клавиши "9", проводя опрос третей строки
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 23
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0145   0AC3           01113     incf Key9,F
+0146   0008           01114     return                  ; выход из функции
+                      01115     
+                      01116 ;==============================================
+                      01117 
+                      01118     #include "time.asm"
+                      00003     #include "main.asm"
+                      01119 ;*******************************************************************************
+                      01120 ;                                                                              *
+                      01121 ;    Filename:  ALARM CLOCK                                                    *
+                      01122 ;    Date:      19.10.17                                                       *
+                      01123 ;    File Version:   1.4.2                                                     *
+                      01124 ;    Author:         Dmitry Vorozhbicky                                        *
+                      01125 ;    Company:        GrSU                                                      *
+                      01126 ;                                                                              *
+                      01127 ;*******************************************************************************  
+                      01128 ;processor    PIC16F877
+Warning[205]: Found directive in column 1. (include)
+Error[138]  : Include files nested too deep
+                      01129 include  <P16F877.INC>
+Warning[205]: Found directive in column 1. (errorlevel)
+                      01130 errorlevel   -302
+                      01131         ;  директивы  типа  контроллера,  под-
+                      01132         ;ключения  заголовочного  файла  и  вы-
+                      01133         ;вода сообщений об ошибках
+Error[115]  : Duplicate label ("bank0" or redefining symbol that cannot be redefined)
+                      01134 #define   bank0  bcf STATUS,  RP0
+Error[115]  : Duplicate label ("bank1" or redefining symbol that cannot be redefined)
+                      01135 #define   bank1  bsf STATUS,  RP0
+                      01136 ; директивы, позволяющие заменять в
+                      01137         ;теле  ПО  команды,  указанные  после
+                      01138         ;этой  директивы  (bcf  ,  bsf)  –  метками
+                      01139         ;bank0, bank1. Обратную замену произ-
+                      01140         ;водит компилятор
+  00000020            01141 WAIT                equ     0x20
+  00000026            01142 fCOUNTER            equ     0x26
+  00000027            01143 fCOUNTER2           equ     0x27
+  00000030            01144 TIME_HH1            equ     0x30
+  00000031            01145 TIME_HH2            equ     0x31
+  00000032            01146 TIME_MM1            equ     0x32
+  00000033            01147 TIME_MM2            equ     0x33
+  00000034            01148 TIME_SS1            equ     0x34
+  00000035            01149 TIME_SS2            equ     0x35
+  00000036            01150 DAY                 equ     0x36
+  00000037            01151 ALARM_HH1           equ     0x37
+  00000038            01152 ALARM_HH2           equ     0x38
+  00000039            01153 ALARM_MM1           equ     0x39
+  0000003A            01154 ALARM_MM2           equ     0x3A
+  0000003B            01155 Key1                equ     0x3B
+  0000003C            01156 Key2                equ     0x3C
+  0000003D            01157 Key3                equ     0x3D
+  0000003E            01158 Key4                equ     0x3E
+  0000003F            01159 Key5                equ     0x3F
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 24
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  00000040            01160 Key6                equ     0x40
+  00000041            01161 Key7                equ     0x41
+  00000042            01162 Key8                equ     0x42
+  00000043            01163 Key9                equ     0x43
+  00000044            01164 fCOUNTER1           equ     0x44
+  00000045            01165 TEMP_TIME_HH1       equ     0x45
+  00000046            01166 TEMP_TIME_HH2       equ     0x46
+  00000047            01167 TEMP_TIME_MM1       equ     0x47
+  00000048            01168 TEMP_TIME_MM2       equ     0x48
+  00000049            01169 TEMP_TIME_SS1       equ     0x49
+  0000004A            01170 TEMP_TIME_SS2       equ     0x4A
+  0000004B            01171 TEMP_DAY            equ     0x4B
+  0000004C            01172 TEMP_ALARM_HH1      equ     0x4C
+  0000004D            01173 TEMP_ALARM_HH2      equ     0x4D
+  0000004E            01174 TEMP_ALARM_MM1      equ     0x4E
+  0000004F            01175 TEMP_ALARM_MM2      equ     0x4F
+  00000050            01176 NumPressKey         equ     0x50
+  00000051            01177 Blink               equ     0x51
+                      01178     ;вспомогательные  регистры,  назначе-
+                      01179         ;ние которых приведено в комментариях
+  0002                01180     constant   DS = .2
+  0002                01181     constant   RST = .2
+                      01182         ;  директивы,  ставящие в  соответствие
+                      01183         ;меткам DS  и  RST  значение  0.  Анало-
+                      01184         ;гия директив equ для имен регистров.
+                      01185 
+Warning[206]: Found call to macro in column 1. (wait)
+Error[136]  : Duplicate macro name (wait)
+                      01186 wait  macro     time
+Error[113]  : Symbol not previously defined (time)
+0147   30FF           01187     movlw    (time/5)-1
+0148   00A0           01188     movwf    WAIT
+Error[113]  : Symbol not previously defined (wait5u)
+0149   2000           01189     call    wait5u
+Error[145]  : Unmatched ENDM
+                      01190     endm
+                      01191         ;макрос паузы с именем wait. Особен-
+                      01192         ;ность этого макроса состоит в том, что
+                      01193         ;у  него  имеется  параметр  –  time.  При
+                      01194         ;вызове  макроса  значение  параметра
+                      01195         ;указывается  после  имени  макроса  в
+                      01196         ;виде  целого  десятичного  числа  крат-
+                      01197         ;ного  5  (в  данном  примере).  В  теле
+                      01198         ;макроса  это  число  подставляется  в
+                      01199         ;«переменную» time и далее использу-
+                      01200         ;ется вычисленное значение (которое в
+                      01201         ;данном случае  выступает  в  роли  кон-
+                      01202         ;станты, записываемой в W). Вместе с
+                      01203         ;процедурой  wait5u  длительность  за-
+                      01204         ;держки,  обеспечиваемая  макросом
+                      01205         ;равна time микросекунд
+                      01206 
+                      01207     org 0x0000
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 25
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0000   0183           01208     clrf STATUS
+0001   3000           01209     movlw 0x00
+0002   008A           01210     movwf PCLATH
+0003   2???           01211     goto begin
+                      01212         ;выбор нулевой страницы памяти ко-
+                      01213         ;манд и размещение на ней откомпили-
+                      01214         ;рованного кода
+                      01215 
+0004                  01216 begin
+0004   1683           01217     bank1  ; выбор первого банка памяти. Для вы-
+                      01218         ;зова используется метка bank1, объяв-
+                      01219         ;ленная выше директивой #define
+0005   308F           01220     movlw 0x8F
+0006   0081           01221     movwf OPTION_REG
+0007   0064           01222     clrwdt
+                      01223         ;установка  максимального  времени
+                      01224         ;срабатывания  сторожевого  таймера  и
+                      01225         ;его сброс
+0008   018B           01226     clrf INTCON
+0009   018C           01227     clrf PIE1
+000A   018D           01228     clrf PIE2
+                      01229         ;отключение  прерываний  и  их  обработки
+000B   3000           01230     movlw .0
+000C   0086           01231     movwf TRISB
+000D   0087           01232     movwf TRISC
+000E   0089           01233     movwf TRISE
+                      01234         ; конфигурирование  портов  В, С, Е
+000F   30F8           01235     movlw b'11111000' 
+0010   0085           01236     movwf TRISA 
+0011   3000           01237     movlw b'00000000'
+0012   0088           01238     movwf TRISD
+0013   300F           01239     movlw b'00001111'
+0014   0081           01240     movwf OPTION_REG
+                      01241         ;конфигурирование  RD0  как  входа
+                      01242         ;для  установки  на  нем  «1»  в  качестве
+                      01243         ;исходного  состояния  интерфейса  «1-Wire»
+0015   019F           01244     clrf ADCON1 
+0016   149F           01245     bsf ADCON1,0x01 
+0017   151F           01246     bsf ADCON1,0x02 
+0018   1283           01247     bank0
+0019   01BB           01248     clrf Key1    
+001A   01BC           01249     clrf Key2       
+001B   01BD           01250     clrf Key3       
+001C   01BE           01251     clrf Key4              
+001D   01C3           01252     clrf Key9               
+001E   0187           01253     clrf PORTC
+001F   0188           01254     clrf PORTD
+                      01255 ; подготовка к передаче команд на контроллер
+                      01256 ;HD путем установки RC0=0
+0020   3001           01257     movlw 0x01
+0021   2???           01258     call write
+0022   300F           01259     movlw 0x0f
+0023   2???           01260     call delay
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 26
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      01261 ; передача команды Clear  Display для очистки
+                      01262 ;дисплея и установки счетчика адреса видеопа-
+                      01263 ;мяти  на  нулевой  адрес  (первое  знакоместо  в
+                      01264 ;верхней строке), с необходимой задержкой
+0024   0064           01265     clrwdt
+0025   3038           01266     movlw 0x38
+0026   2???           01267     call write
+0027   300F           01268     movlw 0x0f
+0028   2???           01269     call delay
+                      01270 
+                      01271 ; передача команды Function Set для установки
+                      01272 ;режима  2-х  строчного  индикатора,  размера
+                      01273 ;знакоместа 5х7 и 8 разрядной шины данных
+0029   3006           01274     movlw 0x06
+002A   2???           01275     call write
+002B   300F           01276     movlw 0x0f
+002C   2???           01277     call delay
+                      01278 ;передача  команды  Entry  Mode  Set  для  уста-
+                      01279 ;новки режима увеличения счетчика адреса ви-
+                      01280 ;деопамяти, после каждой записи символа в нее,
+                      01281 ;при неподвижности видеопамяти относительно
+                      01282 ;индикатора
+002D   300C           01283     movlw 0x0c
+002E   2???           01284     call write
+002F   300F           01285     movlw 0x0f
+0030   2???           01286     call delay
+                      01287 ;  передача  команды  Display  ON/OFF  control
+                      01288 ;для включения дисплея с отключенным курсо-
+                      01289 ;ром.  На  этом  этап инициализации дисплея за-
+                      01290 ;кончен.
+0031   3030           01291     movlw       0x30
+0032   00B0           01292     movwf       TIME_HH1
+0033   00B1           01293     movwf       TIME_HH2
+0034   00B2           01294     movwf       TIME_MM1
+0035   00B3           01295     movwf       TIME_MM2
+0036   00B4           01296     movwf       TIME_SS1
+0037   00B5           01297     movwf       TIME_SS2
+0038   00B7           01298     movwf       ALARM_HH1
+0039   00B8           01299     movwf       ALARM_HH2
+003A   00B9           01300     movwf       ALARM_MM1
+003B   00BA           01301     movwf       ALARM_MM2
+003C   3000           01302     movlw       .0
+003D   00B6           01303     movwf       DAY
+003E   3000           01304     movlw       b'00000000'
+003F   00D1           01305     movwf       Blink
+                      01306 
+0040                  01307 START
+0040   0831           01308     movfw TIME_HH2              ; записываем значения постоянныx переменных в  временныe 
+0041   00C6           01309     movwf TEMP_TIME_HH2         
+0042   0830           01310     movfw TIME_HH1              
+0043   00C5           01311     movwf TEMP_TIME_HH1
+0044   0833           01312     movfw TIME_MM2              
+0045   00C8           01313     movwf TEMP_TIME_MM2
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 27
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0046   0832           01314     movfw TIME_MM1              
+0047   00C7           01315     movwf TEMP_TIME_MM1
+0048   0835           01316     movfw TIME_SS2              
+0049   00CA           01317     movwf TEMP_TIME_SS2
+004A   0834           01318     movfw TIME_SS1              
+004B   00C9           01319     movwf TEMP_TIME_SS1
+004C   0836           01320     movfw DAY
+004D   00CB           01321     movwf TEMP_DAY
+004E   3030           01322     movlw 0x30
+004F   00D0           01323     movwf NumPressKey           ; NPK каждый раз устанавливаем в начальное значение
+                      01324     
+0050   2???           01325     call Keyboard               ; читаем клавиатуру
+0051   183B           01326     btfsc Key1,0                ; проверка нажатия клавиши "1",  если нажата, то переходим 
+Error[113]  : Symbol not previously defined (change_time)
+0052   2800           01327     goto change_time            ; к изменению времени, нет - тогда проверяем клавишу 2
+0053   183C           01328     btfsc Key2,0                ; проверка нажатия клавиши "2",  если нажата, то переходим 
+0054   2???           01329     goto change_day             ; к изменению дня недели, нет - тогда проверяем клавишу 3
+                      01330         
+0055   2???           01331     call LCD_one                ;Отрисовка первой строки                
+                      01332 
+                      01333         ;Счет десятков секунд (0-6) - TIME_SS1
+0056   0AB4           01334     incf TIME_SS1,1
+0057   303A           01335     movlw 0x3A                  ; if !=10
+0058   0634           01336     xorwf TIME_SS1, w;
+0059   1D03           01337     btfss STATUS, 0x02
+005A   2???           01338     goto end_clock
+                      01339         ;обнуление TIME_MM1
+005B   3030           01340     movlw 0x30
+005C   00B4           01341     movwf       TIME_SS1
+                      01342 
+                      01343         ;Счет десятков секунд (0-6) - TIME_SS2
+005D   0AB5           01344     incf TIME_SS2,1
+005E   3036           01345     movlw 0x36                  ; if !=6
+005F   0635           01346     xorwf TIME_SS2, w;
+0060   1D03           01347     btfss STATUS, 0x02
+0061   2???           01348     goto end_clock
+                      01349         ;обнуление TIME_MM2
+0062   3030           01350     movlw 0x30
+0063   00B5           01351     movwf       TIME_SS2
+                      01352         
+                      01353         ;Счет десятков минут (0-6) - TIME_MM1
+0064   0AB2           01354     incf TIME_MM1,1
+0065   303A           01355     movlw 0x3A                  ; if !=10
+0066   0632           01356     xorwf TIME_MM1, w;
+0067   1D03           01357     btfss STATUS, 0x02
+0068   2???           01358     goto end_clock
+                      01359         ;обнуление TIME_MM1
+0069   3030           01360     movlw 0x30
+006A   00B2           01361     movwf       TIME_MM1
+                      01362 
+                      01363         ;Счет десятков минут (0-6) - TIME_MM2
+006B   0AB3           01364     incf TIME_MM2,1
+006C   3036           01365     movlw 0x36                  ; if !=6
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 28
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+006D   0633           01366     xorwf TIME_MM2, w;
+006E   1D03           01367     btfss STATUS, 0x02
+006F   2???           01368     goto end_clock
+                      01369         ;обнуление TIME_MM2
+0070   3030           01370     movlw 0x30
+0071   00B3           01371     movwf       TIME_MM2
+                      01372 
+                      01373         ;Счет десятков единиц часов - TIME_НН2, TIME_НН1
+0072   0AB0           01374     incf TIME_HH1,1
+0073   3034           01375     movlw 0x34                  ; if !=4
+0074   0630           01376     xorwf TIME_HH1, w;
+0075   1D03           01377     btfss STATUS, 0x02
+0076   2???           01378     goto ten_clock
+0077   3032           01379     movlw 0x32                  ; if !=2
+0078   0631           01380     xorwf TIME_HH2, w;
+0079   1D03           01381     btfss STATUS, 0x02
+007A   2???           01382     goto ten_clock
+007B   3030           01383     movlw 0x30
+007C   00B0           01384     movwf       TIME_HH1
+007D   00B1           01385     movwf       TIME_HH2
+007E   0AB6           01386     incf    DAY,1
+007F   3007           01387     movlw       .7                      ; inc переменной День
+0080   0636           01388     xorwf DAY, w;
+0081   1D03           01389     btfss STATUS, 0x02                  ; Обнуление переменной при достижении воскресенья, 
+0082   2???           01390     goto end_clock                      ; что бы при 00:00:00 перейти в понедельник
+0083   3000           01391     movlw       .0
+0084   00B6           01392     movwf       DAY
+                      01393 
+                      01394         
+0085                  01395 ten_clock
+0085   303A           01396     movlw 0x3A                  ; if !=10 
+0086   0630           01397     xorwf TIME_HH1, w;          ; подпрограмма для работы с форматом 24 часа
+0087   1D03           01398     btfss STATUS, 0x02          ; т.к. 18 часов может быть, а 28 нет, то надо
+0088   2???           01399     goto end_clock              ; ограничить единицы при десятках = 2
+Message[305]: Using default destination of 1 (file).
+0089   0AB1           01400     incf    TIME_HH2
+008A   3030           01401     movlw 0x30
+008B   00B0           01402     movwf       TIME_HH1
+                      01403         
+008C                  01404 end_clock
+008C   0064           01405     clrwdt
+                      01406 
+008D   30FF           01407     movlw 0xff
+008E   2???           01408     call delay ;задержка крч
+008F   30FF           01409     movlw 0xff
+0090   2???           01410     call delay ;задержка крч
+0091   30FF           01411     movlw 0xff
+0092   2???           01412     call delay ;задержка крч
+                      01413 
+0093   2???           01414     call LCD_two                ;Отрисовка второй строки
+                      01415     
+                      01416     ; ТУТ ОБРАБОТКА БУДИЛЬНИКА БУДЕТ
+                      01417     
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 29
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0094   2???           01418     goto START          ; конец основного цикла (должен быть = 1сек)
+                      01419 
+                      01420     ;--------------------------------------------------------
+                      01421     ;--------------------------------------------------------
+                      01422     ;--------------------------------------------------------
+                      01423     
+0095                  01424 write    ; процедура записи байта к контроллер HD
+0095   1303           01425     bcf STATUS, RP1
+0096   1283           01426     bcf STATUS, RP0
+0097   0086           01427     movwf PORTB
+0098   1507           01428     bsf PORTC, 2
+0099   3001           01429     movlw 0x01
+009A   2???           01430     call delay
+009B   1107           01431     bcf PORTC, 2
+009C   0008           01432     return
+                      01433     
+                      01434         ; перед вызовом этой процедуры в W помеща-
+                      01435         ;ется байт, который надо записать в HD. Далее
+                      01436         ;он передается в PORTB и формируется отрица-
+                      01437         ;тельный перепад на RC2, путем предваритель-
+                      01438         ;ной  его  установки  в  «1»,  удержания  этого
+                      01439         ;уровня в течение некоторого времени (опреде-
+                      01440         ;ляемого временем задержки delay  при  W=1) и
+                      01441         ;сброса его в «0».
+                      01442 
+                      01443         ;  процедура  задержки,  время  которой  можно
+                      01444         ;регулировать, задавая число в W
+009D                  01445 delay
+009D   1303           01446     bcf   STATUS, RP1
+009E   1283           01447     bcf   STATUS, RP0
+009F   00A7           01448     movwf   fCOUNTER2
+00A0   01A6           01449     clrf    fCOUNTER
+                      01450     
+00A1                  01451 BD_Loop
+00A1   0064           01452     clrwdt
+00A2   0BA6           01453     decfsz  fCOUNTER, f
+00A3   2???           01454     goto    BD_Loop
+00A4   0BA7           01455     decfsz  fCOUNTER2, f
+00A5   2???           01456     goto    BD_Loop
+00A6   0008           01457     return
+                      01458 
+                      01459     ;==========================================
+                      01460     
+00A7                  01461 LCD_one
+00A7   1007           01462     bcf PORTC, 0
+00A8   3080           01463     movlw b'10000000'   ; установка адреса
+00A9   2???           01464     call write
+00AA   1407           01465     bsf PORTC,0
+                      01466     ;Отрисовка первой строки
+                      01467     
+00AB   3030           01468     movlw 0x30                  ; если NumPressKey = 0, то вызываем
+00AC   0650           01469     xorwf NumPressKey, w;       
+00AD   1903           01470     btfsc STATUS, 0x02          
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 30
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00AE   0AD1           01471     incf Blink,1
+00AF   0831           01472     movfw TIME_HH2
+00B0   1851           01473     btfsc Blink, 0              
+00B1   3020           01474     movlw ' '
+00B2   0831           01475     movfw TIME_HH2
+00B3   2???           01476     call write
+                      01477     
+00B4   0830           01478     movfw TIME_HH1
+00B5   2???           01479     call write
+00B6   303A           01480     movlw ':'
+00B7   2???           01481     call write
+00B8   0833           01482     movfw TIME_MM2
+00B9   2???           01483     call write
+00BA   0832           01484     movfw TIME_MM1
+00BB   2???           01485     call write
+00BC   303A           01486     movlw ':'
+00BD   2???           01487     call write
+00BE   0835           01488     movfw TIME_SS2
+00BF   2???           01489     call write
+00C0   0834           01490     movfw TIME_SS1
+00C1   2???           01491     call write
+                      01492 
+00C2   3020           01493     movlw ' '
+00C3   2???           01494     call write
+00C4   3020           01495     movlw ' '
+00C5   2???           01496     call write
+00C6   0836           01497     movfw       DAY                             
+00C7   2???           01498     call        DEC
+00C8   0008           01499     return
+                      01500     
+                      01501     ;==========================================   
+                      01502     
+00C9                  01503 LCD_two
+00C9   1007           01504     bcf PORTC, 0
+00CA   30C4           01505     movlw b'11000100'
+00CB   2???           01506     call write
+                      01507 ; Установка RC0=0, для последующей передачи
+                      01508 ;команды  на  контроллер  HD.  Передается  ко-
+                      01509 ;манда Set DDRAM address,  устанавливающая
+                      01510 ;счетчик  адреса  видеопамяти  на  начало  2-ой
+                      01511 ;строки:  ячейку  с  адресом  (0х40  =  0100  0000).
+                      01512 ;Это  необходимо  для  вывода  фразы  «TEM-
+                      01513 ;PERATURA =» на второй строке индикатора.
+                      01514 
+00CC   1407           01515     bsf PORTC,0  ; установка RC0=1, для последующей передачи
+                      01516 ;кодов символов второй строки на дисплей. Об-
+                      01517 ;ратите внимание на то, что нигде не требуется
+                      01518 ;изменения  банков  памяти: т.к. все регистры, с
+                      01519 ;которыми работает ПО, находятся в 0-ом бан-
+                      01520 ;ке.
+00CD   3041           01521     movlw 'A'
+00CE   2???           01522     call write
+00CF   304C           01523     movlw 'L'
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 31
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00D0   2???           01524     call write
+00D1   3041           01525     movlw 'A'
+00D2   2???           01526     call write
+00D3   3052           01527     movlw 'R'
+00D4   2???           01528     call write
+00D5   304D           01529     movlw 'M'
+00D6   2???           01530     call write
+00D7   3020           01531     movlw ' '
+00D8   2???           01532     call write
+00D9   3020           01533     movlw ' '
+00DA   2???           01534     call write
+00DB   0838           01535     movfw ALARM_HH2
+00DC   2???           01536     call write
+00DD   0837           01537     movfw ALARM_HH1
+00DE   2???           01538     call write
+00DF   303A           01539     movlw ':'
+00E0   2???           01540     call write
+00E1   083A           01541     movfw ALARM_MM2
+00E2   2???           01542     call write
+00E3   0839           01543     movfw ALARM_MM1
+00E4   2???           01544     call write
+00E5   0008           01545     return
+                      01546  
+                      01547      ;==========================================
+                      01548      
+                      01549      ; Процедура типа switch для выбора дня недели
+Message[305]: Using default destination of 1 (file).
+00E6   0782           01550 DEC addwf PCL
+00E7   2???           01551     goto monday
+00E8   2???           01552     goto tuesday
+00E9   2???           01553     goto wednesday      
+00EA   2???           01554     goto thursday    
+00EB   2???           01555     goto friday         
+00EC   2???           01556     goto saturday               
+00ED   2???           01557     goto sunday         
+00EE   0008           01558     return
+                      01559 ;Отрисовка дней недели
+00EF                  01560 monday                      ;понедельник
+00EF   304D           01561     movlw 'M'
+00F0   2???           01562     call write
+00F1   304F           01563     movlw 'O'
+00F2   2???           01564     call write
+00F3   304E           01565     movlw 'N'
+00F4   2???           01566     call write
+00F5   2???           01567     goto exday
+00F6                  01568 tuesday                     ;вторник
+00F6   3054           01569     movlw 'T'
+00F7   2???           01570     call write
+00F8   3055           01571     movlw 'U'
+00F9   2???           01572     call write
+00FA   3045           01573     movlw 'E'
+00FB   2???           01574     call write
+00FC   2???           01575     goto exday
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 32
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00FD                  01576 wednesday                   ;среда
+00FD   3057           01577     movlw 'W'
+00FE   2???           01578     call write
+00FF   3045           01579     movlw 'E'
+0100   2???           01580     call write
+0101   3044           01581     movlw 'D'
+0102   2???           01582     call write
+0103   2???           01583     goto exday
+0104                  01584 thursday                    ;четверг
+0104   3054           01585     movlw 'T'
+0105   2???           01586     call write
+0106   3048           01587     movlw 'H'
+0107   2???           01588     call write
+0108   3055           01589     movlw 'U'
+0109   2???           01590     call write
+010A   2???           01591     goto exday
+010B                  01592 friday                      ;пятница
+010B   3046           01593     movlw 'F'
+010C   2???           01594     call write
+010D   3052           01595     movlw 'R'
+010E   2???           01596     call write
+010F   3049           01597     movlw 'I'
+0110   2???           01598     call write
+0111   2???           01599     goto exday
+0112                  01600 saturday                    ;суббота
+0112   3053           01601     movlw 'S'
+0113   2???           01602     call write
+0114   3041           01603     movlw 'A'
+0115   2???           01604     call write
+0116   3054           01605     movlw 'T'
+0117   2???           01606     call write
+0118   2???           01607     goto exday
+0119                  01608 sunday                      ;воскресенье
+0119   3053           01609     movlw 'S'
+011A   2???           01610     call write
+011B   3055           01611     movlw 'U'
+011C   2???           01612     call write
+011D   304E           01613     movlw 'N'
+011E   2???           01614     call write
+Warning[207]: Found label after column 1. (exday)
+011F                  01615     exday
+011F   0008           01616     return
+                      01617     ;==========================================
+                      01618     
+0120                  01619 Keyboard                    ; драйвер клавиатуры для клавиш 1-4, 9
+0120   1283           01620     bcf STATUS, RP0         ; переход в нулевой банк, для нормального вызова функции из тела программы
+0121   1303           01621     bcf STATUS, RP1
+0122   01BB           01622     clrf Key1               ; обнуление кодов клавиш
+0123   01BC           01623     clrf Key2 
+0124   01BD           01624     clrf Key3
+0125   01BE           01625     clrf Key4  
+0126   01C3           01626     clrf Key9  
+0127                  01627 col1                        ; сканируем первый столбец, где нам нужны клавиши 1, 4
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 33
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0127   1405           01628     bsf PORTA,0             ; подача питания
+0128   1085           01629     bcf PORTA,1
+0129   1105           01630     bcf PORTA,2 
+                      01631     ;movlw .24
+                      01632     ;call small_delay
+012A   0805           01633     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+012B   3938           01634     andlw 0x38
+012C   1903           01635     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col2
+012D   2???           01636     goto col2               ; для сканирования второго столбца клавиатуры. Если Z=0, то пропускаем строк
+                            у
+                      01637     ;movlw .250
+                      01638     ;call small_delay  
+012E   1985           01639     btfsc PORTA,3           ; определяем нажатия клавиши "1", проводя опрос первой строки
+012F   0ABB           01640     incf Key1,F
+0130   1A05           01641     btfsc PORTA,4           ; определяем нажатия клавиши "4", проводя опрос второй строки
+0131   0ABE           01642     incf Key4,F
+Warning[207]: Found label after column 1. (col2)
+0132                  01643     col2                    ; сканируем второй столбец, где нам нужна клавиша 2
+0132   1005           01644     bcf PORTA,0             ; подача питания
+0133   1485           01645     bsf PORTA,1
+0134   1105           01646     bcf PORTA,2 
+                      01647     ;movlw .24
+                      01648     ;sd
+0135   0805           01649     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+0136   3938           01650     andlw 0x38
+0137   1903           01651     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col3
+0138   2???           01652     goto col3               ; для сканирования третьего столбца клавиатуры. Если Z=0, то пропускаем стро
+                            ку
+                      01653     ;movlw .250
+                      01654     ;sd
+0139   1985           01655     btfsc PORTA,3           ; определяем нажатия клавиши "2", проводя опрос первой строки
+013A   0ABC           01656     incf Key2,F
+013B                  01657 col3                ; сканируем третий столбец, где нам нужна клавиша 3
+013B   1005           01658     bcf PORTA,0             ; подача питания
+013C   1085           01659     bcf PORTA,1
+013D   1505           01660     bsf PORTA,2
+                      01661     ;movlw .24
+                      01662     ;sd
+013E   0805           01663     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+013F   3938           01664     andlw 0x38
+0140   1903           01665     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
+0141   0008           01666     return                  ; если Z=0, то пропускаем строку
+                      01667     ;movlw .250
+                      01668     ;sd
+0142   1985           01669     btfsc PORTA,3           ; определяем нажатия клавиши "3", проводя опрос первой строки
+0143   0ABD           01670     incf Key3,F
+0144   1A85           01671     btfsc PORTA,5           ; определяем нажатия клавиши "9", проводя опрос третей строки
+0145   0AC3           01672     incf Key9,F
+0146   0008           01673     return                  ; выход из функции
+                      01674     
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 34
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      01675 ;==============================================
+                      01676 
+Error[138]  : Include files nested too deep
+                      01677     #include "time.asm"
+                      01678     
+                      01679     ;==============================================
+                      01680     ;==============================================
+                      01681     ;==============================================
+                      01682     
+Warning[207]: Found label after column 1. (change_day)
+0147                  01683     change_day              ; функция изменения дня недели
+0147   2???           01684     call Keyboard
+0148   183B           01685     btfsc Key1,0
+0149   2???           01686     goto plus_day_ch        ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное
+                             число (inc)
+014A   183C           01687     btfsc Key2,0
+014B   2???           01688     goto minus_day_ch       ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбранное
+                             число (dec)
+014C   183E           01689     btfsc Key4,0            ; выход из настройки времени в основной цикл без сохранения результата
+014D   2???           01690     goto START
+                      01691     
+014E   1007           01692     bcf PORTC, 0
+014F   308A           01693     movlw b'10001010'   ; установка адреса
+0150   2???           01694     call write
+0151   1407           01695     bsf PORTC,0
+                      01696 
+                      01697         ;Отрисовка первой строки
+0152   084B           01698     movfw       TEMP_DAY                                
+0153   2???           01699     call        DEC
+                      01700     
+0154   2???           01701     goto change_day
+                      01702     
+0155                  01703 plus_day_ch
+0155   30FF           01704     movlw 0xff
+0156   2???           01705     call delay              ; задержка крч
+0157   30FF           01706     movlw 0xff
+0158   2???           01707     call delay              ; задержка крч
+0159   0ACB           01708     incf    TEMP_DAY,1
+015A   3007           01709     movlw       .7                      ; inc переменной День
+015B   064B           01710     xorwf TEMP_DAY, w;
+015C   1D03           01711     btfss STATUS, 0x02          ; is not working 
+015D   2???           01712     goto change_day                     ; 
+015E   3000           01713     movlw       .0
+015F   00CB           01714     movwf       TEMP_DAY
+0160   2???           01715     goto change_day
+                      01716     
+0161                  01717 minus_day_ch
+0161   30FF           01718     movlw 0xff
+0162   2???           01719     call delay              ; задержка крч
+0163   30FF           01720     movlw 0xff
+0164   2???           01721     call delay              ; задержка крч
+0165   0ACB           01722     incf    TEMP_DAY,1
+0166   3000           01723     movlw       .0                      ; inc переменной День
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 35
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0167   064B           01724     xorwf TEMP_DAY, w;
+0168   1D03           01725     btfss STATUS, 0x02          ; is not working 
+0169   2???           01726     goto change_day                     
+016A   3006           01727     movlw       .6
+016B   00CB           01728     movwf       TEMP_DAY
+016C   2???           01729     goto change_day
+                      01730     
+                      01731     ;==============================================
+                      01732     ;==============================================
+                      01733     ;==============================================
+                      01734                             
+016D                  01735 small_delay:                    ; задержка для драйвера
+016D   00C4           01736     movwf fCOUNTER1
+016E   0064           01737     clrwdt
+016F   0BC4           01738     decfsz fCOUNTER1,F
+0170   2???           01739     goto $-2
+0171   0008           01740     return
+                      01741     
+Warning[205]: Found directive in column 1. (end)
+                      01742 end  ; конец программы
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 36
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+ALARM_HH1                         00000037
+ALARM_HH2                         00000038
+ALARM_MM1                         00000039
+ALARM_MM2                         0000003A
+BCLIE                             00000003
+BCLIF                             00000003
+BD_Loop                           000000A1
+BF                                00000000
+BRGH                              00000002
+Blink                             00000051
+C                                 00000000
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CKE                               00000006
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 37
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CKP                               00000004
+CREN                              00000004
+CSRC                              00000007
+D                                 00000005
+DATA_ADDRESS                      00000005
+DAY                               00000036
+DC                                00000001
+DEC                               000000E6
+DS                                00000002
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+Key1                              0000003B
+Key2                              0000003C
+Key3                              0000003D
+Key4                              0000003E
+Key5                              0000003F
+Key6                              00000040
+Key7                              00000041
+Key8                              00000042
+Key9                              00000043
+Keyboard                          00000120
+LCD_one                           000000A7
+LCD_two                           000000C9
+NOT_A                             00000005
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 38
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+NumPressKey                       00000050
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 39
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RST                               00000002
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 40
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+START                             00000040
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TEMP_ALARM_HH1                    0000004C
+TEMP_ALARM_HH2                    0000004D
+TEMP_ALARM_MM1                    0000004E
+TEMP_ALARM_MM2                    0000004F
+TEMP_DAY                          0000004B
+TEMP_TIME_HH1                     00000045
+TEMP_TIME_HH2                     00000046
+TEMP_TIME_MM1                     00000047
+TEMP_TIME_MM2                     00000048
+TEMP_TIME_SS1                     00000049
+TEMP_TIME_SS2                     0000004A
+TIME_HH1                          00000030
+TIME_HH2                          00000031
+TIME_MM1                          00000032
+TIME_MM2                          00000033
+TIME_SS1                          00000034
+TIME_SS2                          00000035
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 41
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 42
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+WAIT                              00000020
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_.org_2_0170                      00000170
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00000FCF
+_CP_HALF                          00001FDF
+_CP_OFF                           00003FFF
+_CP_UPPER_256                     00002FEF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_ENABLE_OFF                   00003DFF
+_WRT_ENABLE_ON                    00003FFF
+_WRT_OFF                          00003DFF
+_WRT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F877                          00000001
+bank0                             bcf STATUS,  RP0
+MPASM 5.75                          TIME.ASM   10-19-2017  8:11:56         PAGE 43
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+bank1                             bsf STATUS,  RP0
+begin                             00000004
+change_day                        00000147
+col1                              00000127
+col2                              00000132
+col3                              0000013B
+delay                             0000009D
+end_clock                         0000008C
+exday                             0000011F
+fCOUNTER                          00000026
+fCOUNTER1                         00000044
+fCOUNTER2                         00000027
+friday                            0000010B
+minus_day_ch                      00000161
+monday                            000000EF
+plus_day_ch                       00000155
+saturday                          00000112
+small_delay                       0000016D
+sunday                            00000119
+ten_clock                         00000085
+thursday                          00000104
+tuesday                           000000F6
+wait                              
+wednesday                         000000FD
+write                             00000095
+
+Errors   :    17
+Warnings :    16 reported,     0 suppressed
+Messages :     7 reported,    36 suppressed
+
+

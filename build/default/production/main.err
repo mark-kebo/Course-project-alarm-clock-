@@ -1,0 +1,8 @@
+Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 11 : Found directive in column 1. (include)
+Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 12 : Found directive in column 1. (errorlevel)
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 282 : Using default destination of 1 (file).
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 441 : Using default destination of 1 (file).
+Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 506 : Found label after column 1. (exday)
+Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 534 : Found label after column 1. (col2)
+Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 836 : Found label after column 1. (change_day)
+Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 895 : Found directive in column 1. (end)
