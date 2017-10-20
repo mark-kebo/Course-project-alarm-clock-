@@ -201,7 +201,7 @@ START
     movwf TEMP_TIME_SS1
     movfw DAY
     movwf TEMP_DAY
-    movlw 0x30
+    movlw 0x00
     movwf NumPressKey		; NPK каждый раз устанавливаем в начальное значение
     
     call Keyboard		; читаем клавиатуру
@@ -346,38 +346,74 @@ LCD_one
     call write
     bsf PORTC,0
     ;Отрисовка первой строки
-    
-    movlw 0x30			; если NumPressKey = 0, то вызываем
+    ; Отрисовка Н2
+    movlw 0x0			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	
     btfss STATUS, 0x02		
     goto blink_on_H2
     incf Blink,1
     btfss Blink, 0
     goto blink_on_H2
-    call blink_off_H2
+    goto blink_off_H2
 blink_off_H2
     movlw ' '
     call write
-    return
+    goto l1
 blink_on_H2
     movfw TIME_HH2
     call write
     goto l1
-    
-l1  
+    ; Отрисовка Н1
+l1  movlw 0x1			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_H1
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_H1
+    goto blink_off_H1
+blink_off_H1
+    movlw ' '
+    call write
+    goto l2
+blink_on_H1
     movfw TIME_HH1
     call write
+    goto l2
+    
+l2  movlw ':'
+    call write
+    
+    ; Отрисовка М2
+    movlw 0x2			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_M2
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_M2
+    goto blink_off_M2
+blink_off_M2
+    movlw ' '
+    call write
+    goto l3
+blink_on_M2
+    movfw TIME_MM2
+    call write
+    goto l3
+    
+    ; Отрисовка М1
+l3  movfw TIME_MM1
+    call write
     
     movlw ':'
     call write
-    movfw TIME_MM2
-    call write
-    movfw TIME_MM1
-    call write
-    movlw ':'
-    call write
+    
+    ; Отрисовка S2
     movfw TIME_SS2
     call write
+    
+    ; Отрисовка S1
     movfw TIME_SS1
     call write
 
@@ -586,32 +622,32 @@ correct_T_plus			; функция типа switch для ввода отдельных символов(инкремент ил
     call delay		    ; задержка крч
     movlw 0xff
     call delay		    ; задержка крч			    
-    movlw 0x30			; если NumPressKey = 0, то вызываем
+    movlw 0x0			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H2
     
-    movlw 0x31			; если NumPressKey = 1, то вызываем
+    movlw 0x1			; если NumPressKey = 1, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H1
 
-    movlw 0x32			; если NumPressKey = 2, то вызываем
+    movlw 0x2			; если NumPressKey = 2, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M2
     
-    movlw 0x33			; если NumPressKey = 3, то вызываем
+    movlw 0x3			; если NumPressKey = 3, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M1
     
-    movlw 0x34			; если NumPressKey = 4, то вызываем
+    movlw 0x4			; если NumPressKey = 4, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_S2
     
-    movlw 0x35			; если NumPressKey = 5, то вызываем
+    movlw 0x5			; если NumPressKey = 5, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S1.
     btfsc STATUS, 0x02		; если нет, выходим из функции
     call correct_S1
@@ -696,32 +732,32 @@ correct_T_minus			; функция типа switch для ввода отдельных символов(декремент)
     call delay		    ; задержка крч
     movlw 0xff
     call delay		    ; задержка крч
-    movlw 0x30			; если NumPressKey = 0, то вызываем
+    movlw 0x0			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H2_minus
     
-    movlw 0x31			; если NumPressKey = 1, то вызываем
+    movlw 0x1			; если NumPressKey = 1, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H1_minus
 
-    movlw 0x32			; если NumPressKey = 2, то вызываем
+    movlw 0x2			; если NumPressKey = 2, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M2_minus
     
-    movlw 0x33			; если NumPressKey = 3, то вызываем
+    movlw 0x3			; если NumPressKey = 3, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M1_minus
     
-    movlw 0x34			; если NumPressKey = 4, то вызываем
+    movlw 0x4			; если NumPressKey = 4, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_S2_minus
     
-    movlw 0x35			; если NumPressKey = 5, то вызываем
+    movlw 0x5			; если NumPressKey = 5, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S1.
     btfsc STATUS, 0x02		; если нет, выходим из функции
     call correct_S1_minus
@@ -806,11 +842,10 @@ save_T				; функция проверки и сохранения времени
     call delay			; задержка крч
     movlw 0xff
     call delay			; задержка крч
-    movlw 0x36			; если происходит переполнение NumPressKey
+    movlw 0x6			; если происходит переполнение NumPressKey
     xorwf NumPressKey, w	; значит время заданно корректно во всех ячейках
     btfsc STATUS, 0x02		; и мы переходим в функцию записи переменных значений
     goto START			; в постоянные
-    
     incf NumPressKey,1		; Если NumPressKey не переполнен, то инкрементируем
     goto change_time		; его и возвращаемся в функцию изменения времени
     
