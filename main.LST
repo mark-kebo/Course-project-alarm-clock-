@@ -1,0 +1,3696 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	main.asm
+	Object File:	main.hex
+	List File:	main.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:				;*******************************************************************************
+    2:				;                                                                              *
+    3:				;    Filename:  ALARM CLOCK                                                    *
+    4:				;    Date:      19.10.17                                                       *
+    5:				;    File Version:   1.4.2                                                     *
+    6:				;    Author:         Dmitry Vorozhbicky                                        *
+    7:				;    Company:        GrSU                                                      *
+    8:				;                                                                              *
+    9:				;*******************************************************************************
+   10:				;processor    PIC16F877
+   11:				include  <P16F877.INC>
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   12:				errorlevel   -302
+					     ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   13:					;  директивы  типа  контроллера,  под-
+   14:					;ключения  заголовочного  файла  и  вы-
+   15:					;вода сообщений об ошибках
+   16:				#define   bank0  bcf STATUS,  RP0
+				^
+			  @@@@@ illegal statement syntax @@@@@
+
+   17:				#define   bank1  bsf STATUS,  RP0
+				^
+			  @@@@@ illegal statement syntax @@@@@
+
+   18:				; директивы, позволяющие заменять в
+   19:					;теле  ПО  команды,  указанные  после
+   20:					;этой  директивы  (bcf  ,  bsf)  –  метками
+   21:					;bank0, bank1. Обратную замену произ-
+   22:					;водит компилятор
+   23:				WAIT		    equ	    0x20
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   24:				fCOUNTER	    equ     0x26
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   25:				fCOUNTER2	    equ     0x27
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   26:				TIME_HH1	    equ	    0x30
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   27:				TIME_HH2	    equ	    0x31
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   28:				TIME_MM1	    equ	    0x32
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   29:				TIME_MM2	    equ	    0x33
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   30:				TIME_SS1	    equ	    0x34
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   31:				TIME_SS2	    equ	    0x35
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   32:				DAY		    equ	    0x36
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   33:				ALARM_HH1	    equ	    0x37
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   34:				ALARM_HH2	    equ	    0x38
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   35:				ALARM_MM1	    equ	    0x39
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   36:				ALARM_MM2	    equ	    0x3A
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   37:				Key1		    equ	    0x3B
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   38:				Key2		    equ	    0x3C
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   39:				Key3		    equ	    0x3D
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+ Line  I  Addr  Code            Source
+
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   40:				Key4		    equ	    0x3E
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   41:				Key5		    equ	    0x3F
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   42:				Key6		    equ	    0x40
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   43:				Key7		    equ	    0x41
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   44:				Key8		    equ	    0x42
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   45:				Key9		    equ	    0x43
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   46:				fCOUNTER1	    equ     0x44
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   47:				TEMP_TIME_HH1	    equ	    0x45
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   48:				TEMP_TIME_HH2	    equ	    0x46
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   49:				TEMP_TIME_MM1	    equ	    0x47
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   50:				TEMP_TIME_MM2	    equ	    0x48
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   51:				TEMP_TIME_SS1	    equ	    0x49
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   52:				TEMP_TIME_SS2	    equ	    0x4A
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   53:				TEMP_DAY	    equ	    0x4B
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+ Line  I  Addr  Code            Source
+
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   54:				TEMP_ALARM_HH1	    equ	    0x4C
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   55:				TEMP_ALARM_HH2	    equ	    0x4D
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   56:				TEMP_ALARM_MM1	    equ	    0x4E
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   57:				TEMP_ALARM_MM2	    equ	    0x4F
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   58:				NumPressKey	    equ	    0x50
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   59:				Blink		    equ	    0x51
+							    ^
+			  @@@@@ illegal constant @@@@@
+
+   60:				    ;вспомогательные  регистры,  назначе-
+   61:					;ние которых приведено в комментариях
+   62:				    constant   DS = .2
+					       ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   63:				    constant   RST = .2
+					       ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   64:					;  директивы,  ставящие в  соответствие
+   65:					;меткам DS  и  RST  значение  0.  Анало-
+   66:					;гия директив equ для имен регистров.
+   67:
+   68:				wait  macro     time
+   69:				    movlw    (time/5)-1
+   70:				    movwf    WAIT
+   71:				    call    wait5u
+   72:				    endm
+   73:					;макрос паузы с именем wait. Особен-
+   74:					;ность этого макроса состоит в том, что
+   75:					;у  него  имеется  параметр  –  time.  При
+   76:					;вызове  макроса  значение  параметра
+   77:					;указывается  после  имени  макроса  в
+   78:					;виде  целого  десятичного  числа  крат-
+   79:					;ного  5  (в  данном  примере).  В  теле
+   80:					;макроса  это  число  подставляется  в
+   81:					;«переменную» time и далее использу-
+   82:					;ется вычисленное значение (которое в
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 5
+
+
+
+ Line  I  Addr  Code            Source
+
+   83:					;данном случае  выступает  в  роли  кон-
+   84:					;станты, записываемой в W). Вместе с
+   85:					;процедурой  wait5u  длительность  за-
+   86:					;держки,  обеспечиваемая  макросом
+   87:					;равна time микросекунд
+   88:
+   89:				    org 0x0000
+					^
+			  @@@@@ illegal constant @@@@@
+
+   90:				    clrf STATUS
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   91:				    movlw 0x00
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+   92:				    movwf PCLATH
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   93:				    goto begin
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   94:					;выбор нулевой страницы памяти ко-
+   95:					;манд и размещение на ней откомпили-
+   96:					;рованного кода
+   97:
+   98:				begin
+				     ^
+			  @@@@@ illegal statement syntax @@@@@
+
+   99:				    bank1  ; выбор первого банка памяти. Для вы-
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  100:					;зова используется метка bank1, объяв-
+  101:					;ленная выше директивой #define
+  102:				    movlw 0x8F
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  103:				    movwf OPTION_REG
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  104:				    clrwdt
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  105:					;установка  максимального  времени
+  106:					;срабатывания  сторожевого  таймера  и
+  107:					;его сброс
+  108:				    clrf INTCON
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 6
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  109:				    clrf PIE1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  110:				    clrf PIE2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  111:					;отключение  прерываний  и  их  обработки
+  112:				    movlw .0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  113:				    movwf TRISB
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  114:				    movwf TRISC
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  115:				    movwf TRISE
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  116:					; конфигурирование  портов  В, С, Е
+  117:				    movlw b'11111000'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  118:				    movwf TRISA
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  119:				    movlw b'00000000'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  120:				    movwf TRISD
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  121:				    movlw b'00001111'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  122:				    movwf OPTION_REG
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  123:					;конфигурирование  RD0  как  входа
+  124:					;для  установки  на  нем  «1»  в  качестве
+  125:					;исходного  состояния  интерфейса  «1-Wire»
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 7
+
+
+
+ Line  I  Addr  Code            Source
+
+  126:				    clrf ADCON1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  127:				    bsf ADCON1,0x01
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  128:				    bsf ADCON1,0x02
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  129:				    bank0
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  130:				    clrf Key1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  131:				    clrf Key2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  132:				    clrf Key3
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  133:				    clrf Key4
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  134:				    clrf Key9
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  135:				    clrf PORTC
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  136:				    clrf PORTD
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  137:				; подготовка к передаче команд на контроллер
+  138:				;HD путем установки RC0=0
+  139:				    movlw 0x01
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  140:	  0000	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  141:				    movlw 0x0f
+					  ^
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 8
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal constant @@@@@
+
+  142:	  0003	12 00 00	    call delay
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  143:				; передача команды Clear  Display для очистки
+  144:				;дисплея и установки счетчика адреса видеопа-
+  145:				;мяти  на  нулевой  адрес  (первое  знакоместо  в
+  146:				;верхней строке), с необходимой задержкой
+  147:				    clrwdt
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  148:				    movlw 0x38
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  149:	  0006	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  150:				    movlw 0x0f
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  151:	  0009	12 00 00	    call delay
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  152:
+  153:				; передача команды Function Set для установки
+  154:				;режима  2-х  строчного  индикатора,  размера
+  155:				;знакоместа 5х7 и 8 разрядной шины данных
+  156:				    movlw 0x06
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  157:	  000C	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  158:				    movlw 0x0f
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  159:	  000F	12 00 00	    call delay
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  160:				;передача  команды  Entry  Mode  Set  для  уста-
+  161:				;новки режима увеличения счетчика адреса ви-
+  162:				;деопамяти, после каждой записи символа в нее,
+  163:				;при неподвижности видеопамяти относительно
+  164:				;индикатора
+  165:				    movlw 0x0c
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 9
+
+
+
+ Line  I  Addr  Code            Source
+
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  166:	  0012	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  167:				    movlw 0x0f
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  168:	  0015	12 00 00	    call delay
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  169:				;  передача  команды  Display  ON/OFF  control
+  170:				;для включения дисплея с отключенным курсо-
+  171:				;ром.  На  этом  этап инициализации дисплея за-
+  172:				;кончен.
+  173:				    movlw 	0x30
+						^
+			  @@@@@ illegal constant @@@@@
+
+  174:				    movwf	TIME_HH1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  175:				    movwf	TIME_HH2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  176:				    movwf	TIME_MM1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  177:				    movwf	TIME_MM2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  178:				    movwf	TIME_SS1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  179:				    movwf	TIME_SS2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  180:				    movwf	ALARM_HH1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  181:				    movwf	ALARM_HH2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  182:				    movwf	ALARM_MM1
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 10
+
+
+
+ Line  I  Addr  Code            Source
+
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  183:				    movwf	ALARM_MM2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  184:				    movlw 	.0
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  185:				    movwf	DAY
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  186:				    movlw 	b'00000000'
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  187:				    movwf	Blink
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  188:
+  189:				START
+				     ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  190:				    movfw TIME_HH2		; записываем значения постоянныx переменных в  временныe
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  191:				    movwf TEMP_TIME_HH2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  192:				    movfw TIME_HH1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  193:				    movwf TEMP_TIME_HH1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  194:				    movfw TIME_MM2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  195:				    movwf TEMP_TIME_MM2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  196:				    movfw TIME_MM1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 11
+
+
+
+ Line  I  Addr  Code            Source
+
+  197:				    movwf TEMP_TIME_MM1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  198:				    movfw TIME_SS2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  199:				    movwf TEMP_TIME_SS2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  200:				    movfw TIME_SS1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  201:				    movwf TEMP_TIME_SS1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  202:				    movfw DAY
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  203:				    movwf TEMP_DAY
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  204:				    movlw 0x00
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  205:				    movwf NumPressKey		; NPK каждый раз устанавливаем в начальное значение
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  206:
+  207:	  0018	12 00 00	    call Keyboard		; читаем клавиатуру
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  208:				    btfsc Key1,0		; проверка нажатия клавиши "1",  если нажата, то переходим
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  209:				    goto change_time		; к изменению времени, нет - тогда проверяем клавишу 2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  210:				    btfsc Key2,0		; проверка нажатия клавиши "2",  если нажата, то переходим
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  211:				    goto change_day		; к изменению дня недели, нет - тогда проверяем клавишу 3
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 12
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  212:
+  213:	  001B	12 00 00	    call LCD_one		;Отрисовка первой строки
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  214:
+  215:					;Счет десятков секунд (0-6) - TIME_SS1
+  216:				    incf TIME_SS1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  217:				    movlw 0x3A			; if !=10
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  218:				    xorwf TIME_SS1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  219:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  220:				    goto end_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  221:					;обнуление TIME_MM1
+  222:				    movlw 0x30
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  223:				    movwf	TIME_SS1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  224:
+  225:					;Счет десятков секунд (0-6) - TIME_SS2
+  226:				    incf TIME_SS2,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  227:				    movlw 0x36			; if !=6
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  228:				    xorwf TIME_SS2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  229:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  230:				    goto end_clock
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 13
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  231:					;обнуление TIME_MM2
+  232:				    movlw 0x30
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  233:				    movwf	TIME_SS2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  234:
+  235:					;Счет десятков минут (0-6) - TIME_MM1
+  236:				    incf TIME_MM1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  237:				    movlw 0x3A			; if !=10
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  238:				    xorwf TIME_MM1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  239:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  240:				    goto end_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  241:					;обнуление TIME_MM1
+  242:				    movlw 0x30
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  243:				    movwf	TIME_MM1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  244:
+  245:					;Счет десятков минут (0-6) - TIME_MM2
+  246:				    incf TIME_MM2,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  247:				    movlw 0x36			; if !=6
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  248:				    xorwf TIME_MM2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 14
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  249:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  250:				    goto end_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  251:					;обнуление TIME_MM2
+  252:				    movlw 0x30
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  253:				    movwf	TIME_MM2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  254:
+  255:					;Счет десятков единиц часов - TIME_НН2, TIME_НН1
+  256:				    incf TIME_HH1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  257:				    movlw 0x34 			; if !=4
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  258:				    xorwf TIME_HH1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  259:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  260:				    goto ten_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  261:				    movlw 0x32			; if !=2
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  262:				    xorwf TIME_HH2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  263:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  264:				    goto ten_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 15
+
+
+
+ Line  I  Addr  Code            Source
+
+  265:				    movlw 0x30
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  266:				    movwf	TIME_HH1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  267:				    movwf	TIME_HH2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  268:				    incf    DAY,1
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  269:				    movlw 	.7			; inc переменной День
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  270:				    xorwf DAY, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  271:				    btfss STATUS, 0x02			; Обнуление переменной при достижении воскресенья,
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  272:				    goto end_clock			; что бы при 00:00:00 перейти в понедельник
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  273:				    movlw 	.0
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  274:				    movwf	DAY
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  275:
+  276:
+  277:				ten_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  278:				    movlw 0x3A 			; if !=10
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  279:				    xorwf TIME_HH1, w;		; подпрограмма для работы с форматом 24 часа
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  280:				    btfss STATUS, 0x02		; т.к. 18 часов может быть, а 28 нет, то надо
+					  ^
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 16
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal statement syntax @@@@@
+
+  281:				    goto end_clock		; ограничить единицы при десятках = 2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  282:				    incf    TIME_HH2
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  283:				    movlw 0x30
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  284:				    movwf	TIME_HH1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  285:
+  286:				end_clock
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  287:				    clrwdt
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  288:
+  289:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  290:	  001E	12 00 00	    call delay ;задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  291:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  292:	  0021	12 00 00	    call delay ;задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  293:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  294:	  0024	12 00 00	    call delay ;задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  295:
+  296:	  0027	12 00 00	    call LCD_two		;Отрисовка второй строки
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 17
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  297:
+  298:				    ; ТУТ ОБРАБОТКА БУДИЛЬНИКА БУДЕТ
+  299:
+  300:				    goto START		; конец основного цикла (должен быть = 1сек)
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  301:
+  302:				    ;--------------------------------------------------------
+  303:				    ;--------------------------------------------------------
+  304:				    ;--------------------------------------------------------
+  305:
+  306:				write    ; процедура записи байта к контроллер HD
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  307:				    bcf STATUS, RP1
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  308:				    bcf STATUS, RP0
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  309:				    movwf PORTB
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  310:				    bsf PORTC, 2
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  311:				    movlw 0x01
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  312:	  002A	12 00 00	    call delay
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  313:				    bcf PORTC, 2
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  314:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  315:
+  316:				    	; перед вызовом этой процедуры в W помеща-
+  317:					;ется байт, который надо записать в HD. Далее
+  318:					;он передается в PORTB и формируется отрица-
+  319:					;тельный перепад на RC2, путем предваритель-
+  320:					;ной  его  установки  в  «1»,  удержания  этого
+  321:					;уровня в течение некоторого времени (опреде-
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 18
+
+
+
+ Line  I  Addr  Code            Source
+
+  322:					;ляемого временем задержки delay  при  W=1) и
+  323:					;сброса его в «0».
+  324:
+  325:					;  процедура  задержки,  время  которой  можно
+  326:					;регулировать, задавая число в W
+  327:				delay
+				     ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  328:				    bcf   STATUS, RP1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  329:				    bcf   STATUS, RP0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  330:				    movwf   fCOUNTER2
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  331:				    clrf    fCOUNTER
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  332:
+  333:				BD_Loop
+				       ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  334:				    clrwdt
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  335:				    decfsz  fCOUNTER, f
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  336:				    goto    BD_Loop
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  337:				    decfsz  fCOUNTER2, f
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  338:				    goto    BD_Loop
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  339:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  340:
+  341:				    ;==========================================
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 19
+
+
+
+ Line  I  Addr  Code            Source
+
+  342:
+  343:				LCD_one
+				       ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  344:				    bcf PORTC, 0
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  345:				    movlw b'10000000'	; установка адреса
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  346:	  002D	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  347:				    bsf PORTC,0
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  348:				    ;Отрисовка первой строки
+  349:				    ; Отрисовка Н2
+  350:				    movlw 0x0			; если NumPressKey = 0, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  351:				    xorwf NumPressKey, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  352:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  353:				    goto blink_on_H2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  354:				    incf Blink,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  355:				    btfss Blink, 0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  356:				    goto blink_on_H2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  357:				    goto blink_off_H2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  358:				blink_off_H2
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 20
+
+
+
+ Line  I  Addr  Code            Source
+
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  359:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  360:	  0030	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  361:				    goto l1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  362:				blink_on_H2
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  363:				    movfw TIME_HH2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  364:	  0033	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  365:				    goto l1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  366:				    ; Отрисовка Н1
+  367:				l1  movlw 0x1			; если NumPressKey = 0, то вызываем
+				    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  368:				    xorwf NumPressKey, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  369:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  370:				    goto blink_on_H1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  371:				    incf Blink,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  372:				    btfss Blink, 0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 21
+
+
+
+ Line  I  Addr  Code            Source
+
+  373:				    goto blink_on_H1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  374:				    goto blink_off_H1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  375:				blink_off_H1
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  376:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  377:	  0036	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  378:				    goto l2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  379:				blink_on_H1
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  380:				    movfw TIME_HH1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  381:	  0039	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  382:				    goto l2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  383:
+  384:				l2  movlw ':'
+				    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  385:	  003C	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  386:
+  387:				    ; Отрисовка М2
+  388:				    movlw 0x2			; если NumPressKey = 0, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  389:				    xorwf NumPressKey, w;
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 22
+
+
+
+ Line  I  Addr  Code            Source
+
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  390:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  391:				    goto blink_on_M2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  392:				    incf Blink,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  393:				    btfss Blink, 0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  394:				    goto blink_on_M2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  395:				    goto blink_off_M2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  396:				blink_off_M2
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  397:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  398:	  003F	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  399:				    goto l3
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  400:				blink_on_M2
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  401:				    movfw TIME_MM2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  402:	  0042	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  403:				    goto l3
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 23
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  404:
+  405:				    ; Отрисовка М1
+  406:				l3  movlw 0x3			; если NumPressKey = 0, то вызываем
+				    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  407:				    xorwf NumPressKey, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  408:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  409:				    goto blink_on_M1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  410:				    incf Blink,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  411:				    btfss Blink, 0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  412:				    goto blink_on_M1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  413:				    goto blink_off_M1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  414:				blink_off_M1
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  415:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  416:	  0045	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  417:				    goto l4
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  418:				blink_on_M1
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 24
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  419:				    movfw TIME_MM1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  420:	  0048	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  421:				    goto l4
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  422:
+  423:				    l4 movlw ':'
+				       ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  424:	  004B	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  425:
+  426:				    ; Отрисовка S2
+  427:				    movlw 0x4			; если NumPressKey = 0, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  428:				    xorwf NumPressKey, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  429:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  430:				    goto blink_on_S2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  431:				    incf Blink,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  432:				    btfss Blink, 0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  433:				    goto blink_on_S2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  434:				    goto blink_off_S2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 25
+
+
+
+ Line  I  Addr  Code            Source
+
+  435:				blink_off_S2
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  436:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  437:	  004E	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  438:				    goto l5
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  439:				blink_on_S2
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  440:				    movfw TIME_SS2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  441:	  0051	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  442:				    goto l5
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  443:
+  444:				    ; Отрисовка S1
+  445:				   l5 movlw 0x5			; если NumPressKey = 0, то вызываем
+				      ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  446:				    xorwf NumPressKey, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  447:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  448:				    goto blink_on_S1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  449:				    incf Blink,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  450:				    btfss Blink, 0
+					  ^
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 26
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal statement syntax @@@@@
+
+  451:				    goto blink_on_S1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  452:				    goto blink_off_S1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  453:				blink_off_S1
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  454:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  455:	  0054	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  456:				    goto l6
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  457:				blink_on_S1
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  458:				    movfw TIME_SS1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  459:	  0057	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  460:				    goto l6
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  461:
+  462:				   l6 movlw ' '
+				      ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  463:	  005A	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  464:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  465:	  005D	12 00 00	    call write
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 27
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  466:				    movfw	DAY
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  467:	  0060	12 00 00	    call	DEC
+						^
+			  @@@@@ illegal operand @@@@@
+
+  468:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  469:
+  470:				    ;==========================================
+  471:
+  472:				LCD_two
+				       ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  473:				    bcf PORTC, 0
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  474:				    movlw b'11000100'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  475:	  0063	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  476:				; Установка RC0=0, для последующей передачи
+  477:				;команды  на  контроллер  HD.  Передается  ко-
+  478:				;манда Set DDRAM address,  устанавливающая
+  479:				;счетчик  адреса  видеопамяти  на  начало  2-ой
+  480:				;строки:  ячейку  с  адресом  (0х40  =  0100  0000).
+  481:				;Это  необходимо  для  вывода  фразы  «TEM-
+  482:				;PERATURA =» на второй строке индикатора.
+  483:
+  484:				    bsf PORTC,0  ; установка RC0=1, для последующей передачи
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  485:				;кодов символов второй строки на дисплей. Об-
+  486:				;ратите внимание на то, что нигде не требуется
+  487:				;изменения  банков  памяти: т.к. все регистры, с
+  488:				;которыми работает ПО, находятся в 0-ом бан-
+  489:				;ке.
+  490:				    movlw 'A'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  491:	  0066	12 00 00	    call write
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 28
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  492:				    movlw 'L'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  493:	  0069	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  494:				    movlw 'A'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  495:	  006C	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  496:				    movlw 'R'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  497:	  006F	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  498:				    movlw 'M'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  499:	  0072	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  500:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  501:	  0075	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  502:				    movlw ' '
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  503:	  0078	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  504:				    movfw ALARM_HH2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  505:	  007B	12 00 00	    call write
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 29
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  506:				    movfw ALARM_HH1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  507:	  007E	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  508:				    movlw ':'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  509:	  0081	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  510:				    movfw ALARM_MM2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  511:	  0084	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  512:				    movfw ALARM_MM1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  513:	  0087	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  514:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  515:
+  516:				     ;==========================================
+  517:
+  518:				     ; Процедура типа switch для выбора дня недели
+  519:	  008A	15 00		DEC addwf PCL
+					  ^
+			  @@@@@ binary operator expected @@@@@
+
+  520:				    goto monday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  521:				    goto tuesday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  522:				    goto wednesday
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 30
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  523:				    goto thursday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  524:				    goto friday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  525:				    goto saturday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  526:				    goto sunday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  527:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  528:				;Отрисовка дней недели
+  529:				monday			    ;понедельник
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  530:				    movlw 'M'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  531:	  008C	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  532:				    movlw 'O'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  533:	  008F	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  534:				    movlw 'N'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  535:	  0092	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  536:				    goto exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 31
+
+
+
+ Line  I  Addr  Code            Source
+
+  537:				tuesday			    ;вторник
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  538:				    movlw 'T'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  539:	  0095	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  540:				    movlw 'U'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  541:	  0098	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  542:				    movlw 'E'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  543:	  009B	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  544:				    goto exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  545:				wednesday		    ;среда
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  546:				    movlw 'W'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  547:	  009E	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  548:				    movlw 'E'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  549:	  00A1	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  550:				    movlw 'D'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 32
+
+
+
+ Line  I  Addr  Code            Source
+
+  551:	  00A4	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  552:				    goto exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  553:				thursday		    ;четверг
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  554:				    movlw 'T'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  555:	  00A7	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  556:				    movlw 'H'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  557:	  00AA	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  558:				    movlw 'U'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  559:	  00AD	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  560:				    goto exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  561:				friday			    ;пятница
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  562:				    movlw 'F'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  563:	  00B0	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  564:				    movlw 'R'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 33
+
+
+
+ Line  I  Addr  Code            Source
+
+  565:	  00B3	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  566:				    movlw 'I'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  567:	  00B6	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  568:				    goto exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  569:				saturday		    ;суббота
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  570:				    movlw 'S'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  571:	  00B9	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  572:				    movlw 'A'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  573:	  00BC	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  574:				    movlw 'T'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  575:	  00BF	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  576:				    goto exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  577:				sunday			    ;воскресенье
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  578:				    movlw 'S'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 34
+
+
+
+ Line  I  Addr  Code            Source
+
+  579:	  00C2	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  580:				    movlw 'U'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  581:	  00C5	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  582:				    movlw 'N'
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  583:	  00C8	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  584:				    exday
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  585:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  586:				    ;==========================================
+  587:
+  588:				Keyboard		    ; драйвер клавиатуры для клавиш 1-4, 9
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  589:				    bcf STATUS, RP0	    ; переход в нулевой банк, для нормального вызова функции из тела програм
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+				мы
+  590:				    bcf STATUS, RP1
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  591:				    clrf Key1		    ; обнуление кодов клавиш
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  592:				    clrf Key2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  593:				    clrf Key3
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  594:				    clrf Key4
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 35
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  595:				    clrf Key9
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  596:				col1			    ; сканируем первый столбец, где нам нужны клавиши 1, 4
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  597:				    bsf PORTA,0		    ; подача питания
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  598:				    bcf PORTA,1
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  599:				    bcf PORTA,2
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  600:				    ;movlw .24
+  601:				    ;call small_delay
+  602:				    movf PORTA,W	    ; читаем порт А в W и выполняем поразрядное умножение битов порта на чис
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				ло 0011 1000.
+  603:				    andlw 0x38
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  604:				    btfsc STATUS,Z	    ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  605:				    goto col2		    ; для сканирования второго столбца клавиатуры. Если Z=0, то пропускаем с
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				троку
+  606:				    ;movlw .250
+  607:				    ;call small_delay
+  608:				    btfsc PORTA,3	    ; определяем нажатия клавиши "1", проводя опрос первой строки
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  609:				    incf Key1,F
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  610:				    btfsc PORTA,4	    ; определяем нажатия клавиши "4", проводя опрос второй строки
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 36
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  611:				    incf Key4,F
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  612:				    col2		    ; сканируем второй столбец, где нам нужна клавиша 2
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  613:				    bcf PORTA,0		    ; подача питания
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  614:				    bsf PORTA,1
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  615:				    bcf PORTA,2
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  616:				    ;movlw .24
+  617:				    ;sd
+  618:				    movf PORTA,W	    ; читаем порт А в W и выполняем поразрядное умножение битов порта на чис
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				ло 0011 1000.
+  619:				    andlw 0x38
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  620:				    btfsc STATUS,Z	    ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col3
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  621:				    goto col3		    ; для сканирования третьего столбца клавиатуры. Если Z=0, то пропускаем
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				строку
+  622:				    ;movlw .250
+  623:				    ;sd
+  624:				    btfsc PORTA,3	    ; определяем нажатия клавиши "2", проводя опрос первой строки
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  625:				    incf Key2,F
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  626:				col3		    ; сканируем третий столбец, где нам нужна клавиша 3
+						    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  627:				    bcf PORTA,0		    ; подача питания
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 37
+
+
+
+ Line  I  Addr  Code            Source
+
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  628:				    bcf PORTA,1
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  629:				    bsf PORTA,2
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  630:				    ;movlw .24
+  631:				    ;sd
+  632:				    movf PORTA,W	    ; читаем порт А в W и выполняем поразрядное умножение битов порта на чис
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				ло 0011 1000.
+  633:				    andlw 0x38
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  634:				    btfsc STATUS,Z	    ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  635:				    return		    ; если Z=0, то пропускаем строку
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  636:				    ;movlw .250
+  637:				    ;sd
+  638:				    btfsc PORTA,3	    ; определяем нажатия клавиши "3", проводя опрос первой строки
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  639:				    incf Key3,F
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  640:				    btfsc PORTA,5	    ; определяем нажатия клавиши "9", проводя опрос третей строки
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  641:				    incf Key9,F
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  642:				    return		    ; выход из функции
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  643:
+  644:				;==============================================
+  645:
+  646:				change_time		    ; функция изменения времени
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 38
+
+
+
+ Line  I  Addr  Code            Source
+
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  647:	  00CB	12 00 00	    call Keyboard	    ; спрашиваем клавиатуру
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  648:				    btfsc Key1,0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  649:	  00CE	12 00 00	    call correct_T_plus	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбра
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+				нное число (inc)
+  650:				    btfsc Key2,0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  651:	  00D1	12 00 00	    call correct_T_minus    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбра
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+				нное число (dec)
+  652:				    btfsc Key3,0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  653:				    goto save_T		    ; переход к другой цифре путем инкремента NPK, при переполнения переменн
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				ой происходит сохранение результата и выход в основной цикл
+  654:				    btfsc Key4,0	    ; выход из настройки времени в основной цикл без сохранения результата
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  655:				    goto change_HMS
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  656:
+  657:	  00D4	12 00 00	    call LCD_one
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  658:				    goto change_time
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  659:
+  660:				    ;----------------------------------------
+  661:
+  662:				correct_T_plus			; функция типа switch для ввода отдельных символов(инкремент или при
+								^
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 39
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal statement syntax @@@@@
+
+				бавление)
+  663:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  664:	  00D7	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  665:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  666:	  00DA	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  667:				    movlw 0x0			; если NumPressKey = 0, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  668:				    xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  669:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  670:	  00DD	12 00 00	    call correct_H2
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  671:
+  672:				    movlw 0x1			; если NumPressKey = 1, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  673:				    xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  674:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  675:	  00E0	12 00 00	    call correct_H1
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  676:
+  677:				    movlw 0x2			; если NumPressKey = 2, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 40
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  678:				    xorwf NumPressKey, w;	; функцию коррекции переменной M2.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  679:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  680:	  00E3	12 00 00	    call correct_M2
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  681:
+  682:				    movlw 0x3			; если NumPressKey = 3, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  683:				    xorwf NumPressKey, w;	; функцию коррекции переменной M1.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  684:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  685:	  00E6	12 00 00	    call correct_M1
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  686:
+  687:				    movlw 0x4			; если NumPressKey = 4, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  688:				    xorwf NumPressKey, w;	; функцию коррекции переменной S2.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  689:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  690:	  00E9	12 00 00	    call correct_S2
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  691:
+  692:				    movlw 0x5			; если NumPressKey = 5, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  693:				    xorwf NumPressKey, w;	; функцию коррекции переменной S1.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 41
+
+
+
+ Line  I  Addr  Code            Source
+
+  694:				    btfsc STATUS, 0x02		; если нет, выходим из функции
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  695:	  00EC	12 00 00	    call correct_S1
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  696:
+  697:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  698:
+  699:				    ;----------------------------------------
+  700:
+  701:				correct_H2			; функцию коррекции переменной H2.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  702:				    incf TIME_HH2,1	; инкремент временной переменной для Н2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  703:				    movlw 0x33			; if !=3, переходим обратно в функцию
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  704:				    xorwf TIME_HH2, w	; correct_T_plus и проверяем там следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  705:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  706:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  707:				    movlw 	0x30		; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
+						^
+			  @@@@@ illegal constant @@@@@
+
+  708:				    movwf	TIME_HH2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  709:				    return			; и идем обратно в correct_T_plus и проверяем там следующее условие
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  710:
+  711:				correct_H1			; функцию коррекции переменной H1.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 42
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  712:				    incf TIME_HH1,1	; инкремент временной переменной для Н1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  713:				    movlw 0x32			; if = 2, переходим в функцию three_H1, которая служит для
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  714:				    xorwf TIME_HH2, w	; корректной задачи времени, т.к. 18 часов может быть, а 28 нет, то надо
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  715:					    			; ограничить единицы при десятках = 2
+  716:				    btfsc STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  717:				    goto three_H1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  718:				    movlw 0x3a			; есди переменная = 0 или = 1, то максимальная единица для обноления
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+				 - 9.
+  719:				t1  xorwf TIME_HH1, w
+				    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  720:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  721:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  722:				    movlw 	0x30		; собственно обнуление переменной при достижении 10 или 4 по условию
+						^
+			  @@@@@ illegal constant @@@@@
+
+				 выше.
+  723:				    movwf	TIME_HH1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  724:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  725:
+  726:				three_H1
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 43
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  727:				    movlw 0x34			; предел для обнуления при переменной = 2
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  728:				    goto t1			; возврат к метке t1 для продолжения корректной работы
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  729:
+  730:				correct_M2			; функцию коррекции переменной M2.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  731:				    incf TIME_MM2,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  732:				    movlw 0x36			; Работает так же, только обнуление происходит при достижении 6
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  733:				    xorwf TIME_MM2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  734:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  735:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  736:				    movlw 	0x30
+						^
+			  @@@@@ illegal constant @@@@@
+
+  737:				    movwf	TIME_MM2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  738:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  739:
+  740:				correct_M1			; функцию коррекции переменной M1.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  741:				    incf TIME_MM1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  742:				    movlw 0x3a			; Работает так же, только обнуление происходит при достижении 10
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 44
+
+
+
+ Line  I  Addr  Code            Source
+
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  743:				    xorwf TIME_MM1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  744:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  745:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  746:				    movlw 	0x30
+						^
+			  @@@@@ illegal constant @@@@@
+
+  747:				    movwf	TIME_MM1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  748:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  749:
+  750:				correct_S2			; функцию коррекции переменной S2.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  751:				    incf TIME_SS2,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  752:				    movlw 0x36			; Работает так же, только обнуление происходит при достижении 6
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  753:				    xorwf TIME_SS2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  754:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  755:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  756:				    movlw 	0x30
+						^
+			  @@@@@ illegal constant @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 45
+
+
+
+ Line  I  Addr  Code            Source
+
+  757:				    movwf	TIME_SS2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  758:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  759:
+  760:				correct_S1			; функцию коррекции переменной S1.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  761:				    incf TIME_SS1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  762:				    movlw 0x3a			; Работает так же, только обнуление происходит при достижении 10
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  763:				    xorwf TIME_SS1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  764:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  765:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  766:				    movlw 	0x30
+						^
+			  @@@@@ illegal constant @@@@@
+
+  767:				    movwf	TIME_SS1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  768:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  769:
+  770:				    ;----------------------------------------
+  771:
+  772:				correct_T_minus			; функция типа switch для ввода отдельных символов(декремент)
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  773:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 46
+
+
+
+ Line  I  Addr  Code            Source
+
+  774:	  00EF	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  775:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  776:	  00F2	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  777:				    movlw 0x0			; если NumPressKey = 0, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  778:				    xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  779:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  780:	  00F5	12 00 00	    call correct_H2_minus
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  781:
+  782:				    movlw 0x1			; если NumPressKey = 1, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  783:				    xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  784:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  785:	  00F8	12 00 00	    call correct_H1_minus
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  786:
+  787:				    movlw 0x2			; если NumPressKey = 2, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  788:				    xorwf NumPressKey, w;	; функцию коррекции переменной M2.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  789:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 47
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal statement syntax @@@@@
+
+  790:	  00FB	12 00 00	    call correct_M2_minus
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  791:
+  792:				    movlw 0x3			; если NumPressKey = 3, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  793:				    xorwf NumPressKey, w;	; функцию коррекции переменной M1.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  794:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  795:	  00FE	12 00 00	    call correct_M1_minus
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  796:
+  797:				    movlw 0x4			; если NumPressKey = 4, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  798:				    xorwf NumPressKey, w;	; функцию коррекции переменной S2.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  799:				    btfsc STATUS, 0x02		; если нет, проверяем следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  800:	  0101	12 00 00	    call correct_S2_minus
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  801:
+  802:				    movlw 0x5			; если NumPressKey = 5, то вызываем
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  803:				    xorwf NumPressKey, w;	; функцию коррекции переменной S1.
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  804:				    btfsc STATUS, 0x02		; если нет, выходим из функции
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  805:	  0104	12 00 00	    call correct_S1_minus
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 48
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  806:
+  807:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  808:
+  809:				    ;----------------------------------------
+  810:
+  811:				correct_H2_minus		; функцию коррекции переменной H2.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  812:				    decf TIME_HH2,1	; декремент временной переменной для Н2
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  813:				    movlw 0x2f			; if !=2f, переходим обратно в функцию
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  814:				    xorwf TIME_HH2, w	; correct_T_ и проверяем там следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  815:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  816:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  817:				    movlw 	0x32		; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках
+						^
+			  @@@@@ illegal constant @@@@@
+
+				2 десятка часов
+  818:				    movwf	TIME_HH2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  819:				    return			; и идем обратно в correct_T_ и проверяем там следующее условие
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  820:
+  821:				correct_H1_minus		; функцию коррекции переменной H1.
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  822:				    decf TIME_HH1,1	; декремент временной переменной для Н1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  823:				    movlw 0x2f			; if != 2f, переходим обратно в функцию
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 49
+
+
+
+ Line  I  Addr  Code            Source
+
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  824:				    xorwf TIME_HH1, w	; correct_T_ и проверяем там следующее условие
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  825:
+  826:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  827:				    return
+							^
+			  @@@@@ illegal statement syntax @@@@@
+
+  828:				    movlw 0x32			; есди переменная = 2, то при достижении 2f будем присваивать Н1 = 3
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+				.
+  829:				    xorwf TIME_HH2, w
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  830:				    btfsc STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  831:				    goto three_H1_minus
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  832:				    movlw 	0x39		; есди переменная != 2, то при достижении 2f будем присваивать Н1 =
+						^
+			  @@@@@ illegal constant @@@@@
+
+				9.
+  833:				t2  movwf	TIME_HH1
+				    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  834:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  835:
+  836:				three_H1_minus
+					      ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  837:				    movlw 0x33			; значение для присваивания при Н2 = 2.
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  838:				    goto t2			; возврат к метке t2 для продолжения корректной работы
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 50
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  839:
+  840:				correct_M2_minus			; функцию коррекции переменной M2.
+									^
+			  @@@@@ illegal statement syntax @@@@@
+
+  841:				    decf TIME_MM2,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  842:				    movlw 0x2f			; Работает так же, только при достижении 2f присваивается 5
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  843:				    xorwf TIME_MM2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  844:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  845:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  846:				    movlw 	0x35
+						^
+			  @@@@@ illegal constant @@@@@
+
+  847:				    movwf	TIME_MM2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  848:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  849:
+  850:				correct_M1_minus			; функцию коррекции переменной M1.
+									^
+			  @@@@@ illegal statement syntax @@@@@
+
+  851:				    decf TIME_MM1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  852:				    movlw 0x2f			; Работает так же, только при достижении 2f присваивается 10
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  853:				    xorwf TIME_MM1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 51
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  854:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  855:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  856:				    movlw 	0x39
+						^
+			  @@@@@ illegal constant @@@@@
+
+  857:				    movwf	TIME_MM1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  858:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  859:
+  860:				correct_S2_minus			; функцию коррекции переменной S2.
+									^
+			  @@@@@ illegal statement syntax @@@@@
+
+  861:				    decf TIME_SS2,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  862:				    movlw 0x2f			; Работает так же, только при достижении 2f присваивается 5
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  863:				    xorwf TIME_SS2, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  864:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  865:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  866:				    movlw 	0x35
+						^
+			  @@@@@ illegal constant @@@@@
+
+  867:				    movwf	TIME_SS2
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  868:				    return
+					  ^
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 52
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal statement syntax @@@@@
+
+  869:
+  870:				correct_S1_minus			; функцию коррекции переменной S1.
+									^
+			  @@@@@ illegal statement syntax @@@@@
+
+  871:				    decf TIME_SS1,1
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  872:				    movlw 0x2f			; Работает так же, только при достижении 2f присваивается 10
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  873:				    xorwf TIME_SS1, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  874:				    btfss STATUS, 0x02
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  875:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  876:				    movlw 	0x39
+						^
+			  @@@@@ illegal constant @@@@@
+
+  877:				    movwf	TIME_SS1
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  878:				    return
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  879:
+  880:				    ;==============================================
+  881:
+  882:				save_T				; функция проверки и сохранения времени
+								^
+			  @@@@@ illegal statement syntax @@@@@
+
+  883:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  884:	  0107	12 00 00	    call delay			; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  885:				    movlw 0xff
+					  ^
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 53
+
+
+
+ Line  I  Addr  Code            Source
+
+			  @@@@@ illegal constant @@@@@
+
+  886:	  010A	12 00 00	    call delay			; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  887:				    movlw 0x6			; если происходит переполнение NumPressKey
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  888:				    xorwf NumPressKey, w	; значит время заданно корректно во всех ячейках
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  889:				    btfsc STATUS, 0x02		; и мы переходим в функцию записи переменных значений
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  890:				    goto START			; в постоянные
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  891:				    incf NumPressKey,1		; Если NumPressKey не переполнен, то инкрементируем
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  892:				    goto change_time		; его и возвращаемся в функцию изменения времени
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  893:
+  894:				change_HMS
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  895:				    movfw TEMP_TIME_HH2		; записываем значения временных переменных в постоянные (NPK
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  896:				    movwf TIME_HH2		; необходим для определения ячейки, в которую записываем
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  897:				    movfw TEMP_TIME_HH1		; значение)
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  898:				    movwf TIME_HH1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  899:				    movfw TEMP_TIME_MM2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  900:				    movwf TIME_MM2
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 54
+
+
+
+ Line  I  Addr  Code            Source
+
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  901:				    movfw TEMP_TIME_MM1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  902:				    movwf TIME_MM1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  903:				    movfw TEMP_TIME_SS2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  904:				    movwf TIME_SS2
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  905:				    movfw TEMP_TIME_SS1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  906:				    movwf TIME_SS1
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  907:				    goto START			; возврат в основной цикл
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  908:
+  909:				    ;==============================================
+  910:				    ;==============================================
+  911:				    ;==============================================
+  912:
+  913:				    change_day		    ; функция изменения дня недели
+							    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  914:	  010D	12 00 00	    call Keyboard
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  915:				    btfsc Key1,0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  916:				    goto plus_day_ch	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбра
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				нное число (inc)
+  917:				    btfsc Key2,0
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 55
+
+
+
+ Line  I  Addr  Code            Source
+
+
+  918:				    goto minus_day_ch	    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбра
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+				нное число (dec)
+  919:				    btfsc Key4,0	    ; выход из настройки времени в основной цикл без сохранения результата
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  920:				    goto START
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  921:
+  922:				    bcf PORTC, 0
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  923:				    movlw b'10001010'	; установка адреса
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  924:	  0110	12 00 00	    call write
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  925:				    bsf PORTC,0
+					^
+			  @@@@@ illegal statement syntax @@@@@
+
+  926:
+  927:					;Отрисовка первой строки
+  928:				    movfw	TEMP_DAY
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  929:	  0113	12 00 00	    call	DEC
+						^
+			  @@@@@ illegal operand @@@@@
+
+  930:
+  931:				    goto change_day
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  932:
+  933:				plus_day_ch
+					   ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  934:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  935:	  0116	12 00 00	    call delay		    ; задержка крч
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 56
+
+
+
+ Line  I  Addr  Code            Source
+
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  936:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  937:	  0119	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  938:				    incf    TEMP_DAY,1
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  939:				    movlw 	.7			; inc переменной День
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  940:				    xorwf TEMP_DAY, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  941:				    btfss STATUS, 0x02		; is not working
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  942:				    goto change_day			;
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  943:				    movlw 	.0
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  944:				    movwf	TEMP_DAY
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  945:				    goto change_day
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  946:
+  947:				minus_day_ch
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  948:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  949:	  011C	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 57
+
+
+
+ Line  I  Addr  Code            Source
+
+  950:				    movlw 0xff
+					  ^
+			  @@@@@ illegal constant @@@@@
+
+  951:	  011F	12 00 00	    call delay		    ; задержка крч
+					 ^
+			  @@@@@ symbol not defined @@@@@
+
+  952:				    incf    TEMP_DAY,1
+					    ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  953:				    movlw 	.0			; inc переменной День
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  954:				    xorwf TEMP_DAY, w;
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  955:				    btfss STATUS, 0x02		; is not working
+					  ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  956:				    goto change_day
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  957:				    movlw 	.6
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  958:				    movwf	TEMP_DAY
+						^
+			  @@@@@ illegal statement syntax @@@@@
+
+  959:				    goto change_day
+					 ^
+			  @@@@@ illegal statement syntax @@@@@
+
+  960:
+  961:				    ;==============================================
+  962:				    ;==============================================
+  963:				    ;==============================================
+  964:
+  965:				;small_delay:			; задержка для драйвера
+  966:				;    movwf fCOUNTER1
+  967:				;    clrwdt
+  968:				;    decfsz fCOUNTER1,F
+  969:				;    goto $-2
+  970:				;    return
+  971:
+  972:				end  ; конец программы
+
+
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 58
+
+
+
+
+
+                     register banks used:  ---
+
+                     729 errors detected
+
+
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 59
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AC				  BIT	      D6
+ACC				  DATA	      E0
+B				  DATA	      F0
+CY				  BIT	      D7
+DPH				  DATA	      83
+DPL				  DATA	      82
+EA				  BIT	      AF
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+IE				  DATA	      A8
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PCON				  DATA	      87
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+REN				  BIT	      9C
+RESET				  CODE	    0000
+RI				  BIT	      98
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+SBUF				  DATA	      99
+SCON				  DATA	      98
+SINT				  CODE	    0023
+SM0				  BIT	      9F
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 60
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+T0				  BIT	      B4
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TXD				  BIT	      B1
+WAIT				  MACRO	        	  68
+WR				  BIT	      B6

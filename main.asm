@@ -206,7 +206,7 @@ START
     
     call Keyboard		; читаем клавиатуру
     btfsc Key1,0		; проверка нажатия клавиши "1",  если нажата, то переходим 
-    goto change_time		; к изменению времени, нет - тогда проверяем клавишу 2
+    call time_plus_blink	; к изменению времени, нет - тогда проверяем клавишу 2
     btfsc Key2,0		; проверка нажатия клавиши "2",  если нажата, то переходим 
     goto change_day		; к изменению дня недели, нет - тогда проверяем клавишу 3
 	
@@ -301,178 +301,7 @@ end_clock
 
     ;--------------------------------------------------------
     ;--------------------------------------------------------
-    ;--------------------------------------------------------
     
-write    ; процедура записи байта к контроллер HD
-    bcf STATUS, RP1
-    bcf STATUS, RP0
-    movwf PORTB
-    bsf PORTC, 2
-    movlw 0x01
-    call delay
-    bcf PORTC, 2
-    return
-    
-    	; перед вызовом этой процедуры в W помеща-
-	;ется байт, который надо записать в HD. Далее
-	;он передается в PORTB и формируется отрица-
-	;тельный перепад на RC2, путем предваритель-
-	;ной  его  установки  в  «1»,  удержания  этого
-	;уровня в течение некоторого времени (опреде-
-	;ляемого временем задержки delay  при  W=1) и
-	;сброса его в «0».
-
-	;  процедура  задержки,  время  которой  можно
-	;регулировать, задавая число в W
-delay
-    bcf   STATUS, RP1
-    bcf   STATUS, RP0
-    movwf   fCOUNTER2
-    clrf    fCOUNTER
-    
-BD_Loop
-    clrwdt
-    decfsz  fCOUNTER, f
-    goto    BD_Loop
-    decfsz  fCOUNTER2, f
-    goto    BD_Loop
-    return
-
-    ;==========================================
-    
-LCD_one
-    bcf PORTC, 0
-    movlw b'10000000'	; установка адреса
-    call write
-    bsf PORTC,0
-    ;Отрисовка первой строки
-    ; Отрисовка Н2
-    movlw 0x0			; если NumPressKey = 0, то вызываем
-    xorwf NumPressKey, w;	
-    btfss STATUS, 0x02		
-    goto blink_on_H2
-    incf Blink,1
-    btfss Blink, 0
-    goto blink_on_H2
-    goto blink_off_H2
-blink_off_H2
-    movlw ' '
-    call write
-    goto l1
-blink_on_H2
-    movfw TIME_HH2
-    call write
-    goto l1
-    ; Отрисовка Н1
-l1  movlw 0x1			; если NumPressKey = 0, то вызываем
-    xorwf NumPressKey, w;	
-    btfss STATUS, 0x02		
-    goto blink_on_H1
-    incf Blink,1
-    btfss Blink, 0
-    goto blink_on_H1
-    goto blink_off_H1
-blink_off_H1
-    movlw ' '
-    call write
-    goto l2
-blink_on_H1
-    movfw TIME_HH1
-    call write
-    goto l2
-    
-l2  movlw ':'
-    call write
-    
-    ; Отрисовка М2
-    movlw 0x2			; если NumPressKey = 0, то вызываем
-    xorwf NumPressKey, w;	
-    btfss STATUS, 0x02		
-    goto blink_on_M2
-    incf Blink,1
-    btfss Blink, 0
-    goto blink_on_M2
-    goto blink_off_M2
-blink_off_M2
-    movlw ' '
-    call write
-    goto l3
-blink_on_M2
-    movfw TIME_MM2
-    call write
-    goto l3
-    
-    ; Отрисовка М1
-l3  movfw TIME_MM1
-    call write
-    
-    movlw ':'
-    call write
-    
-    ; Отрисовка S2
-    movfw TIME_SS2
-    call write
-    
-    ; Отрисовка S1
-    movfw TIME_SS1
-    call write
-
-    movlw ' '
-    call write
-    movlw ' '
-    call write
-    movfw	DAY				
-    call	DEC
-    return
-    
-    ;==========================================   
-    
-LCD_two
-    bcf PORTC, 0
-    movlw b'11000100'
-    call write
-; Установка RC0=0, для последующей передачи
-;команды  на  контроллер  HD.  Передается  ко-
-;манда Set DDRAM address,  устанавливающая
-;счетчик  адреса  видеопамяти  на  начало  2-ой
-;строки:  ячейку  с  адресом  (0х40  =  0100  0000).
-;Это  необходимо  для  вывода  фразы  «TEM-
-;PERATURA =» на второй строке индикатора.
-
-    bsf PORTC,0  ; установка RC0=1, для последующей передачи
-;кодов символов второй строки на дисплей. Об-
-;ратите внимание на то, что нигде не требуется
-;изменения  банков  памяти: т.к. все регистры, с
-;которыми работает ПО, находятся в 0-ом бан-
-;ке.
-    movlw 'A'
-    call write
-    movlw 'L'
-    call write
-    movlw 'A'
-    call write
-    movlw 'R'
-    call write
-    movlw 'M'
-    call write
-    movlw ' '
-    call write
-    movlw ' '
-    call write
-    movfw ALARM_HH2
-    call write
-    movfw ALARM_HH1
-    call write
-    movlw ':'
-    call write
-    movfw ALARM_MM2
-    call write
-    movfw ALARM_MM1
-    call write
-    return
- 
-     ;==========================================
-     
      ; Процедура типа switch для выбора дня недели
 DEC addwf PCL
     goto monday
@@ -539,9 +368,244 @@ sunday			    ;воскресенье
     call write
     movlw 'N'
     call write
-    exday
+exday
     return
+
+    ;--------------------------------------------------------
+    
+time_plus_blink			; инкремент переменной выбора и переход к изменению времени
+    incf NumPressKey,1
+    goto change_time
+    return
+    
+    ;--------------------------------------------------------
+    
+write    ; процедура записи байта к контроллер HD
+    bcf STATUS, RP1
+    bcf STATUS, RP0
+    movwf PORTB
+    bsf PORTC, 2
+    movlw 0x01
+    call delay
+    bcf PORTC, 2
+    return
+    
+    	; перед вызовом этой процедуры в W помеща-
+	;ется байт, который надо записать в HD. Далее
+	;он передается в PORTB и формируется отрица-
+	;тельный перепад на RC2, путем предваритель-
+	;ной  его  установки  в  «1»,  удержания  этого
+	;уровня в течение некоторого времени (опреде-
+	;ляемого временем задержки delay  при  W=1) и
+	;сброса его в «0».
+
+	;  процедура  задержки,  время  которой  можно
+	;регулировать, задавая число в W
+delay
+    bcf   STATUS, RP1
+    bcf   STATUS, RP0
+    movwf   fCOUNTER2
+    clrf    fCOUNTER
+    
+BD_Loop
+    clrwdt
+    decfsz  fCOUNTER, f
+    goto    BD_Loop
+    decfsz  fCOUNTER2, f
+    goto    BD_Loop
+    return
+
     ;==========================================
+    
+LCD_one
+    bcf PORTC, 0
+    movlw b'10000000'	; установка адреса
+    call write
+    bsf PORTC,0
+    ;Отрисовка первой строки
+    ; Отрисовка Н2
+    call paintH2
+    ; Отрисовка Н1
+    call paintH1
+    movlw ':'
+    call write
+    ; Отрисовка М2
+    call paintM2
+    ; Отрисовка М1
+    call paintM1
+    movlw ':'
+    call write
+    ; Отрисовка S2
+    call paintS2
+    ; Отрисовка S1
+    call paintS1
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    movfw	DAY				
+    call	DEC
+
+    return
+    
+    ;==========================================
+    
+    ; Собственно механизм последовательного моргания при настройке времени
+paintH2
+    movlw 0x1			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_H2
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_H2
+    goto blink_off_H2
+blink_off_H2
+    movlw ' '
+    call write
+    return
+blink_on_H2
+    movfw TIME_HH2
+    call write
+    return
+    ;-----------
+paintH1
+    movlw 0x2			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_H1
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_H1
+    goto blink_off_H1
+blink_off_H1
+    movlw ' '
+    call write
+    return
+blink_on_H1
+    movfw TIME_HH1
+    call write
+    return
+    ;------------
+paintM2
+    movlw 0x3			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_M2
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_M2
+    goto blink_off_M2
+blink_off_M2
+    movlw ' '
+    call write
+    return
+blink_on_M2
+    movfw TIME_MM2
+    call write
+    return
+    ;------------
+paintM1
+    movlw 0x4			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_M1
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_M1
+    goto blink_off_M1
+blink_off_M1
+    movlw ' '
+    call write
+    return
+blink_on_M1
+    movfw TIME_MM1
+    call write
+    return
+    ;------------
+paintS2
+    movlw 0x5			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_S2
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_S2
+    goto blink_off_S2
+blink_off_S2
+    movlw ' '
+    call write
+    return
+blink_on_S2
+    movfw TIME_SS2
+    call write
+    return
+    ;------------
+paintS1
+    movlw 0x6			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_S1
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_S1
+    goto blink_off_S1
+blink_off_S1
+    movlw ' '
+    call write
+    return
+blink_on_S1
+    movfw TIME_SS1
+    call write
+    return
+    ;==========================================   
+    
+LCD_two
+    bcf PORTC, 0
+    movlw b'11000100'
+    call write
+; Установка RC0=0, для последующей передачи
+;команды  на  контроллер  HD.  Передается  ко-
+;манда Set DDRAM address,  устанавливающая
+;счетчик  адреса  видеопамяти  на  начало  2-ой
+;строки:  ячейку  с  адресом  (0х40  =  0100  0000).
+;Это  необходимо  для  вывода  фразы  «TEM-
+;PERATURA =» на второй строке индикатора.
+
+    bsf PORTC,0  ; установка RC0=1, для последующей передачи
+;кодов символов второй строки на дисплей. Об-
+;ратите внимание на то, что нигде не требуется
+;изменения  банков  памяти: т.к. все регистры, с
+;которыми работает ПО, находятся в 0-ом бан-
+;ке.
+    movlw 'A'
+    call write
+    movlw 'L'
+    call write
+    movlw 'A'
+    call write
+    movlw 'R'
+    call write
+    movlw 'M'
+    call write
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    movfw ALARM_HH2
+    call write
+    movfw ALARM_HH1
+    call write
+    movlw ':'
+    call write
+    movfw ALARM_MM2
+    call write
+    movfw ALARM_MM1
+    call write
+    return
+ 
+     ;==========================================
+     
     
 Keyboard		    ; драйвер клавиатуры для клавиш 1-4, 9
     bcf STATUS, RP0	    ; переход в нулевой банк, для нормального вызова функции из тела программы
@@ -619,35 +683,35 @@ change_time		    ; функция изменения времени
     
 correct_T_plus			; функция типа switch для ввода отдельных символов(инкремент или прибавление)
     movlw 0xff
-    call delay		    ; задержка крч
+    call delay			; задержка крч
     movlw 0xff
-    call delay		    ; задержка крч			    
-    movlw 0x0			; если NumPressKey = 0, то вызываем
+    call delay			; задержка крч			    
+    movlw 0x1			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H2
     
-    movlw 0x1			; если NumPressKey = 1, то вызываем
+    movlw 0x2			; если NumPressKey = 1, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H1
 
-    movlw 0x2			; если NumPressKey = 2, то вызываем
+    movlw 0x3			; если NumPressKey = 2, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M2
     
-    movlw 0x3			; если NumPressKey = 3, то вызываем
+    movlw 0x4			; если NumPressKey = 3, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M1
     
-    movlw 0x4			; если NumPressKey = 4, то вызываем
+    movlw 0x5			; если NumPressKey = 4, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_S2
     
-    movlw 0x5			; если NumPressKey = 5, то вызываем
+    movlw 0x6			; если NumPressKey = 5, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S1.
     btfsc STATUS, 0x02		; если нет, выходим из функции
     call correct_S1
@@ -732,32 +796,32 @@ correct_T_minus			; функция типа switch для ввода отдельных символов(декремент)
     call delay		    ; задержка крч
     movlw 0xff
     call delay		    ; задержка крч
-    movlw 0x0			; если NumPressKey = 0, то вызываем
+    movlw 0x1			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H2_minus
     
-    movlw 0x1			; если NumPressKey = 1, то вызываем
+    movlw 0x2			; если NumPressKey = 1, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H1_minus
 
-    movlw 0x2			; если NumPressKey = 2, то вызываем
+    movlw 0x3			; если NumPressKey = 2, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M2_minus
     
-    movlw 0x3			; если NumPressKey = 3, то вызываем
+    movlw 0x4			; если NumPressKey = 3, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M1_minus
     
-    movlw 0x4			; если NumPressKey = 4, то вызываем
+    movlw 0x5			; если NumPressKey = 4, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_S2_minus
     
-    movlw 0x5			; если NumPressKey = 5, то вызываем
+    movlw 0x6			; если NumPressKey = 5, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной S1.
     btfsc STATUS, 0x02		; если нет, выходим из функции
     call correct_S1_minus
@@ -868,7 +932,7 @@ change_HMS
     ;==============================================
     ;==============================================
     
-    change_day		    ; функция изменения дня недели
+change_day		    ; функция изменения дня недели
     call Keyboard
     btfsc Key1,0
     goto plus_day_ch	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное число (inc)
