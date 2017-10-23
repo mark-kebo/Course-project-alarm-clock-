@@ -1,6 +1,6 @@
-Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 11 : Found directive in column 1. (include)
-Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 12 : Found directive in column 1. (errorlevel)
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 282 : Using default destination of 1 (file).
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 306 : Using default destination of 1 (file).
-Warning[207] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 634 : Found label after column 1. (col2)
-Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 994 : Found directive in column 1. (end)
+Warning[205] C:\USERS\Марк\MPLABXPROJECTS\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 11 : Found directive in column 1. (include)
+Warning[205] C:\USERS\Марк\MPLABXPROJECTS\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 12 : Found directive in column 1. (errorlevel)
+Message[305] C:\USERS\Марк\MPLABXPROJECTS\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 282 : Using default destination of 1 (file).
+Message[305] C:\USERS\Марк\MPLABXPROJECTS\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 306 : Using default destination of 1 (file).
+Warning[207] C:\USERS\Марк\MPLABXPROJECTS\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 660 : Found label after column 1. (col2)
+Warning[205] C:\USERS\Марк\MPLABXPROJECTS\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 1020 : Found directive in column 1. (end)

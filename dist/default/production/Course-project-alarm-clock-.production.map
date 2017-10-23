@@ -1,160 +1,170 @@
 MPLINK 5.08, LINKER
-Linker Map File - Created Mon Oct 23 16:29:12 2017
+Linker Map File - Created Mon Oct 23 21:20:31 2017
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
-                   .org_0       code   0x000000    program   0x0004fe
-                   .cinit    romdata   0x00027f    program   0x000004
+                   .org_0       code   0x000000    program   0x000528
+                   .cinit    romdata   0x000294    program   0x000004
 
 
 
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x000280      
-            641 out of 8454 program addresses used, program memory utilization is 7%
+                            0x000000    0x000295      
+            662 out of 8454 program addresses used, program memory utilization is 7%
 
 
 
                               Symbols - Sorted by Name
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                  BD_Loop   0x0000de    program     static F:\Course-project-alarm-clock-\main.asm
-                      DEC   0x000095    program     static F:\Course-project-alarm-clock-\main.asm
-                 Keyboard   0x00016a    program     static F:\Course-project-alarm-clock-\main.asm
-                  LCD_one   0x0000e4    program     static F:\Course-project-alarm-clock-\main.asm
-                  LCD_two   0x00014d    program     static F:\Course-project-alarm-clock-\main.asm
-                    START   0x000040    program     static F:\Course-project-alarm-clock-\main.asm
-                    begin   0x000004    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_H1   0x00010f    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_H2   0x000101    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_M1   0x00012b    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_M2   0x00011d    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_S1   0x000147    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_S2   0x000139    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_H1   0x000112    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_H2   0x000104    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_M1   0x00012e    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_M2   0x000120    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_S1   0x00014a    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_S2   0x00013c    program     static F:\Course-project-alarm-clock-\main.asm
-               change_HMS   0x00024c    program     static F:\Course-project-alarm-clock-\main.asm
-               change_day   0x000259    program     static F:\Course-project-alarm-clock-\main.asm
-              change_time   0x000191    program     static F:\Course-project-alarm-clock-\main.asm
-                     col1   0x000171    program     static F:\Course-project-alarm-clock-\main.asm
-                     col2   0x00017c    program     static F:\Course-project-alarm-clock-\main.asm
-                     col3   0x000185    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_H1   0x0001c1    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_H1_minus   0x000214    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_H2   0x0001b9    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_H2_minus   0x00020c    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_M1   0x0001d7    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_M1_minus   0x00022a    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_M2   0x0001cf    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_M2_minus   0x000222    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_S1   0x0001e7    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_S1_minus   0x00023a    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_S2   0x0001df    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_S2_minus   0x000232    program     static F:\Course-project-alarm-clock-\main.asm
-          correct_T_minus   0x0001ef    program     static F:\Course-project-alarm-clock-\main.asm
-           correct_T_plus   0x00019c    program     static F:\Course-project-alarm-clock-\main.asm
-                    delay   0x0000da    program     static F:\Course-project-alarm-clock-\main.asm
-                end_clock   0x00008c    program     static F:\Course-project-alarm-clock-\main.asm
-                    exday   0x0000ce    program     static F:\Course-project-alarm-clock-\main.asm
-                   friday   0x0000ba    program     static F:\Course-project-alarm-clock-\main.asm
-             minus_day_ch   0x000273    program     static F:\Course-project-alarm-clock-\main.asm
-                   monday   0x00009e    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintH1   0x000107    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintH2   0x0000f9    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintM1   0x000123    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintM2   0x000115    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintS1   0x00013f    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintS2   0x000131    program     static F:\Course-project-alarm-clock-\main.asm
-              plus_day_ch   0x000267    program     static F:\Course-project-alarm-clock-\main.asm
-                 saturday   0x0000c1    program     static F:\Course-project-alarm-clock-\main.asm
-                   save_T   0x000242    program     static F:\Course-project-alarm-clock-\main.asm
-                   sunday   0x0000c8    program     static F:\Course-project-alarm-clock-\main.asm
-                       t1   0x0001c7    program     static F:\Course-project-alarm-clock-\main.asm
-                       t2   0x00021e    program     static F:\Course-project-alarm-clock-\main.asm
-                ten_clock   0x000085    program     static F:\Course-project-alarm-clock-\main.asm
-                 three_H1   0x0001cd    program     static F:\Course-project-alarm-clock-\main.asm
-           three_H1_minus   0x000220    program     static F:\Course-project-alarm-clock-\main.asm
-                 thursday   0x0000b3    program     static F:\Course-project-alarm-clock-\main.asm
-          time_plus_blink   0x0000cf    program     static F:\Course-project-alarm-clock-\main.asm
-                  tuesday   0x0000a5    program     static F:\Course-project-alarm-clock-\main.asm
-                wednesday   0x0000ac    program     static F:\Course-project-alarm-clock-\main.asm
-                    write   0x0000d2    program     static F:\Course-project-alarm-clock-\main.asm
+                  BD_Loop   0x0000e2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                      DEC   0x000095    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 Keyboard   0x00017f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  LCD_one   0x0000e8    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  LCD_two   0x000162    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    START   0x000040    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    begin   0x000004    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_H1   0x000112    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_H2   0x000104    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_M1   0x00012e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_M2   0x000120    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_S1   0x00014a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_S2   0x00013c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+            blink_off_day   0x000158    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_H1   0x000115    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_H2   0x000107    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_M1   0x000131    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_M2   0x000123    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_S1   0x00014d    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_S2   0x00013f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_on_day   0x00015f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               change_HMS   0x000261    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               change_day   0x00026e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              change_time   0x0001a6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                     col1   0x000186    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                     col2   0x000191    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                     col3   0x00019a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_H1   0x0001d6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_H1_minus   0x000229    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_H2   0x0001ce    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_H2_minus   0x000221    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_M1   0x0001ec    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_M1_minus   0x00023f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_M2   0x0001e4    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_M2_minus   0x000237    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_S1   0x0001fc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_S1_minus   0x00024f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_S2   0x0001f4    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_S2_minus   0x000247    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+          correct_T_minus   0x000204    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+           correct_T_plus   0x0001b1    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+           day_plus_blink   0x0000d2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    delay   0x0000de    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                end_clock   0x00008c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    exday   0x0000ce    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   friday   0x0000ba    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             minus_day_ch   0x000285    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   monday   0x00009e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintH1   0x00010a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintH2   0x0000fc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintM1   0x000126    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintM2   0x000118    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintS1   0x000142    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintS2   0x000134    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              plus_day_ch   0x000279    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 printDay   0x000150    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 saturday   0x0000c1    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   save_T   0x000257    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              save_day_ch   0x000291    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   sunday   0x0000c8    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                       t1   0x0001dc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                       t2   0x000233    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                ten_clock   0x000085    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 three_H1   0x0001e2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+           three_H1_minus   0x000235    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 thursday   0x0000b3    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+          time_plus_blink   0x0000cf    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  tuesday   0x0000a5    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                wednesday   0x0000ac    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    write   0x0000d6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
 
 
 
                               Symbols - Sorted by Address
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
-                    begin   0x000004    program     static F:\Course-project-alarm-clock-\main.asm
-                    START   0x000040    program     static F:\Course-project-alarm-clock-\main.asm
-                ten_clock   0x000085    program     static F:\Course-project-alarm-clock-\main.asm
-                end_clock   0x00008c    program     static F:\Course-project-alarm-clock-\main.asm
-                      DEC   0x000095    program     static F:\Course-project-alarm-clock-\main.asm
-                   monday   0x00009e    program     static F:\Course-project-alarm-clock-\main.asm
-                  tuesday   0x0000a5    program     static F:\Course-project-alarm-clock-\main.asm
-                wednesday   0x0000ac    program     static F:\Course-project-alarm-clock-\main.asm
-                 thursday   0x0000b3    program     static F:\Course-project-alarm-clock-\main.asm
-                   friday   0x0000ba    program     static F:\Course-project-alarm-clock-\main.asm
-                 saturday   0x0000c1    program     static F:\Course-project-alarm-clock-\main.asm
-                   sunday   0x0000c8    program     static F:\Course-project-alarm-clock-\main.asm
-                    exday   0x0000ce    program     static F:\Course-project-alarm-clock-\main.asm
-          time_plus_blink   0x0000cf    program     static F:\Course-project-alarm-clock-\main.asm
-                    write   0x0000d2    program     static F:\Course-project-alarm-clock-\main.asm
-                    delay   0x0000da    program     static F:\Course-project-alarm-clock-\main.asm
-                  BD_Loop   0x0000de    program     static F:\Course-project-alarm-clock-\main.asm
-                  LCD_one   0x0000e4    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintH2   0x0000f9    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_H2   0x000101    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_H2   0x000104    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintH1   0x000107    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_H1   0x00010f    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_H1   0x000112    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintM2   0x000115    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_M2   0x00011d    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_M2   0x000120    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintM1   0x000123    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_M1   0x00012b    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_M1   0x00012e    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintS2   0x000131    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_S2   0x000139    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_S2   0x00013c    program     static F:\Course-project-alarm-clock-\main.asm
-                  paintS1   0x00013f    program     static F:\Course-project-alarm-clock-\main.asm
-             blink_off_S1   0x000147    program     static F:\Course-project-alarm-clock-\main.asm
-              blink_on_S1   0x00014a    program     static F:\Course-project-alarm-clock-\main.asm
-                  LCD_two   0x00014d    program     static F:\Course-project-alarm-clock-\main.asm
-                 Keyboard   0x00016a    program     static F:\Course-project-alarm-clock-\main.asm
-                     col1   0x000171    program     static F:\Course-project-alarm-clock-\main.asm
-                     col2   0x00017c    program     static F:\Course-project-alarm-clock-\main.asm
-                     col3   0x000185    program     static F:\Course-project-alarm-clock-\main.asm
-              change_time   0x000191    program     static F:\Course-project-alarm-clock-\main.asm
-           correct_T_plus   0x00019c    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_H2   0x0001b9    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_H1   0x0001c1    program     static F:\Course-project-alarm-clock-\main.asm
-                       t1   0x0001c7    program     static F:\Course-project-alarm-clock-\main.asm
-                 three_H1   0x0001cd    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_M2   0x0001cf    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_M1   0x0001d7    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_S2   0x0001df    program     static F:\Course-project-alarm-clock-\main.asm
-               correct_S1   0x0001e7    program     static F:\Course-project-alarm-clock-\main.asm
-          correct_T_minus   0x0001ef    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_H2_minus   0x00020c    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_H1_minus   0x000214    program     static F:\Course-project-alarm-clock-\main.asm
-                       t2   0x00021e    program     static F:\Course-project-alarm-clock-\main.asm
-           three_H1_minus   0x000220    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_M2_minus   0x000222    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_M1_minus   0x00022a    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_S2_minus   0x000232    program     static F:\Course-project-alarm-clock-\main.asm
-         correct_S1_minus   0x00023a    program     static F:\Course-project-alarm-clock-\main.asm
-                   save_T   0x000242    program     static F:\Course-project-alarm-clock-\main.asm
-               change_HMS   0x00024c    program     static F:\Course-project-alarm-clock-\main.asm
-               change_day   0x000259    program     static F:\Course-project-alarm-clock-\main.asm
-              plus_day_ch   0x000267    program     static F:\Course-project-alarm-clock-\main.asm
-             minus_day_ch   0x000273    program     static F:\Course-project-alarm-clock-\main.asm
+                    begin   0x000004    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    START   0x000040    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                ten_clock   0x000085    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                end_clock   0x00008c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                      DEC   0x000095    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   monday   0x00009e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  tuesday   0x0000a5    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                wednesday   0x0000ac    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 thursday   0x0000b3    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   friday   0x0000ba    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 saturday   0x0000c1    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   sunday   0x0000c8    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    exday   0x0000ce    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+          time_plus_blink   0x0000cf    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+           day_plus_blink   0x0000d2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    write   0x0000d6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                    delay   0x0000de    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  BD_Loop   0x0000e2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  LCD_one   0x0000e8    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintH2   0x0000fc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_H2   0x000104    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_H2   0x000107    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintH1   0x00010a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_H1   0x000112    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_H1   0x000115    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintM2   0x000118    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_M2   0x000120    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_M2   0x000123    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintM1   0x000126    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_M1   0x00012e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_M1   0x000131    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintS2   0x000134    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_S2   0x00013c    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_S2   0x00013f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  paintS1   0x000142    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_off_S1   0x00014a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              blink_on_S1   0x00014d    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 printDay   0x000150    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+            blink_off_day   0x000158    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             blink_on_day   0x00015f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                  LCD_two   0x000162    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 Keyboard   0x00017f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                     col1   0x000186    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                     col2   0x000191    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                     col3   0x00019a    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              change_time   0x0001a6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+           correct_T_plus   0x0001b1    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_H2   0x0001ce    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_H1   0x0001d6    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                       t1   0x0001dc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                 three_H1   0x0001e2    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_M2   0x0001e4    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_M1   0x0001ec    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_S2   0x0001f4    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               correct_S1   0x0001fc    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+          correct_T_minus   0x000204    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_H2_minus   0x000221    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_H1_minus   0x000229    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                       t2   0x000233    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+           three_H1_minus   0x000235    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_M2_minus   0x000237    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_M1_minus   0x00023f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_S2_minus   0x000247    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+         correct_S1_minus   0x00024f    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+                   save_T   0x000257    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               change_HMS   0x000261    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+               change_day   0x00026e    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              plus_day_ch   0x000279    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+             minus_day_ch   0x000285    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
+              save_day_ch   0x000291    program     static C:\Users\Марк\MPLABXProjects\Course-project-alarm-clock-\main.asm
 
 

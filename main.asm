@@ -208,7 +208,7 @@ START
     btfsc Key1,0		; проверка нажатия клавиши "1",  если нажата, то переходим 
     call time_plus_blink	; к изменению времени, нет - тогда проверяем клавишу 2
     btfsc Key2,0		; проверка нажатия клавиши "2",  если нажата, то переходим 
-    goto change_day		; к изменению дня недели, нет - тогда проверяем клавишу 3
+    call day_plus_blink		; к изменению дня недели, нет - тогда проверяем клавишу 3
 	
     call LCD_one		;Отрисовка первой строки		
 
@@ -378,6 +378,11 @@ time_plus_blink			; инкремент переменной выбора и переход к изменению времени
     goto change_time
     return
     
+day_plus_blink			; инкремент переменной выбора и переход к изменению времени
+    movlw 0x8
+    movwf NumPressKey
+    goto change_day
+    return
     ;--------------------------------------------------------
     
 write    ; процедура записи байта к контроллер HD
@@ -443,8 +448,7 @@ LCD_one
     call write
     movlw ' '
     call write
-    movfw	DAY				
-    call	DEC
+    call printDay
 
     return
     
@@ -557,6 +561,28 @@ blink_off_S1
 blink_on_S1
     movfw TIME_SS1
     call write
+    return
+    ;-----------
+printDay
+    movlw 0x8			; если NumPressKey = 0, то вызываем
+    xorwf NumPressKey, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_day
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_day
+    goto blink_off_day
+blink_off_day
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    return
+blink_on_day
+    movfw DAY				
+    call DEC
     return
     ;==========================================   
     
@@ -938,17 +964,12 @@ change_day		    ; функция изменения дня недели
     goto plus_day_ch	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное число (inc)
     btfsc Key2,0
     goto minus_day_ch	    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбранное число (dec)
-    btfsc Key4,0	    ; выход из настройки времени в основной цикл без сохранения результата
+    btfsc Key3,0	    ; выход из настройки времени в основной цикл без сохранения результата
     goto START
+    btfsc Key4,0	    ; выход из настройки времени в основной цикл без сохранения результата
+    goto save_day_ch
     
-    bcf PORTC, 0
-    movlw b'10001010'	; установка адреса
-    call write
-    bsf PORTC,0
-
-	;Отрисовка первой строки
-    movfw	TEMP_DAY				
-    call	DEC
+    call LCD_one
     
     goto change_day
     
@@ -957,13 +978,13 @@ plus_day_ch
     call delay		    ; задержка крч
     movlw 0xff
     call delay		    ; задержка крч
-    incf    TEMP_DAY,1
-    movlw 	.7			; inc переменной День
-    xorwf TEMP_DAY, w;
+    incf DAY,1
+    movlw .7			; inc переменной День
+    xorwf DAY, w;
     btfss STATUS, 0x02		; is not working 
     goto change_day			; 
-    movlw 	.0
-    movwf	TEMP_DAY
+    movlw .0
+    movwf DAY
     goto change_day
     
 minus_day_ch
@@ -971,14 +992,19 @@ minus_day_ch
     call delay		    ; задержка крч
     movlw 0xff
     call delay		    ; задержка крч
-    incf    TEMP_DAY,1
-    movlw 	.0			; inc переменной День
-    xorwf TEMP_DAY, w;
+    decf DAY,1
+    movlw .255			; inc переменной День
+    xorwf DAY, w;
     btfss STATUS, 0x02		; is not working 
     goto change_day			
-    movlw 	.6
-    movwf	TEMP_DAY
+    movlw .6
+    movwf DAY
     goto change_day
+    
+save_day_ch
+    movfw TEMP_DAY
+    movwf DAY
+    goto START
     
     ;==============================================
     ;==============================================
