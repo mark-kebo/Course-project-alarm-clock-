@@ -2,7 +2,7 @@
 ;                                                                              *
 ;    Filename:  ALARM CLOCK                                                    *
 ;    Date:      19.10.17                                                       *
-;    File Version:   1.4.2                                                     *
+;    File Version:   1.6                                                    *
 ;    Author:         Dmitry Vorozhbicky                                        *
 ;    Company:        GrSU                                                      *
 ;                                                                              *
@@ -38,11 +38,11 @@ Key1		    equ	    0x3B
 Key2		    equ	    0x3C
 Key3		    equ	    0x3D
 Key4		    equ	    0x3E
-Key5		    equ	    0x3F
-Key6		    equ	    0x40
-Key7		    equ	    0x41
-Key8		    equ	    0x42
-Key9		    equ	    0x43
+Key9		    equ	    0x3F
+Blink		    equ	    0x40
+Cnt		    equ	    0x41
+Blink_Alarm	    equ	    0x42
+NumPressKey	    equ	    0x43
 fCOUNTER1	    equ     0x44
 TEMP_TIME_HH1	    equ	    0x45
 TEMP_TIME_HH2	    equ	    0x46
@@ -55,16 +55,8 @@ TEMP_ALARM_HH1	    equ	    0x4C
 TEMP_ALARM_HH2	    equ	    0x4D
 TEMP_ALARM_MM1	    equ	    0x4E
 TEMP_ALARM_MM2	    equ	    0x4F
-NumPressKey	    equ	    0x50
-Blink		    equ	    0x51
-    ;вспомогательные  регистры,  назначе-
-	;ние которых приведено в комментариях
-    constant   DS = .2
-    constant   RST = .2
-	;  директивы,  ставящие в  соответствие
-	;меткам DS  и  RST  значение  0.  Анало-
-	;гия директив equ для имен регистров.
-
+NumAlarmBit	    equ	    0x50
+    
 wait  macro     time
     movlw    (time/5)-1
     movwf    WAIT
@@ -132,6 +124,7 @@ begin
     clrf Key3	    
     clrf Key4	    	   
     clrf Key9	    	    
+    clrf Cnt	    	    
     clrf PORTC
     clrf PORTD
 ; подготовка к передаче команд на контроллер
@@ -183,10 +176,14 @@ begin
     movwf	ALARM_MM2
     movlw 	.0
     movwf	DAY
+    movwf	Blink_Alarm
+    movwf	NumAlarmBit
     movlw 	b'00000000'
     movwf	Blink
 
 START
+    movlw .0
+    movwf Blink_Alarm
     movfw TIME_HH2		; записываем значения постоянныx переменных в  временныe 
     movwf TEMP_TIME_HH2		
     movfw TIME_HH1		
@@ -203,14 +200,14 @@ START
     movwf TEMP_DAY
     movlw 0x00
     movwf NumPressKey		; NPK каждый раз устанавливаем в начальное значение
-    movfw	ALARM_HH1
-    movwf	TEMP_ALARM_HH1
-    movfw	ALARM_HH2
-    movwf	TEMP_ALARM_HH2
-    movfw	ALARM_MM1
-    movwf	TEMP_ALARM_MM1
-    movfw	ALARM_MM2
-    movwf	TEMP_ALARM_MM2
+    movfw ALARM_HH1
+    movwf TEMP_ALARM_HH1
+    movfw ALARM_HH2
+    movwf TEMP_ALARM_HH2
+    movfw ALARM_MM1
+    movwf TEMP_ALARM_MM1
+    movfw ALARM_MM2
+    movwf TEMP_ALARM_MM2
     
     call Keyboard		; читаем клавиатуру
     btfsc Key1,0		; проверка нажатия клавиши "1",  если нажата, то переходим 
@@ -295,18 +292,68 @@ ten_clock
 	
 end_clock
     clrwdt
-
-    movlw 0xff
-    call delay ;задержка крч
-    movlw 0xff
-    call delay ;задержка крч
-    movlw 0xff
-    call delay ;задержка крч
-
+    
+    ;ОБРАБОТКА БУДИЛЬНИКА
+    movfw TIME_HH2 		
+    xorwf ALARM_HH2, w;		; подпрограмма для работы с форматом 24 часа
+    btfsc STATUS, 0x02
+    goto if_T_AT_H1
+    goto if_A_ON
+    
+if_T_AT_H1    
+    movfw TIME_HH1 		
+    xorwf ALARM_HH1, w;		; подпрограмма для работы с форматом 24 часа
+    btfsc STATUS, 0x02
+    goto if_T_AT_M2
+    goto if_A_ON
+    
+if_T_AT_M2    
+    movfw TIME_MM2 		
+    xorwf ALARM_MM2, w;		; подпрограмма для работы с форматом 24 часа
+    btfsc STATUS, 0x02
+    goto if_T_AT_M1
+    goto if_A_ON
+    
+if_T_AT_M1    
+    movfw TIME_MM1 		
+    xorwf ALARM_MM1, w;		; подпрограмма для работы с форматом 24 часа
+    btfsc STATUS, 0x02
+    goto inc_BA
+    goto if_A_ON
+    
+inc_BA
+    movlw .1
+    movwf Blink_Alarm
+    goto blinkON
+    
+if_A_ON 
+    movlw .1
+    xorwf NumAlarmBit, w
+    btfsc STATUS, 0x02
+    goto blinkON
+    goto end_ALARM
+    
+NULL_BA_NAB
+    movlw .0
+    movwf NumAlarmBit
+    movwf Blink_Alarm
+    goto end_ALARM
+    
+blinkON
+    ; SOUND ON
+    call Keyboard	    ; спрашиваем клавиатуру
+    btfsc Key9,0
+    goto NULL_BA_NAB	    ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное число (inc)
+    movlw .1
+    movwf NumAlarmBit
+end_ALARM
     call LCD_two		;Отрисовка второй строки
-    
-    ; ТУТ ОБРАБОТКА БУДИЛЬНИКА БУДЕТ
-    
+    movlw 0xff
+    call delay ;задержка крч
+    movlw 0xff
+    call delay ;задержка крч
+    movlw 0xff
+    call delay ;задержка крч
     goto START		; конец основного цикла (должен быть = 1сек)
 
     ;--------------------------------------------------------
@@ -384,17 +431,35 @@ exday
     ;--------------------------------------------------------
     
 time_plus_blink			; инкремент переменной выбора и переход к изменению времени
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto time_plus_blink
     incf NumPressKey,1
     goto change_time
     return
     
 day_plus_blink			; инкремент переменной выбора и переход к изменению времени
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto day_plus_blink
     movlw 0x8
     movwf NumPressKey
     goto change_day
     return
     
 alarm_plus_blink			; инкремент переменной выбора и переход к изменению времени
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto alarm_plus_blink
     movlw 0x9
     movwf NumPressKey
     goto change_alarm
@@ -483,10 +548,11 @@ paintH2
 blink_off_H2
     movlw ' '
     call write
-    return
+    goto return_H2
 blink_on_H2
     movfw TIME_HH2
     call write
+return_H2    
     return
     ;-----------
 paintH1
@@ -501,10 +567,11 @@ paintH1
 blink_off_H1
     movlw ' '
     call write
-    return
+    goto return_H1
 blink_on_H1
     movfw TIME_HH1
     call write
+return_H1
     return
     ;------------
 paintM2
@@ -519,10 +586,11 @@ paintM2
 blink_off_M2
     movlw ' '
     call write
-    return
+    goto return_M2
 blink_on_M2
     movfw TIME_MM2
     call write
+return_M2
     return
     ;------------
 paintM1
@@ -537,10 +605,11 @@ paintM1
 blink_off_M1
     movlw ' '
     call write
-    return
+    goto return_M1
 blink_on_M1
     movfw TIME_MM1
     call write
+return_M1
     return
     ;------------
 paintS2
@@ -555,10 +624,11 @@ paintS2
 blink_off_S2
     movlw ' '
     call write
-    return
+    goto return_S2
 blink_on_S2
     movfw TIME_SS2
     call write
+return_S2
     return
     ;------------
 paintS1
@@ -573,10 +643,11 @@ paintS1
 blink_off_S1
     movlw ' '
     call write
-    return
+    goto return_S1
 blink_on_S1
     movfw TIME_SS1
     call write
+return_S1
     return
     ;-----------
 printDay
@@ -595,10 +666,11 @@ blink_off_day
     call write
     movlw ' '
     call write
-    return
+    goto return_DAY
 blink_on_day
     movfw DAY				
     call DEC
+return_DAY
     return
     ;==========================================   
     
@@ -620,16 +692,7 @@ LCD_two
 ;изменения  банков  памяти: т.к. все регистры, с
 ;которыми работает ПО, находятся в 0-ом бан-
 ;ке.
-    movlw 'A'
-    call write
-    movlw 'L'
-    call write
-    movlw 'A'
-    call write
-    movlw 'R'
-    call write
-    movlw 'M'
-    call write
+    call paint_ALARM
     
     movlw ' '
     call write
@@ -646,7 +709,7 @@ LCD_two
  
     ;------------------------------------------
 paintH2_A
-    movlw 0xa			; если NumPressKey = 0, то вызываем
+    movlw 0x9			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	
     btfss STATUS, 0x02		
     goto blink_on_H2_A
@@ -657,14 +720,15 @@ paintH2_A
 blink_off_H2_A
     movlw ' '
     call write
-    return
+    goto return_A_H2
 blink_on_H2_A
     movfw ALARM_HH2
     call write
+return_A_H2
     return
     ;-----------
 paintH1_A
-    movlw 0xb			; если NumPressKey = 0, то вызываем
+    movlw 0xa			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	
     btfss STATUS, 0x02		
     goto blink_on_H1_A
@@ -675,14 +739,15 @@ paintH1_A
 blink_off_H1_A
     movlw ' '
     call write
-    return
+    goto return_A_H1
 blink_on_H1_A
     movfw ALARM_HH1
     call write
+return_A_H1
     return
     ;------------
 paintM2_A
-    movlw 0xc			; если NumPressKey = 0, то вызываем
+    movlw 0xb			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	
     btfss STATUS, 0x02		
     goto blink_on_M2_A
@@ -693,14 +758,15 @@ paintM2_A
 blink_off_M2_A
     movlw ' '
     call write
-    return
+    goto return_A_M2
 blink_on_M2_A
     movfw ALARM_MM2
     call write
+return_A_M2
     return
     ;------------
 paintM1_A
-    movlw 0xd			; если NumPressKey = 0, то вызываем
+    movlw 0xc			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	
     btfss STATUS, 0x02		
     goto blink_on_M1_A
@@ -711,22 +777,61 @@ paintM1_A
 blink_off_M1_A
     movlw ' '
     call write
-    return
+    goto return_A_M1
 blink_on_M1_A
     movfw ALARM_MM1
     call write
+return_A_M1
     return
+    ;----------
+paint_ALARM
+    movlw .1			; если NumPressKey = 0, то вызываем
+    xorwf Blink_Alarm, w;	
+    btfss STATUS, 0x02		
+    goto blink_on_ALARM
+    incf Blink,1
+    btfss Blink, 0
+    goto blink_on_ALARM
+    goto blink_off_ALARM
+blink_off_ALARM
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    movlw ' '
+    call write
+    goto return_ALARM
+blink_on_ALARM
+    movlw 'A'
+    call write
+    movlw 'L'
+    call write
+    movlw 'A'
+    call write
+    movlw 'R'
+    call write
+    movlw 'M'
+    call write
+return_ALARM
+    return
+    ;-----------
+    
     ;==========================================
      
     
 Keyboard		    ; драйвер клавиатуры для клавиш 1-4, 9
-    bcf STATUS, RP0	    ; переход в нулевой банк, для нормального вызова функции из тела программы
+    bank0		    ; переход в нулевой банк, для нормального вызова функции из тела программы
     bcf STATUS, RP1
     clrf Key1		    ; обнуление кодов клавиш
     clrf Key2 
     clrf Key3
     clrf Key4  
     clrf Key9  
+    clrf Cnt  
 col1			    ; сканируем первый столбец, где нам нужны клавиши 1, 4
     bsf PORTA,0		    ; подача питания
     bcf PORTA,1
@@ -743,7 +848,8 @@ col1			    ; сканируем первый столбец, где нам нужны клавиши 1, 4
     incf Key1,F
     btfsc PORTA,4	    ; определяем нажатия клавиши "4", проводя опрос второй строки
     incf Key4,F
-    col2		    ; сканируем второй столбец, где нам нужна клавиша 2
+    
+col2			    ; сканируем второй столбец, где нам нужна клавиша 2
     bcf PORTA,0		    ; подача питания
     bsf PORTA,1
     bcf PORTA,2 
@@ -766,13 +872,25 @@ col3		    ; сканируем третий столбец, где нам нужна клавиша 3
     movf PORTA,W	    ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0011 1000.
     andlw 0x38
     btfsc STATUS,Z	    ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
-    return		    ; если Z=0, то пропускаем строку
+    goto end_keyb	    ; если Z=0, то пропускаем строку
     ;movlw .250
     ;sd
     btfsc PORTA,3	    ; определяем нажатия клавиши "3", проводя опрос первой строки
     incf Key3,F
     btfsc PORTA,5	    ; определяем нажатия клавиши "9", проводя опрос третей строки
     incf Key9,F
+ 
+end_keyb 
+    btfsc Key1,0
+    incf Cnt,F
+    btfsc Key2,0
+    incf Cnt,F
+    btfsc Key3,0
+    incf Cnt,F
+    btfsc Key4,0
+    incf Cnt,F
+    btfsc Key9,0
+    incf Cnt,F
     return		    ; выход из функции
     
 ;==============================================
@@ -792,12 +910,13 @@ change_time		    ; функция изменения времени
     goto change_time
     
     ;----------------------------------------
-    
 correct_T_plus			; функция типа switch для ввода отдельных символов(инкремент или прибавление)
-    movlw 0xff
-    call delay			; задержка крч
-    movlw 0xff
-    call delay			; задержка крч			    
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto correct_T_plus		    
     movlw 0x1			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
@@ -837,9 +956,10 @@ correct_H2			; функцию коррекции переменной H2.
     movlw 0x33			; if !=3, переходим обратно в функцию
     xorwf TIME_HH2, w	; correct_T_plus и проверяем там следующее условие
     btfss STATUS, 0x02
-    return
+    goto return_COR_H2
     movlw 	0x30		; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
     movwf	TIME_HH2
+return_COR_H2
     return			; и идем обратно в correct_T_plus и проверяем там следующее условие
     
 correct_H1			; функцию коррекции переменной H1.
@@ -852,9 +972,10 @@ correct_H1			; функцию коррекции переменной H1.
     movlw 0x3a			; есди переменная = 0 или = 1, то максимальная единица для обноления - 9.
 t1  xorwf TIME_HH1, w	
     btfss STATUS, 0x02
-    return
+    goto return_COR_H1
     movlw 	0x30		; собственно обнуление переменной при достижении 10 или 4 по условию выше. 
     movwf	TIME_HH1
+return_COR_H1
     return
     
 three_H1
@@ -866,9 +987,10 @@ correct_M2			; функцию коррекции переменной M2.
     movlw 0x36			; Работает так же, только обнуление происходит при достижении 6
     xorwf TIME_MM2, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M2
     movlw 	0x30
     movwf	TIME_MM2
+return_COR_M2
     return
     
 correct_M1			; функцию коррекции переменной M1.
@@ -876,9 +998,10 @@ correct_M1			; функцию коррекции переменной M1.
     movlw 0x3a			; Работает так же, только обнуление происходит при достижении 10
     xorwf TIME_MM1, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M1
     movlw 	0x30
     movwf	TIME_MM1
+return_COR_M1
     return
     
 correct_S2			; функцию коррекции переменной S2.
@@ -886,9 +1009,10 @@ correct_S2			; функцию коррекции переменной S2.
     movlw 0x36			; Работает так же, только обнуление происходит при достижении 6
     xorwf TIME_SS2, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_S2
     movlw 	0x30
     movwf	TIME_SS2
+return_COR_S2
     return
     
 correct_S1			; функцию коррекции переменной S1.
@@ -896,18 +1020,21 @@ correct_S1			; функцию коррекции переменной S1.
     movlw 0x3a			; Работает так же, только обнуление происходит при достижении 10
     xorwf TIME_SS1, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_S1
     movlw 	0x30
     movwf	TIME_SS1
+return_COR_S1
     return
     
     ;----------------------------------------
     
 correct_T_minus			; функция типа switch для ввода отдельных символов(декремент)
-    movlw 0xff
-    call delay		    ; задержка крч
-    movlw 0xff
-    call delay		    ; задержка крч
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto correct_T_minus		  
     movlw 0x1			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
@@ -947,9 +1074,10 @@ correct_H2_minus		; функцию коррекции переменной H2.
     movlw 0x2f			; if !=2f, переходим обратно в функцию
     xorwf TIME_HH2, w	; correct_T_ и проверяем там следующее условие
     btfss STATUS, 0x02
-    return
+    goto return_COR_H2_MIN
     movlw 	0x32		; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках 2 десятка часов
     movwf	TIME_HH2
+return_COR_H2_MIN
     return			; и идем обратно в correct_T_ и проверяем там следующее условие
     
 correct_H1_minus		; функцию коррекции переменной H1.
@@ -958,13 +1086,14 @@ correct_H1_minus		; функцию коррекции переменной H1.
     xorwf TIME_HH1, w	; correct_T_ и проверяем там следующее условие
 	    				
     btfss STATUS, 0x02
-    return		
+    goto return_COR_H1_MIN		
     movlw 0x32			; есди переменная = 2, то при достижении 2f будем присваивать Н1 = 3.
     xorwf TIME_HH2, w	
     btfsc STATUS, 0x02
     goto three_H1_minus
     movlw 	0x39		; есди переменная != 2, то при достижении 2f будем присваивать Н1 = 9. 
 t2  movwf	TIME_HH1
+return_COR_H1_MIN
     return
     
 three_H1_minus
@@ -976,9 +1105,10 @@ correct_M2_minus			; функцию коррекции переменной M2.
     movlw 0x2f			; Работает так же, только при достижении 2f присваивается 5
     xorwf TIME_MM2, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M2_MIN
     movlw 	0x35
     movwf	TIME_MM2
+return_COR_M2_MIN
     return
     
 correct_M1_minus			; функцию коррекции переменной M1.
@@ -986,9 +1116,10 @@ correct_M1_minus			; функцию коррекции переменной M1.
     movlw 0x2f			; Работает так же, только при достижении 2f присваивается 10
     xorwf TIME_MM1, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M1_MIN
     movlw 	0x39
     movwf	TIME_MM1
+return_COR_M1_MIN
     return
     
 correct_S2_minus			; функцию коррекции переменной S2.
@@ -996,9 +1127,10 @@ correct_S2_minus			; функцию коррекции переменной S2.
     movlw 0x2f			; Работает так же, только при достижении 2f присваивается 5
     xorwf TIME_SS2, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_S2_MIN
     movlw 	0x35
     movwf	TIME_SS2
+return_COR_S2_MIN
     return
     
 correct_S1_minus			; функцию коррекции переменной S1.
@@ -1006,18 +1138,21 @@ correct_S1_minus			; функцию коррекции переменной S1.
     movlw 0x2f			; Работает так же, только при достижении 2f присваивается 10
     xorwf TIME_SS1, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_S1_MIN
     movlw 	0x39
     movwf	TIME_SS1
+return_COR_S1_MIN
     return
     
     ;==============================================
     
 save_T				; функция проверки и сохранения времени
-    movlw 0xff
-    call delay			; задержка крч
-    movlw 0xff
-    call delay			; задержка крч
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto save_T
     movlw 0x6			; если происходит переполнение NumPressKey
     xorwf NumPressKey, w	; значит время заданно корректно во всех ячейках
     btfsc STATUS, 0x02		; и мы переходим в функцию записи переменных значений
@@ -1026,6 +1161,12 @@ save_T				; функция проверки и сохранения времени
     goto change_time		; его и возвращаемся в функцию изменения времени
     
 change_HMS
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto change_HMS
     movfw TEMP_TIME_HH2		; записываем значения временных переменных в постоянные (NPK 
     movwf TIME_HH2		; необходим для определения ячейки, в которую записываем
     movfw TEMP_TIME_HH1		; значение)
@@ -1051,7 +1192,7 @@ change_day		    ; функция изменения дня недели
     btfsc Key2,0
     goto minus_day_ch	    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбранное число (dec)
     btfsc Key3,0	    ; выход из настройки времени в основной цикл без сохранения результата
-    goto START
+    goto save_end_day
     btfsc Key4,0	    ; выход из настройки времени в основной цикл без сохранения результата
     goto save_day_ch
     
@@ -1060,10 +1201,12 @@ change_day		    ; функция изменения дня недели
     goto change_day
     
 plus_day_ch
-    movlw 0xff
-    call delay		    ; задержка крч
-    movlw 0xff
-    call delay		    ; задержка крч
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto plus_day_ch
     incf DAY,1
     movlw .7			; inc переменной День
     xorwf DAY, w;
@@ -1074,10 +1217,12 @@ plus_day_ch
     goto change_day
     
 minus_day_ch
-    movlw 0xff
-    call delay		    ; задержка крч
-    movlw 0xff
-    call delay		    ; задержка крч
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto minus_day_ch
     decf DAY,1
     movlw .255			; inc переменной День
     xorwf DAY, w;
@@ -1088,10 +1233,24 @@ minus_day_ch
     goto change_day
     
 save_day_ch
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto save_day_ch
     movfw TEMP_DAY
     movwf DAY
     goto START
     
+save_end_day
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto save_end_day
+    goto START
     ;==============================================
     ;==============================================
     ;==============================================
@@ -1114,26 +1273,28 @@ change_alarm
     ;----------------------------------------
     
 correct_A_plus			; функция типа switch для ввода отдельных символов(инкремент или прибавление)
-    movlw 0xff
-    call delay			; задержка крч
-    movlw 0xff
-    call delay			; задержка крч			    
-    movlw 0xa			; если NumPressKey = 0, то вызываем
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto correct_A_plus			    
+    movlw 0x9			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H2_A
     
-    movlw 0xb		; если NumPressKey = 1, то вызываем
+    movlw 0xa		; если NumPressKey = 1, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H1_A
 
-    movlw 0xc			; если NumPressKey = 2, то вызываем
+    movlw 0xb			; если NumPressKey = 2, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M2_A
     
-    movlw 0xd			; если NumPressKey = 3, то вызываем
+    movlw 0xc			; если NumPressKey = 3, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M1_A
@@ -1147,9 +1308,10 @@ correct_H2_A			; функцию коррекции переменной H2.
     movlw 0x33			; if !=3, переходим обратно в функцию
     xorwf ALARM_HH2, w	; correct_T_plus и проверяем там следующее условие
     btfss STATUS, 0x02
-    return
+    goto return_COR_H2_A
     movlw 	0x30		; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
     movwf	ALARM_HH2
+return_COR_H2_A
     return			; и идем обратно в correct_T_plus и проверяем там следующее условие
     
 correct_H1_A			; функцию коррекции переменной H1.
@@ -1162,9 +1324,10 @@ correct_H1_A			; функцию коррекции переменной H1.
     movlw 0x3a			; есди переменная = 0 или = 1, то максимальная единица для обноления - 9.
 ta1 xorwf ALARM_HH1, w	
     btfss STATUS, 0x02
-    return
+    goto return_COR_H1_A
     movlw 	0x30		; собственно обнуление переменной при достижении 10 или 4 по условию выше. 
     movwf	ALARM_HH1
+return_COR_H1_A
     return
     
 three_H1_A
@@ -1176,9 +1339,10 @@ correct_M2_A			; функцию коррекции переменной M2.
     movlw 0x36			; Работает так же, только обнуление происходит при достижении 6
     xorwf ALARM_MM2, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M2_A
     movlw 	0x30
     movwf	ALARM_MM2
+return_COR_M2_A
     return
     
 correct_M1_A			; функцию коррекции переменной M1.
@@ -1186,34 +1350,37 @@ correct_M1_A			; функцию коррекции переменной M1.
     movlw 0x3a			; Работает так же, только обнуление происходит при достижении 10
     xorwf ALARM_MM1, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M1_A
     movlw 	0x30
     movwf	ALARM_MM1
+return_COR_M1_A
     return
     
     ;----------------------------------------
     
 correct_A_minus			; функция типа switch для ввода отдельных символов(декремент)
-    movlw 0xff
-    call delay		    ; задержка крч
-    movlw 0xff
-    call delay		    ; задержка крч
-    movlw 0xa			; если NumPressKey = 0, то вызываем
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto correct_A_minus
+    movlw 0x9			; если NumPressKey = 0, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H2_minus_A
     
-    movlw 0xb			; если NumPressKey = 1, то вызываем
+    movlw 0xa			; если NumPressKey = 1, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной Н1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_H1_minus_A
 
-    movlw 0xc			; если NumPressKey = 2, то вызываем
+    movlw 0xb			; если NumPressKey = 2, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M2.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M2_minus_A
     
-    movlw 0xd			; если NumPressKey = 3, то вызываем
+    movlw 0xc			; если NumPressKey = 3, то вызываем
     xorwf NumPressKey, w;	; функцию коррекции переменной M1.
     btfsc STATUS, 0x02		; если нет, проверяем следующее условие
     call correct_M1_minus_A
@@ -1227,9 +1394,10 @@ correct_H2_minus_A		; функцию коррекции переменной H2.
     movlw 0x2f			; if !=2f, переходим обратно в функцию
     xorwf ALARM_HH2, w	; correct_T_ и проверяем там следующее условие
     btfss STATUS, 0x02
-    return
+    goto return_COR_H2_A_minus
     movlw 	0x32		; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках 2 десятка часов
     movwf	ALARM_HH2
+return_COR_H2_A_minus
     return			; и идем обратно в correct_T_ и проверяем там следующее условие
     
 correct_H1_minus_A		; функцию коррекции переменной H1.
@@ -1238,13 +1406,14 @@ correct_H1_minus_A		; функцию коррекции переменной H1.
     xorwf ALARM_HH1, w	; correct_T_ и проверяем там следующее условие
 	    				
     btfss STATUS, 0x02
-    return		
+    goto return_COR_H1_A_minus		
     movlw 0x32			; есди переменная = 2, то при достижении 2f будем присваивать Н1 = 3.
     xorwf ALARM_HH2, w	
     btfsc STATUS, 0x02
     goto three_H1_minus_A
     movlw 	0x39		; есди переменная != 2, то при достижении 2f будем присваивать Н1 = 9. 
 ta2 movwf	ALARM_HH1
+return_COR_H1_A_minus
     return
     
 three_H1_minus_A
@@ -1256,9 +1425,10 @@ correct_M2_minus_A			; функцию коррекции переменной M2.
     movlw 0x2f			; Работает так же, только при достижении 2f присваивается 5
     xorwf ALARM_MM2, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M2_A_minus
     movlw 	0x35
     movwf	ALARM_MM2
+return_COR_M2_A_minus
     return
     
 correct_M1_minus_A			; функцию коррекции переменной M1.
@@ -1266,19 +1436,22 @@ correct_M1_minus_A			; функцию коррекции переменной M1.
     movlw 0x2f			; Работает так же, только при достижении 2f присваивается 10
     xorwf ALARM_MM1, w;
     btfss STATUS, 0x02
-    return
+    goto return_COR_M1_A_minus
     movlw 	0x39
     movwf	ALARM_MM1
+return_COR_M1_A_minus
     return
     
     ;==============================================
     
 save_A				; функция проверки и сохранения времени
-    movlw 0xff
-    call delay			; задержка крч
-    movlw 0xff
-    call delay			; задержка крч
-    movlw 0xe			; если происходит переполнение NumPressKey
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto save_A
+    movlw 0xd			; если происходит переполнение NumPressKey
     xorwf NumPressKey, w	; значит время заданно корректно во всех ячейках
     btfsc STATUS, 0x02		; и мы переходим в функцию записи переменных значений
     goto START			; в постоянные
@@ -1286,6 +1459,12 @@ save_A				; функция проверки и сохранения времени
     goto change_alarm		; его и возвращаемся в функцию изменения времени
     
 change_AHMS
+    movlw 0xff				
+    call delay				;задержка крч
+    call Keyboard			;опрос клавиатуры что бы выяснить
+    movf Cnt,1				;отжата клавиша или нет
+    btfss STATUS,Z			;если нет, то циклим
+    goto change_AHMS
     movfw TEMP_ALARM_HH2		; записываем значения временных переменных в постоянные (NPK 
     movwf ALARM_HH2		; необходим для определения ячейки, в которую записываем
     movfw TEMP_ALARM_HH1		; значение)
