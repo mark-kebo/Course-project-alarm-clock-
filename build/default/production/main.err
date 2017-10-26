@@ -1,5 +1,5 @@
 Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 11 : Found directive in column 1. (include)
 Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 12 : Found directive in column 1. (errorlevel)
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 289 : Using default destination of 1 (file).
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 363 : Using default destination of 1 (file).
-Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 1489 : Found directive in column 1. (end)
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 258 : Using default destination of 1 (file).
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 339 : Using default destination of 1 (file).
+Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 1479 : Found directive in column 1. (end)
