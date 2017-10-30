@@ -1,5 +1,15 @@
 Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 11 : Found directive in column 1. (include)
 Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 12 : Found directive in column 1. (errorlevel)
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 258 : Using default destination of 1 (file).
-Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 339 : Using default destination of 1 (file).
-Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 1479 : Found directive in column 1. (end)
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 255 : Extraneous arguments on the line.
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 265 : Using default destination of 1 (file).
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 269 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 270 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 271 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 272 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 273 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 275 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 341 : Extraneous arguments on the line.
+Message[305] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 351 : Using default destination of 1 (file).
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 867 : Extraneous arguments on the line.
+Warning[211] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 942 : Extraneous arguments on the line.
+Warning[205] F:\COURSE-PROJECT-ALARM-CLOCK-\MAIN.ASM 1546 : Found directive in column 1. (end)
