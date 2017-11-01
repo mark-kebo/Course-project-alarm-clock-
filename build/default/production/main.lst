@@ -1,4 +1,4 @@
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  1
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ Warning[205]: Found directive in column 1. (errorlevel)
   0000003D            00039 Key3                equ     0x3D
   0000003E            00040 Key4                equ     0x3E
   0000003F            00041 Key9                equ     0x3F
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  2
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -116,7 +116,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0007   0064           00086     clrwdt
 0008   018B           00087     clrf INTCON                 ;Отключение  прерываний  и  их  обработки
 0009   018C           00088     clrf PIE1
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  3
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -175,7 +175,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0033   00B7           00139     movwf       ALARM_HH1
 0034   3030           00140     movlw       0x30
 0035   00B5           00141     movwf       TIME_SS2 
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  4
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +234,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0065   2???           00192     call alarm_plus_blink       ; к изменению будильника, нет - тогда едем дальше
                       00193         
 0066   2???           00194     call LCD_one                ;Отрисовка первой строки на дисплее             
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  5
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -293,7 +293,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 008F   0AB6           00245     incf    DAY,1               ; Инкремент переменной Деня, для перехода в новый день в 00:00
 0090   3007           00246     movlw       .7              ; Обнуление переменной при достижении воскресенья,
 0091   0636           00247     xorwf DAY, w;               ; что бы при 00:00:00 перейти в понедельник
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  6
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -352,7 +352,7 @@ Warning[211]: Extraneous arguments on the line.
 00B3   3030           00290     movlw 0x30                  
 00B4   0635           00291     xorwf TIME_SS2, w;
 00B5   1903           00292     btfsc STATUS, 0x02
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  7
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -411,7 +411,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 Warning[211]: Extraneous arguments on the line.
 00D8   0000           00341     nop nop nop
 00D9                  00342 end_ALARM                   ;Метка конца обработки будильника
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  8
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -424,9 +424,9 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00347     ;--------------------------------------------------------
                       00348     ;--------------------------------------------------------
                       00349     
-                      00350 ; Процедура типа switch для выбора дня недели
+                      00350 ; Процедура типа switch для выбора и отрисовки дня недели
 Message[305]: Using default destination of 1 (file).
-00DC   0782           00351 DEC addwf PCL
+00DC   0782           00351 DEC addwf PCL           ;в зависимости от переданного значения
 00DD   2???           00352     goto monday
 00DE   2???           00353     goto tuesday
 00DF   2???           00354     goto wednesday      
@@ -470,7 +470,7 @@ Message[305]: Using default destination of 1 (file).
 0100   2???           00392     goto exday
 0101                  00393 friday                      ;пятница
 0101   3046           00394     movlw 'F'
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE  9
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -529,7 +529,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0129   3001           00445     movlw 0x1               ; Задержка, для защиты от дребезга          
 012A   2???           00446     call delay                          
 012B   2???           00447     call Keyboard           ;Опрос клавиатуры что бы выяснить отжата клавиша или нет
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 10
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -572,1222 +572,1227 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0143   2???           00482     goto    BD_Loop
 0144   0008           00483     return
                       00484 
-0145                  00485 delay_one_sec               ;Колибровочные задержки
-                      00486 ; Задержка 971 195 машинных циклов
-0145   30A2           00487             movlw       .162
-0146   00A3           00488             movwf       Reg_1
-0147   30EC           00489             movlw       .236
-0148   00A4           00490             movwf       Reg_2
-0149   3005           00491             movlw       .5
-014A   00A5           00492             movwf       Reg_3
-014B   0BA3           00493             decfsz      Reg_1,F
-014C   2???           00494             goto        $-1
-014D   0064           00495             clrwdt
-014E   0BA4           00496             decfsz      Reg_2,F
-014F   2???           00497             goto        $-4
-0150   0BA5           00498             decfsz      Reg_3,F
-0151   2???           00499             goto        $-6
-0152   0000           00500             nop
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 11
+0145                  00485 delay_one_sec                   ;Колибровочные задержки
+                      00486 ;для корректного времени работы
+                      00487 ;программы в зависимости от разных условий
+                      00488 ;выполениня определенных команд, т.к. в 
+                      00489 ;любом случае основной цикл должен выполняться 
+                      00490 ;за 1 сек
+                      00491 ; Задержка 775 567 машинных циклов
+                      00492 ; Задержка 772 567 машинных циклов
+0145   3003           00493             movlw       .3
+0146   00A3           00494             movwf       Reg_1
+0147   30EB           00495             movlw       .235
+0148   00A4           00496             movwf       Reg_2
+0149   3004           00497             movlw       .4
+014A   00A5           00498             movwf       Reg_3
+014B   0BA3           00499             decfsz      Reg_1,F
+014C   2???           00500             goto        $-1
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0153   0008           00501     return   
-0154                  00502 delay_one
-0154   3014           00503     movlw       .20
-0155   00A3           00504     movwf       Reg_1
-0156   0BA3           00505     decfsz      Reg_1,F
-0157   2???           00506     goto        $-1
-0158   0064           00507     clrwdt
-0159   0000           00508     nop
-015A   2???           00509     goto end_ALARM
-                      00510             
-015B                  00511 delay_two
-015B   3016           00512     movlw       .22
-015C   00A3           00513     movwf       Reg_1
-015D   0BA3           00514     decfsz      Reg_1,F
-015E   2???           00515     goto        $-1
-015F   0064           00516     clrwdt
-0160   0000           00517     nop
-0161   2???           00518     goto end_ALARM
-                      00519             
-0162                  00520 delay_three
-0162   3018           00521     movlw       .24
-0163   00A3           00522     movwf       Reg_1
-0164   0BA3           00523     decfsz      Reg_1,F
-0165   2???           00524     goto        $-1
-0166   0064           00525     clrwdt
-0167   0000           00526     nop
-0168   2???           00527     goto end_ALARM
-                      00528             
-0169                  00529 delay_four
-0169   301A           00530     movlw       .26
-016A   00A3           00531     movwf       Reg_1
-016B   0BA3           00532     decfsz      Reg_1,F
-016C   2???           00533     goto        $-1
-016D   0064           00534     clrwdt
-016E   0000           00535     nop
-016F   2???           00536     goto end_ALARM
-                      00537             
-0170                  00538 delay_five
-0170   301C           00539     movlw       .28
-0171   00A3           00540     movwf       Reg_1
-0172   0BA3           00541     decfsz      Reg_1,F
-0173   2???           00542     goto        $-1
-0174   0064           00543     clrwdt
-0175   0000           00544     nop
-0176   2???           00545     goto end_ALARM
-                      00546             
-0177                  00547 delay_six
-0177   301E           00548     movlw       .30
-0178   00A3           00549     movwf       Reg_1
-0179   0BA3           00550     decfsz      Reg_1,F
-017A   2???           00551     goto        $-1
-017B   0064           00552     clrwdt
-017C   0000           00553     nop
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 12
+014D   0064           00501             clrwdt
+014E   0BA4           00502             decfsz      Reg_2,F
+014F   2???           00503             goto        $-4
+0150   0BA5           00504             decfsz      Reg_3,F
+0151   2???           00505             goto        $-6
+0152   0008           00506     return   
+0153                  00507 delay_one
+0153   3014           00508     movlw       .20
+0154   00A3           00509     movwf       Reg_1
+0155   0BA3           00510     decfsz      Reg_1,F
+0156   2???           00511     goto        $-1
+0157   0064           00512     clrwdt
+0158   0000           00513     nop
+0159   2???           00514     goto end_ALARM
+                      00515             
+015A                  00516 delay_two
+015A   3016           00517     movlw       .22
+015B   00A3           00518     movwf       Reg_1
+015C   0BA3           00519     decfsz      Reg_1,F
+015D   2???           00520     goto        $-1
+015E   0064           00521     clrwdt
+015F   0000           00522     nop
+0160   2???           00523     goto end_ALARM
+                      00524             
+0161                  00525 delay_three
+0161   3018           00526     movlw       .24
+0162   00A3           00527     movwf       Reg_1
+0163   0BA3           00528     decfsz      Reg_1,F
+0164   2???           00529     goto        $-1
+0165   0064           00530     clrwdt
+0166   0000           00531     nop
+0167   2???           00532     goto end_ALARM
+                      00533             
+0168                  00534 delay_four
+0168   301A           00535     movlw       .26
+0169   00A3           00536     movwf       Reg_1
+016A   0BA3           00537     decfsz      Reg_1,F
+016B   2???           00538     goto        $-1
+016C   0064           00539     clrwdt
+016D   0000           00540     nop
+016E   2???           00541     goto end_ALARM
+                      00542             
+016F                  00543 delay_five
+016F   301C           00544     movlw       .28
+0170   00A3           00545     movwf       Reg_1
+0171   0BA3           00546     decfsz      Reg_1,F
+0172   2???           00547     goto        $-1
+0173   0064           00548     clrwdt
+0174   0000           00549     nop
+0175   2???           00550     goto end_ALARM
+                      00551             
+0176                  00552 delay_six
+0176   301E           00553     movlw       .30
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-017D   2???           00554     goto end_ALARM
-                      00555             
-017E                  00556 delay_seven
-017E   3021           00557     movlw       .33
-017F   00A3           00558     movwf       Reg_1
-0180   0BA3           00559     decfsz      Reg_1,F
-0181   2???           00560     goto        $-1
-0182   0064           00561     clrwdt
-0183   0000           00562     nop
-0184   2???           00563     goto inc_BA 
-                      00564     ;==========================================
-                      00565 
-0185                  00566 LCD_one
-                      00567 ;Установка RC0=0, для последующей передачи команды  на  контроллер  HD.  Передается  ко-
-                      00568 ;манда Set DDRAM address,  устанавливающая счетчик  адреса  видеопамяти  на  начало  1-ой 
-                      00569 ;строки:  ячейку  с  адресом  (10000000). Это  необходимо  для  вывода  
-                      00570 ;времени и дня недели на первой строке индикатора.
-0185   1007           00571     bcf PORTC, 0
-0186   3080           00572     movlw b'10000000'   
-0187   2???           00573     call write
-0188   1407           00574     bsf PORTC,0
-                      00575 ;Отрисовка первой строки
-                      00576 ; Отрисовка Н2
-0189   2???           00577     call paintH2
-                      00578 ; Отрисовка Н1
-018A   2???           00579     call paintH1
-018B   303A           00580     movlw ':'
-018C   2???           00581     call write
-                      00582 ; Отрисовка М2
-018D   2???           00583     call paintM2
-                      00584 ; Отрисовка М1
-018E   2???           00585     call paintM1
-018F   303A           00586     movlw ':'
-0190   2???           00587     call write
-                      00588 ; Отрисовка S2
-0191   2???           00589     call paintS2
-                      00590 ; Отрисовка S1
-0192   2???           00591     call paintS1
-0193   3020           00592     movlw ' '
-0194   2???           00593     call write
-0195   3020           00594     movlw ' '
-0196   2???           00595     call write
-                      00596 ;Отрисовка дня недели
-0197   2???           00597     call printDay
-                      00598 
-0198   0008           00599     return
-                      00600     
-                      00601     ;==========================================
-                      00602     
-                      00603 ; Собственно механизм последовательного моргания при настройке времени
-0199                  00604 paintH2                         ;Моргание десятков часов
-0199   3001           00605     movlw 0x1                   ;Если NumPressKey = 1, то включаем моргание
-019A   0643           00606     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 13
+0177   00A3           00554     movwf       Reg_1
+0178   0BA3           00555     decfsz      Reg_1,F
+0179   2???           00556     goto        $-1
+017A   0064           00557     clrwdt
+017B   0000           00558     nop
+017C   2???           00559     goto end_ALARM
+                      00560             
+017D                  00561 delay_seven
+017D   3021           00562     movlw       .33
+017E   00A3           00563     movwf       Reg_1
+017F   0BA3           00564     decfsz      Reg_1,F
+0180   2???           00565     goto        $-1
+0181   0064           00566     clrwdt
+0182   0000           00567     nop
+0183   2???           00568     goto inc_BA 
+                      00569     ;==========================================
+                      00570 
+0184                  00571 LCD_one
+                      00572 ;Установка RC0=0, для последующей передачи команды  на  контроллер  HD.  Передается  ко-
+                      00573 ;манда Set DDRAM address,  устанавливающая счетчик  адреса  видеопамяти  на  начало  1-ой 
+                      00574 ;строки:  ячейку  с  адресом  (10000000). Это  необходимо  для  вывода  
+                      00575 ;времени и дня недели на первой строке индикатора.
+0184   1007           00576     bcf PORTC, 0
+0185   3080           00577     movlw b'10000000'   
+0186   2???           00578     call write
+0187   1407           00579     bsf PORTC,0
+                      00580 ;Отрисовка первой строки
+                      00581 ; Отрисовка Н2
+0188   2???           00582     call paintH2
+                      00583 ; Отрисовка Н1
+0189   2???           00584     call paintH1
+018A   303A           00585     movlw ':'
+018B   2???           00586     call write
+                      00587 ; Отрисовка М2
+018C   2???           00588     call paintM2
+                      00589 ; Отрисовка М1
+018D   2???           00590     call paintM1
+018E   303A           00591     movlw ':'
+018F   2???           00592     call write
+                      00593 ; Отрисовка S2
+0190   2???           00594     call paintS2
+                      00595 ; Отрисовка S1
+0191   2???           00596     call paintS1
+0192   3020           00597     movlw ' '
+0193   2???           00598     call write
+0194   3020           00599     movlw ' '
+0195   2???           00600     call write
+                      00601 ;Отрисовка дня недели
+0196   2???           00602     call printDay
+                      00603 
+0197   0008           00604     return
+                      00605     
+                      00606     ;==========================================
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 13
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-019B   1D03           00607     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-019C   2???           00608     goto blink_on_H2            ;за отрисовку. Один отрисовывает значение времени,
-019D   0AC0           00609     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-019E   1C40           00610     btfss Blink, 0              ;Если NumPressKey != 1, то проверяем следующую функцию
-019F   2???           00611     goto blink_on_H2            ;и отрисовываем постоянно значение
-01A0   2???           00612     goto blink_off_H2
-01A1                  00613 blink_off_H2
-01A1   3020           00614     movlw ' '
-01A2   2???           00615     call write
-01A3   2???           00616     goto return_H2
-01A4                  00617 blink_on_H2
-01A4   0831           00618     movfw TIME_HH2
-01A5   2???           00619     call write
-01A6                  00620 return_H2    
-01A6   0008           00621     return
-                      00622     ;-----------
-01A7                  00623 paintH1                         ;Моргание единиц часов
-01A7   3002           00624     movlw 0x2                   ;Если NumPressKey = 2, то включаем моргание
-01A8   0643           00625     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-01A9   1D03           00626     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-01AA   2???           00627     goto blink_on_H1            ;за отрисовку. Один отрисовывает значение времени,
-01AB   0AC0           00628     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-01AC   1C40           00629     btfss Blink, 0              ;Если NumPressKey != 2, то проверяем следующую функцию
-01AD   2???           00630     goto blink_on_H1            ;и отрисовываем постоянно значение
-01AE   2???           00631     goto blink_off_H1
-01AF                  00632 blink_off_H1
-01AF   3020           00633     movlw ' '
-01B0   2???           00634     call write
-01B1   2???           00635     goto return_H1
-01B2                  00636 blink_on_H1
-01B2   0830           00637     movfw TIME_HH1
-01B3   2???           00638     call write
-01B4                  00639 return_H1
-01B4   0008           00640     return
-                      00641     ;------------
-01B5                  00642 paintM2                         ;Моргание десятков минут
-01B5   3003           00643     movlw 0x3                   ;Если NumPressKey = 3, то включаем моргание
-01B6   0643           00644     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-01B7   1D03           00645     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-01B8   2???           00646     goto blink_on_M2            ;за отрисовку. Один отрисовывает значение времени,
-01B9   0AC0           00647     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-01BA   1C40           00648     btfss Blink, 0              ;Если NumPressKey != 3, то проверяем следующую функцию
-01BB   2???           00649     goto blink_on_M2            ;и отрисовываем постоянно значение
-01BC   2???           00650     goto blink_off_M2
-01BD                  00651 blink_off_M2
-01BD   3020           00652     movlw ' '
-01BE   2???           00653     call write
-01BF   2???           00654     goto return_M2
-01C0                  00655 blink_on_M2
-01C0   0833           00656     movfw TIME_MM2
-01C1   2???           00657     call write
-01C2                  00658 return_M2
-01C2   0008           00659     return
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 14
+                      00607     
+                      00608 ; Собственно механизм последовательного моргания при настройке времени
+0198                  00609 paintH2                         ;Моргание десятков часов
+0198   3001           00610     movlw 0x1                   ;Если NumPressKey = 1, то включаем моргание
+0199   0643           00611     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+019A   1D03           00612     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+019B   2???           00613     goto blink_on_H2            ;за отрисовку. Один отрисовывает значение времени,
+019C   0AC0           00614     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+019D   1C40           00615     btfss Blink, 0              ;Если NumPressKey != 1, то проверяем следующую функцию
+019E   2???           00616     goto blink_on_H2            ;и отрисовываем постоянно значение
+019F   2???           00617     goto blink_off_H2
+01A0                  00618 blink_off_H2
+01A0   3020           00619     movlw ' '
+01A1   2???           00620     call write
+01A2   2???           00621     goto return_H2
+01A3                  00622 blink_on_H2
+01A3   0831           00623     movfw TIME_HH2
+01A4   2???           00624     call write
+01A5                  00625 return_H2    
+01A5   0008           00626     return
+                      00627     ;-----------
+01A6                  00628 paintH1                         ;Моргание единиц часов
+01A6   3002           00629     movlw 0x2                   ;Если NumPressKey = 2, то включаем моргание
+01A7   0643           00630     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+01A8   1D03           00631     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+01A9   2???           00632     goto blink_on_H1            ;за отрисовку. Один отрисовывает значение времени,
+01AA   0AC0           00633     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+01AB   1C40           00634     btfss Blink, 0              ;Если NumPressKey != 2, то проверяем следующую функцию
+01AC   2???           00635     goto blink_on_H1            ;и отрисовываем постоянно значение
+01AD   2???           00636     goto blink_off_H1
+01AE                  00637 blink_off_H1
+01AE   3020           00638     movlw ' '
+01AF   2???           00639     call write
+01B0   2???           00640     goto return_H1
+01B1                  00641 blink_on_H1
+01B1   0830           00642     movfw TIME_HH1
+01B2   2???           00643     call write
+01B3                  00644 return_H1
+01B3   0008           00645     return
+                      00646     ;------------
+01B4                  00647 paintM2                         ;Моргание десятков минут
+01B4   3003           00648     movlw 0x3                   ;Если NumPressKey = 3, то включаем моргание
+01B5   0643           00649     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+01B6   1D03           00650     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+01B7   2???           00651     goto blink_on_M2            ;за отрисовку. Один отрисовывает значение времени,
+01B8   0AC0           00652     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+01B9   1C40           00653     btfss Blink, 0              ;Если NumPressKey != 3, то проверяем следующую функцию
+01BA   2???           00654     goto blink_on_M2            ;и отрисовываем постоянно значение
+01BB   2???           00655     goto blink_off_M2
+01BC                  00656 blink_off_M2
+01BC   3020           00657     movlw ' '
+01BD   2???           00658     call write
+01BE   2???           00659     goto return_M2
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 14
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00660     ;------------
-01C3                  00661 paintM1                         ;Моргание единиц минут
-01C3   3004           00662     movlw 0x4                   ;Если NumPressKey = 4, то включаем моргание
-01C4   0643           00663     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-01C5   1D03           00664     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-01C6   2???           00665     goto blink_on_M1            ;за отрисовку. Один отрисовывает значение времени,
-01C7   0AC0           00666     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-01C8   1C40           00667     btfss Blink, 0              ;Если NumPressKey != 4, то проверяем следующую функцию
-01C9   2???           00668     goto blink_on_M1            ;и отрисовываем постоянно значение
-01CA   2???           00669     goto blink_off_M1
-01CB                  00670 blink_off_M1
-01CB   3020           00671     movlw ' '
-01CC   2???           00672     call write
-01CD   2???           00673     goto return_M1
-01CE                  00674 blink_on_M1
-01CE   0832           00675     movfw TIME_MM1
-01CF   2???           00676     call write
-01D0                  00677 return_M1
-01D0   0008           00678     return
-                      00679     ;------------
-01D1                  00680 paintS2                         ;Моргание десятков секунд
-01D1   3005           00681     movlw 0x5                   ;Если NumPressKey = 5, то включаем моргание
-01D2   0643           00682     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-01D3   1D03           00683     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-01D4   2???           00684     goto blink_on_S2            ;за отрисовку. Один отрисовывает значение времени,
-01D5   0AC0           00685     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-01D6   1C40           00686     btfss Blink, 0              ;Если NumPressKey != 5, то проверяем следующую функцию
-01D7   2???           00687     goto blink_on_S2            ;и отрисовываем постоянно значение
-01D8   2???           00688     goto blink_off_S2
-01D9                  00689 blink_off_S2
-01D9   3020           00690     movlw ' '
-01DA   2???           00691     call write
-01DB   2???           00692     goto return_S2
-01DC                  00693 blink_on_S2
-01DC   0835           00694     movfw TIME_SS2
-01DD   2???           00695     call write
-01DE                  00696 return_S2
-01DE   0008           00697     return
-                      00698     ;------------
-01DF                  00699 paintS1                         ;Моргание единиц секунд
-01DF   3006           00700     movlw 0x6                   ;Если NumPressKey = 6, то включаем моргание
-01E0   0643           00701     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-01E1   1D03           00702     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-01E2   2???           00703     goto blink_on_S1            ;за отрисовку. Один отрисовывает значение времени,
-01E3   0AC0           00704     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-01E4   1C40           00705     btfss Blink, 0              ;Если NumPressKey != 6, то проверяем следующую функцию
-01E5   2???           00706     goto blink_on_S1            ;и отрисовываем постоянно значение
-01E6   2???           00707     goto blink_off_S1
-01E7                  00708 blink_off_S1
-01E7   3020           00709     movlw ' '
-01E8   2???           00710     call write
-01E9   2???           00711     goto return_S1
-01EA                  00712 blink_on_S1
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 15
+01BF                  00660 blink_on_M2
+01BF   0833           00661     movfw TIME_MM2
+01C0   2???           00662     call write
+01C1                  00663 return_M2
+01C1   0008           00664     return
+                      00665     ;------------
+01C2                  00666 paintM1                         ;Моргание единиц минут
+01C2   3004           00667     movlw 0x4                   ;Если NumPressKey = 4, то включаем моргание
+01C3   0643           00668     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+01C4   1D03           00669     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+01C5   2???           00670     goto blink_on_M1            ;за отрисовку. Один отрисовывает значение времени,
+01C6   0AC0           00671     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+01C7   1C40           00672     btfss Blink, 0              ;Если NumPressKey != 4, то проверяем следующую функцию
+01C8   2???           00673     goto blink_on_M1            ;и отрисовываем постоянно значение
+01C9   2???           00674     goto blink_off_M1
+01CA                  00675 blink_off_M1
+01CA   3020           00676     movlw ' '
+01CB   2???           00677     call write
+01CC   2???           00678     goto return_M1
+01CD                  00679 blink_on_M1
+01CD   0832           00680     movfw TIME_MM1
+01CE   2???           00681     call write
+01CF                  00682 return_M1
+01CF   0008           00683     return
+                      00684     ;------------
+01D0                  00685 paintS2                         ;Моргание десятков секунд
+01D0   3005           00686     movlw 0x5                   ;Если NumPressKey = 5, то включаем моргание
+01D1   0643           00687     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+01D2   1D03           00688     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+01D3   2???           00689     goto blink_on_S2            ;за отрисовку. Один отрисовывает значение времени,
+01D4   0AC0           00690     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+01D5   1C40           00691     btfss Blink, 0              ;Если NumPressKey != 5, то проверяем следующую функцию
+01D6   2???           00692     goto blink_on_S2            ;и отрисовываем постоянно значение
+01D7   2???           00693     goto blink_off_S2
+01D8                  00694 blink_off_S2
+01D8   3020           00695     movlw ' '
+01D9   2???           00696     call write
+01DA   2???           00697     goto return_S2
+01DB                  00698 blink_on_S2
+01DB   0835           00699     movfw TIME_SS2
+01DC   2???           00700     call write
+01DD                  00701 return_S2
+01DD   0008           00702     return
+                      00703     ;------------
+01DE                  00704 paintS1                         ;Моргание единиц секунд
+01DE   3006           00705     movlw 0x6                   ;Если NumPressKey = 6, то включаем моргание
+01DF   0643           00706     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+01E0   1D03           00707     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+01E1   2???           00708     goto blink_on_S1            ;за отрисовку. Один отрисовывает значение времени,
+01E2   0AC0           00709     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+01E3   1C40           00710     btfss Blink, 0              ;Если NumPressKey != 6, то проверяем следующую функцию
+01E4   2???           00711     goto blink_on_S1            ;и отрисовываем постоянно значение
+01E5   2???           00712     goto blink_off_S1
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 15
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-01EA   0834           00713     movfw TIME_SS1
-01EB   2???           00714     call write
-01EC                  00715 return_S1
-01EC   0008           00716     return
-                      00717     ;-----------
-01ED                  00718 printDay                        ;Моргание дня недели
-01ED   3008           00719     movlw 0x8                   ;Если NumPressKey = 8, то включаем моргание
-01EE   0643           00720     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-01EF   1D03           00721     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-01F0   2???           00722     goto blink_on_day           ;за отрисовку. Один отрисовывает значение дня,
-01F1   0AC0           00723     incf Blink,1                ;а другой символы пробела. Так создается эффект моргания.
-01F2   1C40           00724     btfss Blink, 0              ;Если NumPressKey != 8, то проверяем следующую функцию
-01F3   2???           00725     goto blink_on_day           ;и отрисовываем постоянно значение
-01F4   2???           00726     goto blink_off_day
-01F5                  00727 blink_off_day
-01F5   3020           00728     movlw ' '
-01F6   2???           00729     call write
-01F7   3020           00730     movlw ' '
-01F8   2???           00731     call write
-01F9   3020           00732     movlw ' '
-01FA   2???           00733     call write
-01FB   2???           00734     goto return_DAY
-01FC                  00735 blink_on_day
-01FC   0836           00736     movfw DAY                           
-01FD   2???           00737     call DEC
-01FE                  00738 return_DAY
-01FE   0008           00739     return
-                      00740     ;==========================================   
-                      00741     
-01FF                  00742 LCD_two
-01FF   1007           00743     bcf PORTC, 0
-0200   30C4           00744     movlw b'11000100'
-0201   2???           00745     call write
-                      00746 ;Установка RC0=0, для последующей передачи команды  на  контроллер  HD.  Передается  ко-
-                      00747 ;манда Set DDRAM address,  устанавливающая счетчик  адреса  видеопамяти  на  начало  2-ой
-                      00748 ;строки:  ячейку  с  адресом  (11000100). Это  необходимо  для  вывода  фразы  «ALARM» и будильника на в
+01E6                  00713 blink_off_S1
+01E6   3020           00714     movlw ' '
+01E7   2???           00715     call write
+01E8   2???           00716     goto return_S1
+01E9                  00717 blink_on_S1
+01E9   0834           00718     movfw TIME_SS1
+01EA   2???           00719     call write
+01EB                  00720 return_S1
+01EB   0008           00721     return
+                      00722     ;-----------
+01EC                  00723 printDay                        ;Моргание дня недели
+01EC   3008           00724     movlw 0x8                   ;Если NumPressKey = 8, то включаем моргание
+01ED   0643           00725     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+01EE   1D03           00726     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+01EF   2???           00727     goto blink_on_day           ;за отрисовку. Один отрисовывает значение дня,
+01F0   0AC0           00728     incf Blink,1                ;а другой символы пробела. Так создается эффект моргания.
+01F1   1C40           00729     btfss Blink, 0              ;Если NumPressKey != 8, то проверяем следующую функцию
+01F2   2???           00730     goto blink_on_day           ;и отрисовываем постоянно значение
+01F3   2???           00731     goto blink_off_day
+01F4                  00732 blink_off_day
+01F4   3020           00733     movlw ' '
+01F5   2???           00734     call write
+01F6   3020           00735     movlw ' '
+01F7   2???           00736     call write
+01F8   3020           00737     movlw ' '
+01F9   2???           00738     call write
+01FA   2???           00739     goto return_DAY
+01FB                  00740 blink_on_day
+01FB   0836           00741     movfw DAY                           
+01FC   2???           00742     call DEC
+01FD                  00743 return_DAY
+01FD   0008           00744     return
+                      00745     ;==========================================   
+                      00746     
+01FE                  00747 LCD_two
+01FE   1007           00748     bcf PORTC, 0
+01FF   30C4           00749     movlw b'11000100'
+0200   2???           00750     call write
+                      00751 ;Установка RC0=0, для последующей передачи команды  на  контроллер  HD.  Передается  ко-
+                      00752 ;манда Set DDRAM address,  устанавливающая счетчик  адреса  видеопамяти  на  начало  2-ой
+                      00753 ;строки:  ячейку  с  адресом  (11000100). Это  необходимо  для  вывода  фразы  «ALARM» и будильника на в
                             торой строке индикатора.
-0202   1407           00749     bsf PORTC,0                 ; установка RC0=1, для последующей передачи
-                      00750                                 ;кодов символов второй строки на дисплей. Об-
-                      00751                                 ;ратите внимание на то, что нигде не требуется
-                      00752                                 ;изменения  банков  памяти: т.к. все регистры, с
-                      00753                                 ;которыми работает ПО, находятся в 0-ом банке.
-0203   2???           00754     call paint_ALARM            ;Вызов метода отрисовки
-                      00755     
-0204   3020           00756     movlw ' '
-0205   2???           00757     call write
-0206   3020           00758     movlw ' '
-0207   2???           00759     call write
+0201   1407           00754     bsf PORTC,0                 ; установка RC0=1, для последующей передачи
+                      00755                                 ;кодов символов второй строки на дисплей. Об-
+                      00756                                 ;ратите внимание на то, что нигде не требуется
+                      00757                                 ;изменения  банков  памяти: т.к. все регистры, с
+                      00758                                 ;которыми работает ПО, находятся в 0-ом банке.
+0202   2???           00759     call paint_ALARM            ;Вызов метода отрисовки
                       00760     
-0208   2???           00761     call paintH2_A              ;Вызов метода отрисовки
-0209   2???           00762     call paintH1_A              ;Вызов метода отрисовки
-020A   303A           00763     movlw ':'
-020B   2???           00764     call write
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 16
+0203   3020           00761     movlw ' '
+0204   2???           00762     call write
+0205   3020           00763     movlw ' '
+0206   2???           00764     call write
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 16
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-020C   2???           00765     call paintM2_A              ;Вызов метода отрисовки
-020D   2???           00766     call paintM1_A              ;Вызов метода отрисовки
-020E   0008           00767     return
-                      00768     ;------------------------------------------
-020F                  00769 paintH2_A                       ;Моргание десятков часов будильника
-020F   3009           00770     movlw 0x9                   ;Если NumPressKey = 9, то включаем моргание
-0210   0643           00771     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-0211   1D03           00772     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-0212   2???           00773     goto blink_on_H2_A          ;за отрисовку. Один отрисовывает значение времени,
-0213   0AC0           00774     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-0214   1C40           00775     btfss Blink, 0              ;Если NumPressKey != 9, то проверяем следующую функцию
-0215   2???           00776     goto blink_on_H2_A          ;и отрисовываем постоянно значение
-0216   2???           00777     goto blink_off_H2_A
-0217                  00778 blink_off_H2_A
-0217   3020           00779     movlw ' '
-0218   2???           00780     call write
-0219   2???           00781     goto return_A_H2
-021A                  00782 blink_on_H2_A
-021A   0838           00783     movfw ALARM_HH2
-021B   2???           00784     call write
-021C                  00785 return_A_H2
-021C   0008           00786     return
-                      00787     ;-----------
-021D                  00788 paintH1_A                       ;Моргание единиц часов будильника
-021D   300A           00789     movlw 0xa                   ;Если NumPressKey = 10, то включаем моргание
-021E   0643           00790     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-021F   1D03           00791     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-0220   2???           00792     goto blink_on_H1_A          ;за отрисовку. Один отрисовывает значение времени,
-0221   0AC0           00793     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-0222   1C40           00794     btfss Blink, 0              ;Если NumPressKey != 10, то проверяем следующую функцию
-0223   2???           00795     goto blink_on_H1_A          ;и отрисовываем постоянно значение
-0224   2???           00796     goto blink_off_H1_A
-0225                  00797 blink_off_H1_A
-0225   3020           00798     movlw ' '
-0226   2???           00799     call write
-0227   2???           00800     goto return_A_H1
-0228                  00801 blink_on_H1_A
-0228   0837           00802     movfw ALARM_HH1
-0229   2???           00803     call write
-022A                  00804 return_A_H1
-022A   0008           00805     return
-                      00806     ;------------
-022B                  00807 paintM2_A                       ;Моргание десятков минут будильника
-022B   300B           00808     movlw 0xb                   ;Если NumPressKey = 11, то включаем моргание
-022C   0643           00809     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-022D   1D03           00810     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-022E   2???           00811     goto blink_on_M2_A          ;за отрисовку. Один отрисовывает значение времени,
-022F   0AC0           00812     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-0230   1C40           00813     btfss Blink, 0              ;Если NumPressKey != 11, то проверяем следующую функцию
-0231   2???           00814     goto blink_on_M2_A          ;и отрисовываем постоянно значение
-0232   2???           00815     goto blink_off_M2_A
-0233                  00816 blink_off_M2_A
-0233   3020           00817     movlw ' '
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 17
+                      00765     
+0207   2???           00766     call paintH2_A              ;Вызов метода отрисовки
+0208   2???           00767     call paintH1_A              ;Вызов метода отрисовки
+0209   303A           00768     movlw ':'
+020A   2???           00769     call write
+020B   2???           00770     call paintM2_A              ;Вызов метода отрисовки
+020C   2???           00771     call paintM1_A              ;Вызов метода отрисовки
+020D   0008           00772     return
+                      00773     ;------------------------------------------
+020E                  00774 paintH2_A                       ;Моргание десятков часов будильника
+020E   3009           00775     movlw 0x9                   ;Если NumPressKey = 9, то включаем моргание
+020F   0643           00776     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+0210   1D03           00777     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+0211   2???           00778     goto blink_on_H2_A          ;за отрисовку. Один отрисовывает значение времени,
+0212   0AC0           00779     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+0213   1C40           00780     btfss Blink, 0              ;Если NumPressKey != 9, то проверяем следующую функцию
+0214   2???           00781     goto blink_on_H2_A          ;и отрисовываем постоянно значение
+0215   2???           00782     goto blink_off_H2_A
+0216                  00783 blink_off_H2_A
+0216   3020           00784     movlw ' '
+0217   2???           00785     call write
+0218   2???           00786     goto return_A_H2
+0219                  00787 blink_on_H2_A
+0219   0838           00788     movfw ALARM_HH2
+021A   2???           00789     call write
+021B                  00790 return_A_H2
+021B   0008           00791     return
+                      00792     ;-----------
+021C                  00793 paintH1_A                       ;Моргание единиц часов будильника
+021C   300A           00794     movlw 0xa                   ;Если NumPressKey = 10, то включаем моргание
+021D   0643           00795     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+021E   1D03           00796     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+021F   2???           00797     goto blink_on_H1_A          ;за отрисовку. Один отрисовывает значение времени,
+0220   0AC0           00798     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+0221   1C40           00799     btfss Blink, 0              ;Если NumPressKey != 10, то проверяем следующую функцию
+0222   2???           00800     goto blink_on_H1_A          ;и отрисовываем постоянно значение
+0223   2???           00801     goto blink_off_H1_A
+0224                  00802 blink_off_H1_A
+0224   3020           00803     movlw ' '
+0225   2???           00804     call write
+0226   2???           00805     goto return_A_H1
+0227                  00806 blink_on_H1_A
+0227   0837           00807     movfw ALARM_HH1
+0228   2???           00808     call write
+0229                  00809 return_A_H1
+0229   0008           00810     return
+                      00811     ;------------
+022A                  00812 paintM2_A                       ;Моргание десятков минут будильника
+022A   300B           00813     movlw 0xb                   ;Если NumPressKey = 11, то включаем моргание
+022B   0643           00814     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+022C   1D03           00815     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+022D   2???           00816     goto blink_on_M2_A          ;за отрисовку. Один отрисовывает значение времени,
+022E   0AC0           00817     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 17
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0234   2???           00818     call write
-0235   2???           00819     goto return_A_M2
-0236                  00820 blink_on_M2_A
-0236   083A           00821     movfw ALARM_MM2
-0237   2???           00822     call write
-0238                  00823 return_A_M2
-0238   0008           00824     return
-                      00825     ;------------
-0239                  00826 paintM1_A                       ;Моргание единиц минут будильника
-0239   300C           00827     movlw 0xc                   ;Если NumPressKey = 12, то включаем моргание
-023A   0643           00828     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
-023B   1D03           00829     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-023C   2???           00830     goto blink_on_M1_A          ;за отрисовку. Один отрисовывает значение времени,
-023D   0AC0           00831     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-023E   1C40           00832     btfss Blink, 0              ;Если NumPressKey != 12, то проверяем следующую функцию
-023F   2???           00833     goto blink_on_M1_A          ;и отрисовываем постоянно значение
-0240   2???           00834     goto blink_off_M1_A
-0241                  00835 blink_off_M1_A
-0241   3020           00836     movlw ' '
-0242   2???           00837     call write
-0243   2???           00838     goto return_A_M1
-0244                  00839 blink_on_M1_A
-0244   0839           00840     movfw ALARM_MM1
-0245   2???           00841     call write
-0246                  00842 return_A_M1
-0246   0008           00843     return
-                      00844     ;----------
-0247                  00845 paint_ALARM                     ;Моргание надписи будильника
-0247   3001           00846     movlw .1                    ;Если Blink_Alarm = 1, то включаем моргание
-0248   0642           00847     xorwf Blink_Alarm, w;       ;В зависимости от регистра Blink поочередно
-0249   1D03           00848     btfss STATUS, 0x02          ;включае один из методов, отвечающих
-024A   2???           00849     goto blink_on_ALARM_nop             ;за отрисовку. Один отрисовывает значение времени,
-024B   0AC0           00850     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
-024C   1C40           00851     btfss Blink, 0              ;Если Blink_Alarm != 1, то проверяем следующую функцию
-024D   2???           00852     goto blink_on_ALARM         ;и отрисовываем постоянно значение
-024E   2???           00853         goto blink_off_ALARM
-024F                  00854 blink_off_ALARM
-024F   1088           00855     bcf PORTD,0x01
-0250   3020           00856     movlw ' '
-0251   2???           00857     call write
-0252   3020           00858     movlw ' '
-0253   2???           00859     call write
-0254   3020           00860     movlw ' '
-0255   2???           00861     call write
-0256   3020           00862     movlw ' '
-0257   2???           00863     call write
-0258   3020           00864     movlw ' '
-0259   2???           00865     call write
-025A   2???           00866     goto return_ALARM
+022F   1C40           00818     btfss Blink, 0              ;Если NumPressKey != 11, то проверяем следующую функцию
+0230   2???           00819     goto blink_on_M2_A          ;и отрисовываем постоянно значение
+0231   2???           00820     goto blink_off_M2_A
+0232                  00821 blink_off_M2_A
+0232   3020           00822     movlw ' '
+0233   2???           00823     call write
+0234   2???           00824     goto return_A_M2
+0235                  00825 blink_on_M2_A
+0235   083A           00826     movfw ALARM_MM2
+0236   2???           00827     call write
+0237                  00828 return_A_M2
+0237   0008           00829     return
+                      00830     ;------------
+0238                  00831 paintM1_A                       ;Моргание единиц минут будильника
+0238   300C           00832     movlw 0xc                   ;Если NumPressKey = 12, то включаем моргание
+0239   0643           00833     xorwf NumPressKey, w;       ;В зависимости от регистра Blink поочередно
+023A   1D03           00834     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+023B   2???           00835     goto blink_on_M1_A          ;за отрисовку. Один отрисовывает значение времени,
+023C   0AC0           00836     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+023D   1C40           00837     btfss Blink, 0              ;Если NumPressKey != 12, то проверяем следующую функцию
+023E   2???           00838     goto blink_on_M1_A          ;и отрисовываем постоянно значение
+023F   2???           00839     goto blink_off_M1_A
+0240                  00840 blink_off_M1_A
+0240   3020           00841     movlw ' '
+0241   2???           00842     call write
+0242   2???           00843     goto return_A_M1
+0243                  00844 blink_on_M1_A
+0243   0839           00845     movfw ALARM_MM1
+0244   2???           00846     call write
+0245                  00847 return_A_M1
+0245   0008           00848     return
+                      00849     ;----------
+0246                  00850 paint_ALARM                     ;Моргание надписи будильника
+0246   3001           00851     movlw .1                    ;Если Blink_Alarm = 1, то включаем моргание
+0247   0642           00852     xorwf Blink_Alarm, w;       ;В зависимости от регистра Blink поочередно
+0248   1D03           00853     btfss STATUS, 0x02          ;включае один из методов, отвечающих
+0249   2???           00854     goto blink_on_ALARM_nop             ;за отрисовку. Один отрисовывает значение времени,
+024A   0AC0           00855     incf Blink,1                ;а другой символ пробела. Так создается эффект моргания.
+024B   1C40           00856     btfss Blink, 0              ;Если Blink_Alarm != 1, то проверяем следующую функцию
+024C   2???           00857     goto blink_on_ALARM         ;и отрисовываем постоянно значение
+024D   2???           00858         goto blink_off_ALARM
+024E                  00859 blink_off_ALARM
+024E   1088           00860     bcf PORTD,0x01
+024F   3020           00861     movlw ' '
+0250   2???           00862     call write
+0251   3020           00863     movlw ' '
+0252   2???           00864     call write
+0253   3020           00865     movlw ' '
+0254   2???           00866     call write
+0255   3020           00867     movlw ' '
+0256   2???           00868     call write
+0257   3020           00869     movlw ' '
+0258   2???           00870     call write
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 18
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0259   2???           00871     goto return_ALARM
 Warning[211]: Extraneous arguments on the line.
-025B   0000           00867 blink_on_ALARM_nop nop nop nop
-025C                  00868 blink_on_ALARM
-025C   1488           00869     bsf PORTD,0x01
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 18
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-025D   3041           00870     movlw 'A'
-025E   2???           00871     call write
-025F   304C           00872     movlw 'L'
-0260   2???           00873     call write
-0261   3041           00874     movlw 'A'
-0262   2???           00875     call write
-0263   3052           00876     movlw 'R'
-0264   2???           00877     call write
-0265   304D           00878     movlw 'M'
-0266   2???           00879     call write
-0267                  00880 return_ALARM
-0267   0008           00881     return
-                      00882     ;==========================================
-                      00883     
-0268                  00884 Keyboard                    ; драйвер клавиатуры для клавиш 1-4, 9
-0268   1283           00885     bank0                   ; переход в нулевой банк, для нормального вызова функции из тела программы
-0269   1303           00886     bcf STATUS, RP1
-026A   01BB           00887     clrf Key1               ; обнуление кодов клавиш
-026B   01BC           00888     clrf Key2 
-026C   01BD           00889     clrf Key3
-026D   01BE           00890     clrf Key4  
-026E   01BF           00891     clrf Key9  
-026F   01C1           00892     clrf Cnt  
-0270                  00893 col1                        ; сканируем первый столбец, где нам нужны клавиши 1, 4
-0270   1405           00894     bsf PORTA,0             ; подача питания
-0271   1085           00895     bcf PORTA,1
-0272   1105           00896     bcf PORTA,2 
-                      00897     ;movlw .24
-                      00898     ;call small_delay
-0273   0805           00899     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+025A   0000           00872 blink_on_ALARM_nop nop nop nop
+025B                  00873 blink_on_ALARM
+025B   1488           00874     bsf PORTD,0x01
+025C   3041           00875     movlw 'A'
+025D   2???           00876     call write
+025E   304C           00877     movlw 'L'
+025F   2???           00878     call write
+0260   3041           00879     movlw 'A'
+0261   2???           00880     call write
+0262   3052           00881     movlw 'R'
+0263   2???           00882     call write
+0264   304D           00883     movlw 'M'
+0265   2???           00884     call write
+0266                  00885 return_ALARM
+0266   0008           00886     return
+                      00887     ;==========================================
+                      00888     
+0267                  00889 Keyboard                    ; драйвер клавиатуры для клавиш 1-4, 9
+0267   1283           00890     bank0                   ; переход в нулевой банк, для нормального вызова функции из тела программы
+0268   1303           00891     bcf STATUS, RP1
+0269   01BB           00892     clrf Key1               ; обнуление кодов клавиш
+026A   01BC           00893     clrf Key2 
+026B   01BD           00894     clrf Key3
+026C   01BE           00895     clrf Key4  
+026D   01BF           00896     clrf Key9  
+026E   01C1           00897     clrf Cnt  
+026F                  00898 col1                        ; сканируем первый столбец, где нам нужны клавиши 1, 4
+026F   1405           00899     bsf PORTA,0             ; подача питания
+0270   1085           00900     bcf PORTA,1
+0271   1105           00901     bcf PORTA,2 
+                      00902     ;movlw .24
+                      00903     ;call small_delay
+0272   0805           00904     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
                             011 1000.
-0274   3938           00900     andlw 0x38
-0275   1903           00901     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col2
-0276   2???           00902     goto col2               ; для сканирования второго столбца клавиатуры. Если Z=0, то пропускаем строк
+0273   3938           00905     andlw 0x38
+0274   1903           00906     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col2
+0275   2???           00907     goto col2               ; для сканирования второго столбца клавиатуры. Если Z=0, то пропускаем строк
                             у
-                      00903     ;movlw .250
-                      00904     ;call small_delay  
-0277   1985           00905     btfsc PORTA,3           ; определяем нажатия клавиши "1", проводя опрос первой строки
-0278   0ABB           00906     incf Key1,F
-0279   1A05           00907     btfsc PORTA,4           ; определяем нажатия клавиши "4", проводя опрос второй строки
-027A   0ABE           00908     incf Key4,F
-                      00909     
-027B                  00910 col2                        ; сканируем второй столбец, где нам нужна клавиша 2
-027B   1005           00911     bcf PORTA,0             ; подача питания
-027C   1485           00912     bsf PORTA,1
-027D   1105           00913     bcf PORTA,2 
-                      00914     ;movlw .24
-                      00915     ;sd
-027E   0805           00916     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
-                            011 1000.
-027F   3938           00917     andlw 0x38
-0280   1903           00918     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col3
-0281   2???           00919     goto col3               ; для сканирования третьего столбца клавиатуры. Если Z=0, то пропускаем стро
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 19
+                      00908     ;movlw .250
+                      00909     ;call small_delay  
+0276   1985           00910     btfsc PORTA,3           ; определяем нажатия клавиши "1", проводя опрос первой строки
+0277   0ABB           00911     incf Key1,F
+0278   1A05           00912     btfsc PORTA,4           ; определяем нажатия клавиши "4", проводя опрос второй строки
+0279   0ABE           00913     incf Key4,F
+                      00914     
+027A                  00915 col2                        ; сканируем второй столбец, где нам нужна клавиша 2
+027A   1005           00916     bcf PORTA,0             ; подача питания
+027B   1485           00917     bsf PORTA,1
+027C   1105           00918     bcf PORTA,2 
+                      00919     ;movlw .24
+                      00920     ;sd
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 19
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
+027D   0805           00921     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                            011 1000.
+027E   3938           00922     andlw 0x38
+027F   1903           00923     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) переходим на метку col3
+0280   2???           00924     goto col3               ; для сканирования третьего столбца клавиатуры. Если Z=0, то пропускаем стро
                             ку
-                      00920     ;movlw .250
-                      00921     ;sd
-0282   1985           00922     btfsc PORTA,3           ; определяем нажатия клавиши "2", проводя опрос первой строки
-0283   0ABC           00923     incf Key2,F
-0284                  00924 col3                        ; сканируем третий столбец, где нам нужна клавиша 3
-0284   1005           00925     bcf PORTA,0             ; подача питания
-0285   1085           00926     bcf PORTA,1
-0286   1505           00927     bsf PORTA,2
-                      00928     ;movlw .24
-                      00929     ;sd
-0287   0805           00930     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
+                      00925     ;movlw .250
+                      00926     ;sd
+0281   1985           00927     btfsc PORTA,3           ; определяем нажатия клавиши "2", проводя опрос первой строки
+0282   0ABC           00928     incf Key2,F
+0283                  00929 col3                        ; сканируем третий столбец, где нам нужна клавиша 3
+0283   1005           00930     bcf PORTA,0             ; подача питания
+0284   1085           00931     bcf PORTA,1
+0285   1505           00932     bsf PORTA,2
+                      00933     ;movlw .24
+                      00934     ;sd
+0286   0805           00935     movf PORTA,W            ; читаем порт А в W и выполняем поразрядное умножение битов порта на число 0
                             011 1000.
-0288   3938           00931     andlw 0x38
-0289   1903           00932     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
-028A   2???           00933     goto nop_end_key        ; если Z=0, то пропускаем строку
-                      00934     ;movlw .250
-                      00935     ;sd
-028B   1985           00936     btfsc PORTA,3           ; определяем нажатия клавиши "3", проводя опрос первой строки
-028C   0ABD           00937     incf Key3,F
-028D   1A85           00938     btfsc PORTA,5           ; определяем нажатия клавиши "9", проводя опрос третей строки
-028E   0ABF           00939     incf Key9,F
-028F   2???           00940     goto end_keyb
-                      00941  
+0287   3938           00936     andlw 0x38
+0288   1903           00937     btfsc STATUS,Z          ; если Z=1 (т.е. не нажата ни одна из кнопок) выходим из функции
+0289   2???           00938     goto nop_end_key        ; если Z=0, то пропускаем строку
+                      00939     ;movlw .250
+                      00940     ;sd
+028A   1985           00941     btfsc PORTA,3           ; определяем нажатия клавиши "3", проводя опрос первой строки
+028B   0ABD           00942     incf Key3,F
+028C   1A85           00943     btfsc PORTA,5           ; определяем нажатия клавиши "9", проводя опрос третей строки
+028D   0ABF           00944     incf Key9,F
+028E   2???           00945     goto end_keyb
+                      00946  
 Warning[211]: Extraneous arguments on the line.
-0290   0000           00942 nop_end_key nop nop nop nop nop nop
-0291                  00943 end_keyb                    ;Метод, для записи в Cnt = 1, если нажата клавиша (нужен для преверки, отпущ
+028F   0000           00947 nop_end_key nop nop nop nop nop nop
+0290                  00948 end_keyb                    ;Метод, для записи в Cnt = 1, если нажата клавиша (нужен для преверки, отпущ
                             ена ли клавиша)
-0291   183B           00944     btfsc Key1,0
-0292   0AC1           00945     incf Cnt,F
-0293   183C           00946     btfsc Key2,0
-0294   0AC1           00947     incf Cnt,F
-0295   183D           00948     btfsc Key3,0
-0296   0AC1           00949     incf Cnt,F
-0297   183E           00950     btfsc Key4,0
-0298   0AC1           00951     incf Cnt,F
-0299   183F           00952     btfsc Key9,0
-029A   0AC1           00953     incf Cnt,F
-029B   0008           00954     return                  ; выход из функции
-                      00955     
-                      00956 ;==============================================
-                      00957 
-029C                  00958 change_time                 ; функция изменения времени
-029C   2???           00959     call Keyboard           ; спрашиваем клавиатуру
-029D   183B           00960     btfsc Key1,0
-029E   2???           00961     call correct_T_plus     ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное
+0290   183B           00949     btfsc Key1,0
+0291   0AC1           00950     incf Cnt,F
+0292   183C           00951     btfsc Key2,0
+0293   0AC1           00952     incf Cnt,F
+0294   183D           00953     btfsc Key3,0
+0295   0AC1           00954     incf Cnt,F
+0296   183E           00955     btfsc Key4,0
+0297   0AC1           00956     incf Cnt,F
+0298   183F           00957     btfsc Key9,0
+0299   0AC1           00958     incf Cnt,F
+029A   0008           00959     return                  ; выход из функции
+                      00960     
+                      00961 ;==============================================
+                      00962 
+029B                  00963 change_time                 ; функция изменения времени
+029B   2???           00964     call Keyboard           ; спрашиваем клавиатуру
+029C   183B           00965     btfsc Key1,0
+029D   2???           00966     call correct_T_plus     ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбранное
                              число (inc)
-029F   183C           00962     btfsc Key2,0
-02A0   2???           00963     call correct_T_minus    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбранное
+029E   183C           00967     btfsc Key2,0
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 20
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+029F   2???           00968     call correct_T_minus    ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбранное
                              число (dec)
-02A1   183D           00964     btfsc Key3,0
-02A2   2???           00965     goto save_T             ; переход к другой цифре путем инкремента NPK, при переполнения переменной п
+02A0   183D           00969     btfsc Key3,0
+02A1   2???           00970     goto save_T             ; переход к другой цифре путем инкремента NPK, при переполнения переменной п
                             роисходит сохранение результата и выход в основной цикл
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 20
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-02A3   183E           00966     btfsc Key4,0            ; выход из настройки времени в основной цикл без сохранения результата
-02A4   2???           00967     goto change_HMS
-                      00968     
-02A5   2???           00969     call LCD_one            ; Отрисовка первой строки
-02A6   2???           00970     call delay_one_sec          ; задержка пока на 1сек
-02A7   2???           00971     goto change_time
-                      00972     
-                      00973     ;----------------------------------------
-02A8                  00974 correct_T_plus                  ; функция типа switch для ввода отдельных символов(инкремент или прибавл
+02A2   183E           00971     btfsc Key4,0            ; выход из настройки времени в основной цикл без сохранения результата
+02A3   2???           00972     goto change_HMS
+                      00973     
+02A4   2???           00974     call LCD_one            ; Отрисовка первой строки
+02A5   2???           00975     call delay_one_sec          ; задержка пока на 1сек
+02A6   2???           00976     goto change_time
+                      00977     
+                      00978     ;----------------------------------------
+02A7                  00979 correct_T_plus                  ; функция типа switch для ввода отдельных символов(инкремент или прибавл
                             ение)
-02A8   3001           00975     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов
-02A9   2???           00976     call delay                          
-02AA   2???           00977     call Keyboard               ;опрос клавиатуры что бы выяснить
-02AB   08C1           00978     movf Cnt,1                  ;отжата клавиша или нет
-02AC   1D03           00979     btfss STATUS,Z              ;если нет, то циклим
-02AD   2???           00980     goto correct_T_plus             
-02AE   3001           00981     movlw 0x1                   ; если NumPressKey = 1, то вызываем
-02AF   0643           00982     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
-02B0   1903           00983     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-02B1   2???           00984     call correct_H2
-                      00985     
-02B2   3002           00986     movlw 0x2                   ; если NumPressKey = 2, то вызываем
-02B3   0643           00987     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
-02B4   1903           00988     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-02B5   2???           00989     call correct_H1
-                      00990 
-02B6   3003           00991     movlw 0x3                   ; если NumPressKey = 3, то вызываем
-02B7   0643           00992     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
-02B8   1903           00993     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-02B9   2???           00994     call correct_M2
-                      00995     
-02BA   3004           00996     movlw 0x4                   ; если NumPressKey = 4, то вызываем
-02BB   0643           00997     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
-02BC   1903           00998     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-02BD   2???           00999     call correct_M1
+02A7   3001           00980     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов
+02A8   2???           00981     call delay                          
+02A9   2???           00982     call Keyboard               ;опрос клавиатуры что бы выяснить
+02AA   08C1           00983     movf Cnt,1                  ;отжата клавиша или нет
+02AB   1D03           00984     btfss STATUS,Z              ;если нет, то циклим
+02AC   2???           00985     goto correct_T_plus             
+02AD   3001           00986     movlw 0x1                   ; если NumPressKey = 1, то вызываем
+02AE   0643           00987     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
+02AF   1903           00988     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+02B0   2???           00989     call correct_H2
+                      00990     
+02B1   3002           00991     movlw 0x2                   ; если NumPressKey = 2, то вызываем
+02B2   0643           00992     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
+02B3   1903           00993     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+02B4   2???           00994     call correct_H1
+                      00995 
+02B5   3003           00996     movlw 0x3                   ; если NumPressKey = 3, то вызываем
+02B6   0643           00997     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
+02B7   1903           00998     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+02B8   2???           00999     call correct_M2
                       01000     
-02BE   3005           01001     movlw 0x5                   ; если NumPressKey = 5, то вызываем
-02BF   0643           01002     xorwf NumPressKey, w;       ; функцию коррекции переменной S2.
-02C0   1903           01003     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-02C1   2???           01004     call correct_S2
+02B9   3004           01001     movlw 0x4                   ; если NumPressKey = 4, то вызываем
+02BA   0643           01002     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
+02BB   1903           01003     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+02BC   2???           01004     call correct_M1
                       01005     
-02C2   3006           01006     movlw 0x6                   ; если NumPressKey = 6, то вызываем
-02C3   0643           01007     xorwf NumPressKey, w;       ; функцию коррекции переменной S1.
-02C4   1903           01008     btfsc STATUS, 0x02          ; если нет, выходим из функции
-02C5   2???           01009     call correct_S1
+02BD   3005           01006     movlw 0x5                   ; если NumPressKey = 5, то вызываем
+02BE   0643           01007     xorwf NumPressKey, w;       ; функцию коррекции переменной S2.
+02BF   1903           01008     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+02C0   2???           01009     call correct_S2
                       01010     
-02C6   0008           01011     return
-                      01012     
-                      01013     ;----------------------------------------
-                      01014     
-02C7                  01015 correct_H2                      ; функцию коррекции переменной H2.
-02C7   0AB1           01016     incf TIME_HH2,1             ; инкремент переменной Н2
-02C8   3033           01017     movlw 0x33                  ; Если !=3, переходим обратно в функцию
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 21
+02C1   3006           01011     movlw 0x6                   ; если NumPressKey = 6, то вызываем
+02C2   0643           01012     xorwf NumPressKey, w;       ; функцию коррекции переменной S1.
+02C3   1903           01013     btfsc STATUS, 0x02          ; если нет, выходим из функции
+02C4   2???           01014     call correct_S1
+                      01015     
+02C5   0008           01016     return
+                      01017     
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 21
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-02C9   0631           01018     xorwf TIME_HH2, w           ; correct_T_plus и проверяем там следующее условие
-02CA   1D03           01019     btfss STATUS, 0x02
-02CB   2???           01020     goto return_COR_H2
-02CC   3030           01021     movlw       0x30            ; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
-02CD   00B1           01022     movwf       TIME_HH2
-02CE                  01023 return_COR_H2
-02CE   0008           01024     return                      ; и идем обратно в correct_T_plus и проверяем там следующее условие
-                      01025     
-02CF                  01026 correct_H1                      ; функцию коррекции переменной H1.
-02CF   0AB0           01027     incf TIME_HH1,1             ; инкремент переменной Н1
-02D0   3032           01028     movlw 0x32                  ; Если = 2, переходим в функцию three_H1, которая служит для 
-02D1   0631           01029     xorwf TIME_HH2, w           ; корректной задачи времени, т.к. 18 часов может быть, а 28 нет, то надо
-                      01030                                 ; ограничить единицы при десятках = 2   
-02D2   1903           01031     btfsc STATUS, 0x02
-02D3   2???           01032     goto three_H1                       
-02D4   303A           01033     movlw 0x3a                  ; есди переменная = 0 или = 1, то максимальная единица для обноления - 9
+                      01018     ;----------------------------------------
+                      01019     
+02C6                  01020 correct_H2                      ; функцию коррекции переменной H2.
+02C6   0AB1           01021     incf TIME_HH2,1             ; инкремент переменной Н2
+02C7   3033           01022     movlw 0x33                  ; Если !=3, переходим обратно в функцию
+02C8   0631           01023     xorwf TIME_HH2, w           ; correct_T_plus и проверяем там следующее условие
+02C9   1D03           01024     btfss STATUS, 0x02
+02CA   2???           01025     goto return_COR_H2
+02CB   3030           01026     movlw       0x30            ; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
+02CC   00B1           01027     movwf       TIME_HH2
+02CD                  01028 return_COR_H2
+02CD   0008           01029     return                      ; и идем обратно в correct_T_plus и проверяем там следующее условие
+                      01030     
+02CE                  01031 correct_H1                      ; функцию коррекции переменной H1.
+02CE   0AB0           01032     incf TIME_HH1,1             ; инкремент переменной Н1
+02CF   3032           01033     movlw 0x32                  ; Если = 2, переходим в функцию three_H1, которая служит для 
+02D0   0631           01034     xorwf TIME_HH2, w           ; корректной задачи времени, т.к. 18 часов может быть, а 28 нет, то надо
+                      01035                                 ; ограничить единицы при десятках = 2   
+02D1   1903           01036     btfsc STATUS, 0x02
+02D2   2???           01037     goto three_H1                       
+02D3   303A           01038     movlw 0x3a                  ; если переменная = 0 или = 1, то максимальная единица для обнуления - 9
                             .
-02D5   0630           01034 t1  xorwf TIME_HH1, w   
-02D6   1D03           01035     btfss STATUS, 0x02
-02D7   2???           01036     goto return_COR_H1
-02D8   3030           01037     movlw       0x30            ; собственно обнуление переменной при достижении 10 или 4 по условию выш
+02D4   0630           01039 t1  xorwf TIME_HH1, w   
+02D5   1D03           01040     btfss STATUS, 0x02
+02D6   2???           01041     goto return_COR_H1
+02D7   3030           01042     movlw       0x30            ; собственно обнуление переменной при достижении 10 или 4 по условию выш
                             е. 
-02D9   00B0           01038     movwf       TIME_HH1
-02DA                  01039 return_COR_H1
-02DA   0008           01040     return
-                      01041     
-02DB                  01042 three_H1
-02DB   3034           01043     movlw 0x34                  ; предел для обнуления при переменной = 2
-02DC   2???           01044     goto t1                     ; возврат к метке t1 для продолжения корректной работы
-                      01045     
-02DD                  01046 correct_M2                      ; функцию коррекции переменной M2.
-02DD   0AB3           01047     incf TIME_MM2,1
-02DE   3036           01048     movlw 0x36                  ; Работает так же, только обнуление происходит при достижении 6
-02DF   0633           01049     xorwf TIME_MM2, w;
-02E0   1D03           01050     btfss STATUS, 0x02
-02E1   2???           01051     goto return_COR_M2
-02E2   3030           01052     movlw       0x30
-02E3   00B3           01053     movwf       TIME_MM2
-02E4                  01054 return_COR_M2
-02E4   0008           01055     return
-                      01056     
-02E5                  01057 correct_M1                      ; функцию коррекции переменной M1.
-02E5   0AB2           01058     incf TIME_MM1,1
-02E6   303A           01059     movlw 0x3a                  ; Работает так же, только обнуление происходит при достижении 10
-02E7   0632           01060     xorwf TIME_MM1, w;
-02E8   1D03           01061     btfss STATUS, 0x02
-02E9   2???           01062     goto return_COR_M1
-02EA   3030           01063     movlw       0x30
-02EB   00B2           01064     movwf       TIME_MM1
-02EC                  01065 return_COR_M1
-02EC   0008           01066     return
-                      01067     
-02ED                  01068 correct_S2                      ; функцию коррекции переменной S2.
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 22
+02D8   00B0           01043     movwf       TIME_HH1
+02D9                  01044 return_COR_H1
+02D9   0008           01045     return
+                      01046     
+02DA                  01047 three_H1
+02DA   3034           01048     movlw 0x34                  ; предел для обнуления при переменной = 2
+02DB   2???           01049     goto t1                     ; возврат к метке t1 для продолжения корректной работы
+                      01050     
+02DC                  01051 correct_M2                      ; функцию коррекции переменной M2.
+02DC   0AB3           01052     incf TIME_MM2,1
+02DD   3036           01053     movlw 0x36                  ; Работает так же, только обнуление происходит при достижении 6
+02DE   0633           01054     xorwf TIME_MM2, w;
+02DF   1D03           01055     btfss STATUS, 0x02
+02E0   2???           01056     goto return_COR_M2
+02E1   3030           01057     movlw       0x30
+02E2   00B3           01058     movwf       TIME_MM2
+02E3                  01059 return_COR_M2
+02E3   0008           01060     return
+                      01061     
+02E4                  01062 correct_M1                      ; функцию коррекции переменной M1.
+02E4   0AB2           01063     incf TIME_MM1,1
+02E5   303A           01064     movlw 0x3a                  ; Работает так же, только обнуление происходит при достижении 10
+02E6   0632           01065     xorwf TIME_MM1, w;
+02E7   1D03           01066     btfss STATUS, 0x02
+02E8   2???           01067     goto return_COR_M1
+02E9   3030           01068     movlw       0x30
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 22
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-02ED   0AB5           01069     incf TIME_SS2,1
-02EE   3036           01070     movlw 0x36                  ; Работает так же, только обнуление происходит при достижении 6
-02EF   0635           01071     xorwf TIME_SS2, w;
-02F0   1D03           01072     btfss STATUS, 0x02
-02F1   2???           01073     goto return_COR_S2
-02F2   3030           01074     movlw       0x30
-02F3   00B5           01075     movwf       TIME_SS2
-02F4                  01076 return_COR_S2
-02F4   0008           01077     return
-                      01078     
-02F5                  01079 correct_S1                      ; функцию коррекции переменной S1.
-02F5   0AB4           01080     incf TIME_SS1,1
-02F6   303A           01081     movlw 0x3a                  ; Работает так же, только обнуление происходит при достижении 10
-02F7   0634           01082     xorwf TIME_SS1, w;
-02F8   1D03           01083     btfss STATUS, 0x02
-02F9   2???           01084     goto return_COR_S1
-02FA   3030           01085     movlw       0x30
-02FB   00B4           01086     movwf       TIME_SS1
-02FC                  01087 return_COR_S1
-02FC   0008           01088     return
-                      01089     
-                      01090     ;----------------------------------------
-                      01091     
-02FD                  01092 correct_T_minus                 ; функция типа switch для ввода отдельных символов(декремент)
-02FD   3001           01093     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов      
-02FE   2???           01094     call delay                          
-02FF   2???           01095     call Keyboard               ;опрос клавиатуры что бы выяснить
-0300   08C1           01096     movf Cnt,1                  ;отжата клавиша или нет
-0301   1D03           01097     btfss STATUS,Z              ;если нет, то циклим
-0302   2???           01098     goto correct_T_minus                  
-0303   3001           01099     movlw 0x1                   ; если NumPressKey = 1, то вызываем
-0304   0643           01100     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
-0305   1903           01101     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-0306   2???           01102     call correct_H2_minus
-                      01103     
-0307   3002           01104     movlw 0x2                   ; если NumPressKey = 2, то вызываем
-0308   0643           01105     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
-0309   1903           01106     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-030A   2???           01107     call correct_H1_minus
-                      01108 
-030B   3003           01109     movlw 0x3                   ; если NumPressKey = 3, то вызываем
-030C   0643           01110     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
-030D   1903           01111     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-030E   2???           01112     call correct_M2_minus
-                      01113     
-030F   3004           01114     movlw 0x4                   ; если NumPressKey = 4, то вызываем
-0310   0643           01115     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
-0311   1903           01116     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-0312   2???           01117     call correct_M1_minus
+02EA   00B2           01069     movwf       TIME_MM1
+02EB                  01070 return_COR_M1
+02EB   0008           01071     return
+                      01072     
+02EC                  01073 correct_S2                      ; функцию коррекции переменной S2.
+02EC   0AB5           01074     incf TIME_SS2,1
+02ED   3036           01075     movlw 0x36                  ; Работает так же, только обнуление происходит при достижении 6
+02EE   0635           01076     xorwf TIME_SS2, w;
+02EF   1D03           01077     btfss STATUS, 0x02
+02F0   2???           01078     goto return_COR_S2
+02F1   3030           01079     movlw       0x30
+02F2   00B5           01080     movwf       TIME_SS2
+02F3                  01081 return_COR_S2
+02F3   0008           01082     return
+                      01083     
+02F4                  01084 correct_S1                      ; функцию коррекции переменной S1.
+02F4   0AB4           01085     incf TIME_SS1,1
+02F5   303A           01086     movlw 0x3a                  ; Работает так же, только обнуление происходит при достижении 10
+02F6   0634           01087     xorwf TIME_SS1, w;
+02F7   1D03           01088     btfss STATUS, 0x02
+02F8   2???           01089     goto return_COR_S1
+02F9   3030           01090     movlw       0x30
+02FA   00B4           01091     movwf       TIME_SS1
+02FB                  01092 return_COR_S1
+02FB   0008           01093     return
+                      01094     
+                      01095     ;----------------------------------------
+                      01096     
+02FC                  01097 correct_T_minus                 ; функция типа switch для ввода отдельных символов(декремент)
+02FC   3001           01098     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов      
+02FD   2???           01099     call delay                          
+02FE   2???           01100     call Keyboard               ;опрос клавиатуры что бы выяснить
+02FF   08C1           01101     movf Cnt,1                  ;отжата клавиша или нет
+0300   1D03           01102     btfss STATUS,Z              ;если нет, то циклим
+0301   2???           01103     goto correct_T_minus                  
+0302   3001           01104     movlw 0x1                   ; если NumPressKey = 1, то вызываем
+0303   0643           01105     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
+0304   1903           01106     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+0305   2???           01107     call correct_H2_minus
+                      01108     
+0306   3002           01109     movlw 0x2                   ; если NumPressKey = 2, то вызываем
+0307   0643           01110     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
+0308   1903           01111     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+0309   2???           01112     call correct_H1_minus
+                      01113 
+030A   3003           01114     movlw 0x3                   ; если NumPressKey = 3, то вызываем
+030B   0643           01115     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
+030C   1903           01116     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+030D   2???           01117     call correct_M2_minus
                       01118     
-0313   3005           01119     movlw 0x5                   ; если NumPressKey = 5, то вызываем
-0314   0643           01120     xorwf NumPressKey, w;       ; функцию коррекции переменной S2.
-0315   1903           01121     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 23
+030E   3004           01119     movlw 0x4                   ; если NumPressKey = 4, то вызываем
+030F   0643           01120     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
+0310   1903           01121     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 23
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0316   2???           01122     call correct_S2_minus
+0311   2???           01122     call correct_M1_minus
                       01123     
-0317   3006           01124     movlw 0x6                   ; если NumPressKey = 6, то вызываем
-0318   0643           01125     xorwf NumPressKey, w;       ; функцию коррекции переменной S1.
-0319   1903           01126     btfsc STATUS, 0x02          ; если нет, выходим из функции
-031A   2???           01127     call correct_S1_minus
+0312   3005           01124     movlw 0x5                   ; если NumPressKey = 5, то вызываем
+0313   0643           01125     xorwf NumPressKey, w;       ; функцию коррекции переменной S2.
+0314   1903           01126     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+0315   2???           01127     call correct_S2_minus
                       01128     
-031B   0008           01129     return
-                      01130     ;----------------------------------------
-                      01131     
-031C                  01132 correct_H2_minus                ; функцию коррекции переменной H2.
-031C   03B1           01133     decf TIME_HH2,1             ; декремент переменной Н2
-031D   302F           01134     movlw 0x2f                  ; Если !=2f, переходим обратно в функцию
-031E   0631           01135     xorwf TIME_HH2, w           ; correct_T_ и проверяем там следующее условие
-031F   1D03           01136     btfss STATUS, 0x02
-0320   2???           01137     goto return_COR_H2_MIN
-0321   3032           01138     movlw       0x32            ; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках 2 де
+0316   3006           01129     movlw 0x6                   ; если NumPressKey = 6, то вызываем
+0317   0643           01130     xorwf NumPressKey, w;       ; функцию коррекции переменной S1.
+0318   1903           01131     btfsc STATUS, 0x02          ; если нет, выходим из функции
+0319   2???           01132     call correct_S1_minus
+                      01133     
+031A   0008           01134     return
+                      01135     ;----------------------------------------
+                      01136     
+031B                  01137 correct_H2_minus                ; функцию коррекции переменной H2.
+031B   03B1           01138     decf TIME_HH2,1             ; декремент переменной Н2
+031C   302F           01139     movlw 0x2f                  ; Если !=2f, переходим обратно в функцию
+031D   0631           01140     xorwf TIME_HH2, w           ; correct_T_ и проверяем там следующее условие
+031E   1D03           01141     btfss STATUS, 0x02
+031F   2???           01142     goto return_COR_H2_MIN
+0320   3032           01143     movlw       0x32            ; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках 2 де
                             сятка часов
-0322   00B1           01139     movwf       TIME_HH2
-0323                  01140 return_COR_H2_MIN
-0323   0008           01141     return                      ; и идем обратно в correct_T_ и проверяем там следующее условие
-                      01142     
-0324                  01143 correct_H1_minus                ; функцию коррекции переменной H1.
-0324   03B0           01144     decf TIME_HH1,1             ; декремент переменной Н1
-0325   302F           01145     movlw 0x2f                  ; Если != 2f, переходим обратно в функцию 
-0326   0630           01146     xorwf TIME_HH1, w           ; correct_T_ и проверяем там следующее условие
-                      01147                                         
-0327   1D03           01148     btfss STATUS, 0x02
-0328   2???           01149     goto return_COR_H1_MIN              
-0329   3032           01150     movlw 0x32                  ; если переменная = 2, то при достижении 2f будем присваивать Н1 = 3.
-032A   0631           01151     xorwf TIME_HH2, w   
-032B   1903           01152     btfsc STATUS, 0x02
-032C   2???           01153     goto three_H1_minus
-032D   3039           01154     movlw       0x39            ; если переменная != 2, то при достижении 2f будем присваивать Н1 = 9. 
-032E   00B0           01155 t2  movwf       TIME_HH1
-032F                  01156 return_COR_H1_MIN
-032F   0008           01157     return
-                      01158     
-0330                  01159 three_H1_minus
-0330   3033           01160     movlw 0x33                  ; значение для присваивания при Н2 = 2.
-0331   2???           01161     goto t2                     ; возврат к метке t2 для продолжения корректной работы
-                      01162     
-0332                  01163 correct_M2_minus                ; функцию коррекции переменной M2.
-0332   03B3           01164     decf TIME_MM2,1
-0333   302F           01165     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 5
-0334   0633           01166     xorwf TIME_MM2, w;
-0335   1D03           01167     btfss STATUS, 0x02
-0336   2???           01168     goto return_COR_M2_MIN
-0337   3035           01169     movlw       0x35
-0338   00B3           01170     movwf       TIME_MM2
-0339                  01171 return_COR_M2_MIN
-0339   0008           01172     return
-                      01173     
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 24
+0321   00B1           01144     movwf       TIME_HH2
+0322                  01145 return_COR_H2_MIN
+0322   0008           01146     return                      ; и идем обратно в correct_T_ и проверяем там следующее условие
+                      01147     
+0323                  01148 correct_H1_minus                ; функцию коррекции переменной H1.
+0323   03B0           01149     decf TIME_HH1,1             ; декремент переменной Н1
+0324   302F           01150     movlw 0x2f                  ; Если != 2f, переходим обратно в функцию 
+0325   0630           01151     xorwf TIME_HH1, w           ; correct_T_ и проверяем там следующее условие
+                      01152                                         
+0326   1D03           01153     btfss STATUS, 0x02
+0327   2???           01154     goto return_COR_H1_MIN              
+0328   3032           01155     movlw 0x32                  ; если переменная = 2, то при достижении 2f будем присваивать Н1 = 3.
+0329   0631           01156     xorwf TIME_HH2, w   
+032A   1903           01157     btfsc STATUS, 0x02
+032B   2???           01158     goto three_H1_minus
+032C   3039           01159     movlw       0x39            ; если переменная != 2, то при достижении 2f будем присваивать Н1 = 9. 
+032D   00B0           01160 t2  movwf       TIME_HH1
+032E                  01161 return_COR_H1_MIN
+032E   0008           01162     return
+                      01163     
+032F                  01164 three_H1_minus
+032F   3033           01165     movlw 0x33                  ; значение для присваивания при Н2 = 2.
+0330   2???           01166     goto t2                     ; возврат к метке t2 для продолжения корректной работы
+                      01167     
+0331                  01168 correct_M2_minus                ; функцию коррекции переменной M2.
+0331   03B3           01169     decf TIME_MM2,1
+0332   302F           01170     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 5
+0333   0633           01171     xorwf TIME_MM2, w;
+0334   1D03           01172     btfss STATUS, 0x02
+0335   2???           01173     goto return_COR_M2_MIN
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 24
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-033A                  01174 correct_M1_minus                ; функцию коррекции переменной M1.
-033A   03B2           01175     decf TIME_MM1,1
-033B   302F           01176     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 10
-033C   0632           01177     xorwf TIME_MM1, w;
-033D   1D03           01178     btfss STATUS, 0x02
-033E   2???           01179     goto return_COR_M1_MIN
-033F   3039           01180     movlw       0x39
-0340   00B2           01181     movwf       TIME_MM1
-0341                  01182 return_COR_M1_MIN
-0341   0008           01183     return
-                      01184     
-0342                  01185 correct_S2_minus                ; функцию коррекции переменной S2.
-0342   03B5           01186     decf TIME_SS2,1
-0343   302F           01187     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 5
-0344   0635           01188     xorwf TIME_SS2, w;
-0345   1D03           01189     btfss STATUS, 0x02
-0346   2???           01190     goto return_COR_S2_MIN
-0347   3035           01191     movlw       0x35
-0348   00B5           01192     movwf       TIME_SS2
-0349                  01193 return_COR_S2_MIN
-0349   0008           01194     return
-                      01195     
-034A                  01196 correct_S1_minus                ; функцию коррекции переменной S1.
-034A   03B4           01197     decf TIME_SS1,1
-034B   302F           01198     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 10
-034C   0634           01199     xorwf TIME_SS1, w;
-034D   1D03           01200     btfss STATUS, 0x02
-034E   2???           01201     goto return_COR_S1_MIN
-034F   3039           01202     movlw       0x39
-0350   00B4           01203     movwf       TIME_SS1
-0351                  01204 return_COR_S1_MIN
-0351   0008           01205     return
-                      01206     
-                      01207     ;==============================================
-                      01208     
-0352                  01209 save_T                          ; функция проверки и сохранения времени
-0352   3001           01210     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов
-0353   2???           01211     call delay                  
-0354   2???           01212     call Keyboard               ;опрос клавиатуры что бы выяснить
-0355   08C1           01213     movf Cnt,1                  ;отжата клавиша или нет
-0356   1D03           01214     btfss STATUS,Z              ;если нет, то циклим
-0357   2???           01215     goto save_T
-0358   3006           01216     movlw 0x6                   ; если происходит переполнение NumPressKey
-0359   0643           01217     xorwf NumPressKey, w        ; значит время заданно корректно во всех ячейках
-035A   1903           01218     btfsc STATUS, 0x02          ; и мы переходим в функцию записи переменных значений
-035B   2???           01219     goto START                  ; в постоянные
-035C   0AC3           01220     incf NumPressKey,1          ; Если NumPressKey не переполнен, то инкрементируем
-035D   2???           01221     goto change_time            ; его и возвращаемся в функцию изменения времени
-                      01222     
-035E                  01223 change_HMS
-035E   3001           01224     movlw 0x1                           
-035F   2???           01225     call delay                  ;Задержка для борьбы с дребезгом контактов
-0360   2???           01226     call Keyboard               ;опрос клавиатуры что бы выяснить
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 25
+0336   3035           01174     movlw       0x35
+0337   00B3           01175     movwf       TIME_MM2
+0338                  01176 return_COR_M2_MIN
+0338   0008           01177     return
+                      01178     
+0339                  01179 correct_M1_minus                ; функцию коррекции переменной M1.
+0339   03B2           01180     decf TIME_MM1,1
+033A   302F           01181     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 10
+033B   0632           01182     xorwf TIME_MM1, w;
+033C   1D03           01183     btfss STATUS, 0x02
+033D   2???           01184     goto return_COR_M1_MIN
+033E   3039           01185     movlw       0x39
+033F   00B2           01186     movwf       TIME_MM1
+0340                  01187 return_COR_M1_MIN
+0340   0008           01188     return
+                      01189     
+0341                  01190 correct_S2_minus                ; функцию коррекции переменной S2.
+0341   03B5           01191     decf TIME_SS2,1
+0342   302F           01192     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 5
+0343   0635           01193     xorwf TIME_SS2, w;
+0344   1D03           01194     btfss STATUS, 0x02
+0345   2???           01195     goto return_COR_S2_MIN
+0346   3035           01196     movlw       0x35
+0347   00B5           01197     movwf       TIME_SS2
+0348                  01198 return_COR_S2_MIN
+0348   0008           01199     return
+                      01200     
+0349                  01201 correct_S1_minus                ; функцию коррекции переменной S1.
+0349   03B4           01202     decf TIME_SS1,1
+034A   302F           01203     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 10
+034B   0634           01204     xorwf TIME_SS1, w;
+034C   1D03           01205     btfss STATUS, 0x02
+034D   2???           01206     goto return_COR_S1_MIN
+034E   3039           01207     movlw       0x39
+034F   00B4           01208     movwf       TIME_SS1
+0350                  01209 return_COR_S1_MIN
+0350   0008           01210     return
+                      01211     
+                      01212     ;==============================================
+                      01213     
+0351                  01214 save_T                          ; функция проверки и сохранения времени
+0351   3001           01215     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов
+0352   2???           01216     call delay                  
+0353   2???           01217     call Keyboard               ;опрос клавиатуры что бы выяснить
+0354   08C1           01218     movf Cnt,1                  ;отжата клавиша или нет
+0355   1D03           01219     btfss STATUS,Z              ;если нет, то циклим
+0356   2???           01220     goto save_T
+0357   3006           01221     movlw 0x6                   ; если происходит переполнение NumPressKey
+0358   0643           01222     xorwf NumPressKey, w        ; значит время заданно корректно во всех ячейках
+0359   1903           01223     btfsc STATUS, 0x02          ; и мы переходим в функцию записи переменных значений
+035A   2???           01224     goto START                  ; в постоянные
+035B   0AC3           01225     incf NumPressKey,1          ; Если NumPressKey не переполнен, то инкрементируем
+035C   2???           01226     goto change_time            ; его и возвращаемся в функцию изменения времени
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 25
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0361   08C1           01227     movf Cnt,1                  ;отжата клавиша или нет
-0362   1D03           01228     btfss STATUS,Z              ;если нет, то циклим
-0363   2???           01229     goto change_HMS
-0364   0846           01230     movfw TEMP_TIME_HH2         ; записываем значения временных переменных в постоянные (NPK 
-0365   00B1           01231     movwf TIME_HH2              ; необходим для определения ячейки, в которую записываем
-0366   0845           01232     movfw TEMP_TIME_HH1         ; значение)
-0367   00B0           01233     movwf TIME_HH1
-0368   0848           01234     movfw TEMP_TIME_MM2         
-0369   00B3           01235     movwf TIME_MM2
-036A   0847           01236     movfw TEMP_TIME_MM1         
-036B   00B2           01237     movwf TIME_MM1
-036C   084A           01238     movfw TEMP_TIME_SS2         
-036D   00B5           01239     movwf TIME_SS2
-036E   0849           01240     movfw TEMP_TIME_SS1         
-036F   00B4           01241     movwf TIME_SS1
-0370   2???           01242     goto START                  ; возврат в основной цикл
-                      01243     
-                      01244     ;==============================================
-                      01245     ;==============================================
-                      01246     
-0371                  01247 change_day                      ; функция изменения дня недели
-0371   2???           01248     call Keyboard
-0372   183B           01249     btfsc Key1,0
-0373   2???           01250     goto plus_day_ch            ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбра
+                      01227     
+035D                  01228 change_HMS
+035D   3001           01229     movlw 0x1                           
+035E   2???           01230     call delay                  ;Задержка для борьбы с дребезгом контактов
+035F   2???           01231     call Keyboard               ;опрос клавиатуры что бы выяснить
+0360   08C1           01232     movf Cnt,1                  ;отжата клавиша или нет
+0361   1D03           01233     btfss STATUS,Z              ;если нет, то циклим
+0362   2???           01234     goto change_HMS
+0363   0846           01235     movfw TEMP_TIME_HH2         ; записываем значения временных переменных в постоянные (NPK 
+0364   00B1           01236     movwf TIME_HH2              ; необходим для определения ячейки, в которую записываем
+0365   0845           01237     movfw TEMP_TIME_HH1         ; значение)
+0366   00B0           01238     movwf TIME_HH1
+0367   0848           01239     movfw TEMP_TIME_MM2         
+0368   00B3           01240     movwf TIME_MM2
+0369   0847           01241     movfw TEMP_TIME_MM1         
+036A   00B2           01242     movwf TIME_MM1
+036B   084A           01243     movfw TEMP_TIME_SS2         
+036C   00B5           01244     movwf TIME_SS2
+036D   0849           01245     movfw TEMP_TIME_SS1         
+036E   00B4           01246     movwf TIME_SS1
+036F   2???           01247     goto START                  ; возврат в основной цикл
+                      01248     
+                      01249     ;==============================================
+                      01250     ;==============================================
+                      01251     
+0370                  01252 change_day                      ; функция изменения дня недели
+0370   2???           01253     call Keyboard
+0371   183B           01254     btfsc Key1,0
+0372   2???           01255     goto plus_day_ch            ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбра
                             нное число (inc)
-0374   183C           01251     btfsc Key2,0
-0375   2???           01252     goto minus_day_ch           ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбра
+0373   183C           01256     btfsc Key2,0
+0374   2???           01257     goto minus_day_ch           ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбра
                             нное число (dec)
-0376   183D           01253     btfsc Key3,0                ; если нажали кнопку 3 переходим в функцию, которая сохраняет результат
-0377   2???           01254     goto save_end_day
-0378   183E           01255     btfsc Key4,0                ; если нажали кнопку 4 переходим в функцию, которая отменяет все изменен
+0375   183D           01258     btfsc Key3,0                ; если нажали кнопку 3 переходим в функцию, которая сохраняет результат
+0376   2???           01259     goto save_end_day
+0377   183E           01260     btfsc Key4,0                ; если нажали кнопку 4 переходим в функцию, которая отменяет все изменен
                             ия
-0379   2???           01256     goto save_day_ch
-                      01257     
-037A   2???           01258     call LCD_one                ; Отрисовка первой строки на дисплее
-037B   2???           01259     call delay_one_sec          ; задержка пока на 1сек
-037C   2???           01260     goto change_day
-                      01261     
-037D                  01262 plus_day_ch
-037D   3001           01263     movlw 0x1                           
-037E   2???           01264     call delay                  ;Задержка для борьбы с дребезгом контактов
-037F   2???           01265     call Keyboard               ;опрос клавиатуры что бы выяснить
-0380   08C1           01266     movf Cnt,1                  ;отжата клавиша или нет
-0381   1D03           01267     btfss STATUS,Z              ;если нет, то циклим
-0382   2???           01268     goto plus_day_ch
-0383   0AB6           01269     incf DAY,1                  ;Инкремент регистра День
-0384   3007           01270     movlw .7                    ;Если день равен 7, то обнуляем
-0385   0636           01271     xorwf DAY, w;               ;после чего возвращаемся в функцию изменения дня
-0386   1D03           01272     btfss STATUS, 0x02          ;Если не равен 7, то просто возвращаемся в функцию
-0387   2???           01273     goto change_day                     
-0388   3000           01274     movlw .0
-0389   00B6           01275     movwf DAY
-038A   2???           01276     goto change_day
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 26
+0378   2???           01261     goto save_day_ch
+                      01262     
+0379   2???           01263     call LCD_one                ; Отрисовка первой строки на дисплее
+037A   2???           01264     call delay_one_sec          ; задержка пока на 1сек
+037B   2???           01265     goto change_day
+                      01266     
+037C                  01267 plus_day_ch
+037C   3001           01268     movlw 0x1                           
+037D   2???           01269     call delay                  ;Задержка для борьбы с дребезгом контактов
+037E   2???           01270     call Keyboard               ;опрос клавиатуры что бы выяснить
+037F   08C1           01271     movf Cnt,1                  ;отжата клавиша или нет
+0380   1D03           01272     btfss STATUS,Z              ;если нет, то циклим
+0381   2???           01273     goto plus_day_ch
+0382   0AB6           01274     incf DAY,1                  ;Инкремент регистра День
+0383   3007           01275     movlw .7                    ;Если день равен 7, то обнуляем
+0384   0636           01276     xorwf DAY, w;               ;после чего возвращаемся в функцию изменения дня
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 26
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      01277     
-038B                  01278 minus_day_ch
-038B   3001           01279     movlw 0x1                           
-038C   2???           01280     call delay                  ;Задержка для борьбы с дребезгом контактов
-038D   2???           01281     call Keyboard               ;опрос клавиатуры что бы выяснить
-038E   08C1           01282     movf Cnt,1                  ;отжата клавиша или нет
-038F   1D03           01283     btfss STATUS,Z              ;если нет, то циклим
-0390   2???           01284     goto minus_day_ch
-0391   03B6           01285     decf DAY,1
-0392   30FF           01286     movlw .255                  ;Декремент регистра День
-0393   0636           01287     xorwf DAY, w;               ;Если день равен 255, то присваиваем регистру 6
-0394   1D03           01288     btfss STATUS, 0x02          ;после чего возвращаемся в функцию изменения дня
-0395   2???           01289     goto change_day             ;Если не равен 255, то просто возвращаемся в функцию
-0396   3006           01290     movlw .6
-0397   00B6           01291     movwf DAY
-0398   2???           01292     goto change_day
-                      01293     
-0399                  01294 save_day_ch
-0399   3001           01295     movlw 0x1                           
-039A   2???           01296     call delay                  ;Задержка для борьбы с дребезгом контактов
-039B   2???           01297     call Keyboard               ;опрос клавиатуры что бы выяснить
-039C   08C1           01298     movf Cnt,1                  ;отжата клавиша или нет
-039D   1D03           01299     btfss STATUS,Z              ;если нет, то циклим
-039E   2???           01300     goto save_day_ch
-039F   084B           01301     movfw TEMP_DAY              ;Присваиваем значение временного регистра постоянному
-03A0   00B6           01302     movwf DAY                   ;что бы отменить изменения и выходим в основной цикл
-03A1   2???           01303     goto START
-                      01304     
-03A2                  01305 save_end_day
-03A2   3001           01306     movlw 0x1                           
-03A3   2???           01307     call delay                  ;Задержка для борьбы с дребезгом контактов
-03A4   2???           01308     call Keyboard               ;опрос клавиатуры что бы выяснить
-03A5   08C1           01309     movf Cnt,1                  ;отжата клавиша или нет
-03A6   1D03           01310     btfss STATUS,Z              ;если нет, то циклим
-03A7   2???           01311     goto save_end_day
-03A8   2???           01312     goto START                  ;Возвращаемся в основной цикл
-                      01313     ;==============================================
-                      01314     ;==============================================
-03A9                  01315 change_alarm                    ; функция изменения времени будильника
-03A9   2???           01316     call Keyboard               ; спрашиваем клавиатуру
-03AA   183B           01317     btfsc Key1,0
-03AB   2???           01318     call correct_A_plus         ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбра
+0385   1D03           01277     btfss STATUS, 0x02          ;Если не равен 7, то просто возвращаемся в функцию
+0386   2???           01278     goto change_day                     
+0387   3000           01279     movlw .0
+0388   00B6           01280     movwf DAY
+0389   2???           01281     goto change_day
+                      01282     
+038A                  01283 minus_day_ch
+038A   3001           01284     movlw 0x1                           
+038B   2???           01285     call delay                  ;Задержка для борьбы с дребезгом контактов
+038C   2???           01286     call Keyboard               ;опрос клавиатуры что бы выяснить
+038D   08C1           01287     movf Cnt,1                  ;отжата клавиша или нет
+038E   1D03           01288     btfss STATUS,Z              ;если нет, то циклим
+038F   2???           01289     goto minus_day_ch
+0390   03B6           01290     decf DAY,1
+0391   30FF           01291     movlw .255                  ;Декремент регистра День
+0392   0636           01292     xorwf DAY, w;               ;Если день равен 255, то присваиваем регистру 6
+0393   1D03           01293     btfss STATUS, 0x02          ;после чего возвращаемся в функцию изменения дня
+0394   2???           01294     goto change_day             ;Если не равен 255, то просто возвращаемся в функцию
+0395   3006           01295     movlw .6
+0396   00B6           01296     movwf DAY
+0397   2???           01297     goto change_day
+                      01298     
+0398                  01299 save_day_ch
+0398   3001           01300     movlw 0x1                           
+0399   2???           01301     call delay                  ;Задержка для борьбы с дребезгом контактов
+039A   2???           01302     call Keyboard               ;опрос клавиатуры что бы выяснить
+039B   08C1           01303     movf Cnt,1                  ;отжата клавиша или нет
+039C   1D03           01304     btfss STATUS,Z              ;если нет, то циклим
+039D   2???           01305     goto save_day_ch
+039E   084B           01306     movfw TEMP_DAY              ;Присваиваем значение временного регистра постоянному
+039F   00B6           01307     movwf DAY                   ;что бы отменить изменения и выходим в основной цикл
+03A0   2???           01308     goto START
+                      01309     
+03A1                  01310 save_end_day
+03A1   3001           01311     movlw 0x1                           
+03A2   2???           01312     call delay                  ;Задержка для борьбы с дребезгом контактов
+03A3   2???           01313     call Keyboard               ;опрос клавиатуры что бы выяснить
+03A4   08C1           01314     movf Cnt,1                  ;отжата клавиша или нет
+03A5   1D03           01315     btfss STATUS,Z              ;если нет, то циклим
+03A6   2???           01316     goto save_end_day
+03A7   2???           01317     goto START                  ;Возвращаемся в основной цикл
+                      01318     ;==============================================
+                      01319     ;==============================================
+03A8                  01320 change_alarm                    ; функция изменения времени будильника
+03A8   2???           01321     call Keyboard               ; спрашиваем клавиатуру
+03A9   183B           01322     btfsc Key1,0
+03AA   2???           01323     call correct_A_plus         ; если нажали кнопку 1 переходим в функцию, которая инкрементирует выбра
                             нное число (inc)
-03AC   183C           01319     btfsc Key2,0
-03AD   2???           01320     call correct_A_minus        ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбра
+03AB   183C           01324     btfsc Key2,0
+03AC   2???           01325     call correct_A_minus        ; если нажали кнопку 2 переходим в функцию, которая декрементирует выбра
                             нное число (dec)
-03AE   183D           01321     btfsc Key3,0
-03AF   2???           01322     goto save_A                 ; переход к другой цифре путем инкремента NPK, при переполнения переменн
+03AD   183D           01326     btfsc Key3,0
+03AE   2???           01327     goto save_A                 ; переход к другой цифре путем инкремента NPK, при переполнения переменн
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 27
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
                             ой происходит сохранение результата и выход в основной цикл
-03B0   183E           01323     btfsc Key4,0                ; выход из настройки времени в основной цикл без сохранения результата
-03B1   2???           01324     goto change_AHMS
-                      01325     
-03B2   2???           01326     call LCD_two                ; отрисовка второй строки
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 27
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-                      01327     
-03B3   2???           01328     call delay_one_sec          ; задержка пока на 1сек
-03B4   2???           01329     goto change_alarm
+03AF   183E           01328     btfsc Key4,0                ; выход из настройки времени в основной цикл без сохранения результата
+03B0   2???           01329     goto change_AHMS
                       01330     
-                      01331     ;----------------------------------------
+03B1   2???           01331     call LCD_two                ; отрисовка второй строки
                       01332     
-03B5                  01333 correct_A_plus                  ; функция типа switch для ввода отдельных символов(инкремент или прибавл
+03B2   2???           01333     call delay_one_sec          ; задержка пока на 1сек
+03B3   2???           01334     goto change_alarm
+                      01335     
+                      01336     ;----------------------------------------
+                      01337     
+03B4                  01338 correct_A_plus                  ; функция типа switch для ввода отдельных символов(инкремент или прибавл
                             ение)
-03B5   3001           01334     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов      
-03B6   2???           01335     call delay                  
-03B7   2???           01336     call Keyboard               ;опрос клавиатуры что бы выяснить
-03B8   08C1           01337     movf Cnt,1                  ;отжата клавиша или нет
-03B9   1D03           01338     btfss STATUS,Z              ;если нет, то циклим
-03BA   2???           01339     goto correct_A_plus                     
-03BB   3009           01340     movlw 0x9                   ; если NumPressKey = 9, то вызываем
-03BC   0643           01341     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
-03BD   1903           01342     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-03BE   2???           01343     call correct_H2_A
-                      01344     
-03BF   300A           01345     movlw 0xa                   ; если NumPressKey = а, то вызываем
-03C0   0643           01346     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
-03C1   1903           01347     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-03C2   2???           01348     call correct_H1_A
-                      01349 
-03C3   300B           01350     movlw 0xb                   ; если NumPressKey = b, то вызываем
-03C4   0643           01351     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
-03C5   1903           01352     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-03C6   2???           01353     call correct_M2_A
-                      01354     
-03C7   300C           01355     movlw 0xc                   ; если NumPressKey = c, то вызываем
-03C8   0643           01356     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
-03C9   1903           01357     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-03CA   2???           01358     call correct_M1_A
+03B4   3001           01339     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов      
+03B5   2???           01340     call delay                  
+03B6   2???           01341     call Keyboard               ;опрос клавиатуры что бы выяснить
+03B7   08C1           01342     movf Cnt,1                  ;отжата клавиша или нет
+03B8   1D03           01343     btfss STATUS,Z              ;если нет, то циклим
+03B9   2???           01344     goto correct_A_plus                     
+03BA   3009           01345     movlw 0x9                   ; если NumPressKey = 9, то вызываем
+03BB   0643           01346     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
+03BC   1903           01347     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+03BD   2???           01348     call correct_H2_A
+                      01349     
+03BE   300A           01350     movlw 0xa                   ; если NumPressKey = а, то вызываем
+03BF   0643           01351     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
+03C0   1903           01352     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+03C1   2???           01353     call correct_H1_A
+                      01354 
+03C2   300B           01355     movlw 0xb                   ; если NumPressKey = b, то вызываем
+03C3   0643           01356     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
+03C4   1903           01357     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+03C5   2???           01358     call correct_M2_A
                       01359     
-03CB   0008           01360     return
-                      01361     
-                      01362     ;----------------------------------------
-                      01363     
-03CC                  01364 correct_H2_A                    ; функцию коррекции переменной H2.
-03CC   0AB8           01365     incf ALARM_HH2,1            ; инкремент переменной Н2
-03CD   3033           01366     movlw 0x33                  ; Если !=3, переходим обратно в функцию
-03CE   0638           01367     xorwf ALARM_HH2, w          ; correct_A_plus и проверяем там следующее условие
-03CF   1D03           01368     btfss STATUS, 0x02
-03D0   2???           01369     goto return_COR_H2_A
-03D1   3030           01370     movlw       0x30            ; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
-03D2   00B8           01371     movwf       ALARM_HH2
-03D3                  01372 return_COR_H2_A
-03D3   0008           01373     return                      ; и идем обратно в correct_A_plus и проверяем там следующее условие
-                      01374     
-03D4                  01375 correct_H1_A                    ; функцию коррекции переменной H1.
-03D4   0AB7           01376     incf ALARM_HH1,1            ; инкремент переменной Н1
-03D5   3032           01377     movlw 0x32                  ; Если = 2, переходим в функцию three_H1_A, которая служит для 
-03D6   0638           01378     xorwf ALARM_HH2, w          ; корректной задачи времени, т.к. 18 часов может быть, а 28 нет, то надо
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 28
+03C6   300C           01360     movlw 0xc                   ; если NumPressKey = c, то вызываем
+03C7   0643           01361     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
+03C8   1903           01362     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+03C9   2???           01363     call correct_M1_A
+                      01364     
+03CA   0008           01365     return
+                      01366     
+                      01367     ;----------------------------------------
+                      01368     
+03CB                  01369 correct_H2_A                    ; функцию коррекции переменной H2.
+03CB   0AB8           01370     incf ALARM_HH2,1            ; инкремент переменной Н2
+03CC   3033           01371     movlw 0x33                  ; Если !=3, переходим обратно в функцию
+03CD   0638           01372     xorwf ALARM_HH2, w          ; correct_A_plus и проверяем там следующее условие
+03CE   1D03           01373     btfss STATUS, 0x02
+03CF   2???           01374     goto return_COR_H2_A
+03D0   3030           01375     movlw       0x30            ; Если переменная = 3, то обнуляем ее, т.к. в сутках 2 десятка часов
+03D1   00B8           01376     movwf       ALARM_HH2
+03D2                  01377 return_COR_H2_A
+03D2   0008           01378     return                      ; и идем обратно в correct_A_plus и проверяем там следующее условие
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 28
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      01379                                 ; ограничить единицы при десятках = 2   
-03D7   1903           01380     btfsc STATUS, 0x02
-03D8   2???           01381     goto three_H1_A                     
-03D9   303A           01382     movlw 0x3a                  ; есди переменная = 0 или = 1, то максимальная единица для обнyления - 9
+                      01379     
+03D3                  01380 correct_H1_A                    ; функцию коррекции переменной H1.
+03D3   0AB7           01381     incf ALARM_HH1,1            ; инкремент переменной Н1
+03D4   3032           01382     movlw 0x32                  ; Если = 2, переходим в функцию three_H1_A, которая служит для 
+03D5   0638           01383     xorwf ALARM_HH2, w          ; корректной задачи времени, т.к. 18 часов может быть, а 28 нет, то надо
+                      01384                                 ; ограничить единицы при десятках = 2   
+03D6   1903           01385     btfsc STATUS, 0x02
+03D7   2???           01386     goto three_H1_A                     
+03D8   303A           01387     movlw 0x3a                  ; есди переменная = 0 или = 1, то максимальная единица для обнyления - 9
                             .
-03DA   0637           01383 ta1 xorwf ALARM_HH1, w  
-03DB   1D03           01384     btfss STATUS, 0x02
-03DC   2???           01385     goto return_COR_H1_A
-03DD   3030           01386     movlw       0x30            ; собственно обнуление переменной при достижении 10 или 4 по условию выш
+03D9   0637           01388 ta1 xorwf ALARM_HH1, w  
+03DA   1D03           01389     btfss STATUS, 0x02
+03DB   2???           01390     goto return_COR_H1_A
+03DC   3030           01391     movlw       0x30            ; собственно обнуление переменной при достижении 10 или 4 по условию выш
                             е. 
-03DE   00B7           01387     movwf       ALARM_HH1
-03DF                  01388 return_COR_H1_A
-03DF   0008           01389     return
-                      01390     
-03E0                  01391 three_H1_A
-03E0   3034           01392     movlw 0x34                  ; предел для обнуления при переменной = 2
-03E1   2???           01393     goto ta1                    ; возврат к метке ta1 для продолжения корректной работы
-                      01394     
-03E2                  01395 correct_M2_A                    ; функцию коррекции переменной M2.
-03E2   0ABA           01396     incf ALARM_MM2,1
-03E3   3036           01397     movlw 0x36                  ; Работает так же, только обнуление происходит при достижении 6
-03E4   063A           01398     xorwf ALARM_MM2, w;
-03E5   1D03           01399     btfss STATUS, 0x02
-03E6   2???           01400     goto return_COR_M2_A
-03E7   3030           01401     movlw       0x30
-03E8   00BA           01402     movwf       ALARM_MM2
-03E9                  01403 return_COR_M2_A
-03E9   0008           01404     return
-                      01405     
-03EA                  01406 correct_M1_A                    ; функцию коррекции переменной M1.
-03EA   0AB9           01407     incf ALARM_MM1,1
-03EB   303A           01408     movlw 0x3a                  ; Работает так же, только обнуление происходит при достижении 10
-03EC   0639           01409     xorwf ALARM_MM1, w;
-03ED   1D03           01410     btfss STATUS, 0x02
-03EE   2???           01411     goto return_COR_M1_A
-03EF   3030           01412     movlw       0x30
-03F0   00B9           01413     movwf       ALARM_MM1
-03F1                  01414 return_COR_M1_A
-03F1   0008           01415     return
-                      01416     
-                      01417     ;----------------------------------------
-                      01418     
-03F2                  01419 correct_A_minus                 ; функция типа switch для ввода отдельных символов(декремент)
-03F2   3001           01420     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов
-03F3   2???           01421     call delay                          
-03F4   2???           01422     call Keyboard               ;опрос клавиатуры что бы выяснить
-03F5   08C1           01423     movf Cnt,1                  ;отжата клавиша или нет
-03F6   1D03           01424     btfss STATUS,Z              ;если нет, то циклим
-03F7   2???           01425     goto correct_A_minus
-03F8   3009           01426     movlw 0x9                   ; если NumPressKey = 9, то вызываем
-03F9   0643           01427     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
-03FA   1903           01428     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-03FB   2???           01429     call correct_H2_minus_A
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 29
+03DD   00B7           01392     movwf       ALARM_HH1
+03DE                  01393 return_COR_H1_A
+03DE   0008           01394     return
+                      01395     
+03DF                  01396 three_H1_A
+03DF   3034           01397     movlw 0x34                  ; предел для обнуления при переменной = 2
+03E0   2???           01398     goto ta1                    ; возврат к метке ta1 для продолжения корректной работы
+                      01399     
+03E1                  01400 correct_M2_A                    ; функцию коррекции переменной M2.
+03E1   0ABA           01401     incf ALARM_MM2,1
+03E2   3036           01402     movlw 0x36                  ; Работает так же, только обнуление происходит при достижении 6
+03E3   063A           01403     xorwf ALARM_MM2, w;
+03E4   1D03           01404     btfss STATUS, 0x02
+03E5   2???           01405     goto return_COR_M2_A
+03E6   3030           01406     movlw       0x30
+03E7   00BA           01407     movwf       ALARM_MM2
+03E8                  01408 return_COR_M2_A
+03E8   0008           01409     return
+                      01410     
+03E9                  01411 correct_M1_A                    ; функцию коррекции переменной M1.
+03E9   0AB9           01412     incf ALARM_MM1,1
+03EA   303A           01413     movlw 0x3a                  ; Работает так же, только обнуление происходит при достижении 10
+03EB   0639           01414     xorwf ALARM_MM1, w;
+03EC   1D03           01415     btfss STATUS, 0x02
+03ED   2???           01416     goto return_COR_M1_A
+03EE   3030           01417     movlw       0x30
+03EF   00B9           01418     movwf       ALARM_MM1
+03F0                  01419 return_COR_M1_A
+03F0   0008           01420     return
+                      01421     
+                      01422     ;----------------------------------------
+                      01423     
+03F1                  01424 correct_A_minus                 ; функция типа switch для ввода отдельных символов(декремент)
+03F1   3001           01425     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов
+03F2   2???           01426     call delay                          
+03F3   2???           01427     call Keyboard               ;опрос клавиатуры что бы выяснить
+03F4   08C1           01428     movf Cnt,1                  ;отжата клавиша или нет
+03F5   1D03           01429     btfss STATUS,Z              ;если нет, то циклим
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 29
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      01430     
-03FC   300A           01431     movlw 0xa                   ; если NumPressKey = a, то вызываем
-03FD   0643           01432     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
-03FE   1903           01433     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-03FF   2???           01434     call correct_H1_minus_A
-                      01435 
-0400   300B           01436     movlw 0xb                   ; если NumPressKey = b, то вызываем
-0401   0643           01437     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
-0402   1903           01438     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-0403   2???           01439     call correct_M2_minus_A
-                      01440     
-0404   300C           01441     movlw 0xc                   ; если NumPressKey = c, то вызываем
-0405   0643           01442     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
-0406   1903           01443     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
-0407   2???           01444     call correct_M1_minus_A
+03F6   2???           01430     goto correct_A_minus
+03F7   3009           01431     movlw 0x9                   ; если NumPressKey = 9, то вызываем
+03F8   0643           01432     xorwf NumPressKey, w;       ; функцию коррекции переменной Н2.
+03F9   1903           01433     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+03FA   2???           01434     call correct_H2_minus_A
+                      01435     
+03FB   300A           01436     movlw 0xa                   ; если NumPressKey = a, то вызываем
+03FC   0643           01437     xorwf NumPressKey, w;       ; функцию коррекции переменной Н1.
+03FD   1903           01438     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+03FE   2???           01439     call correct_H1_minus_A
+                      01440 
+03FF   300B           01441     movlw 0xb                   ; если NumPressKey = b, то вызываем
+0400   0643           01442     xorwf NumPressKey, w;       ; функцию коррекции переменной M2.
+0401   1903           01443     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+0402   2???           01444     call correct_M2_minus_A
                       01445     
-0408   0008           01446     return
-                      01447     
-                      01448     ;----------------------------------------
-                      01449     
-0409                  01450 correct_H2_minus_A              ; функцию коррекции переменной H2.
-0409   03B8           01451     decf ALARM_HH2,1            ; декремент переменной Н2
-040A   302F           01452     movlw 0x2f                  ; Если !=2f, переходим обратно в функцию
-040B   0638           01453     xorwf ALARM_HH2, w          ; correct_А_minus и проверяем там следующее условие
-040C   1D03           01454     btfss STATUS, 0x02
-040D   2???           01455     goto return_COR_H2_A_minus
-040E   3032           01456     movlw       0x32            ; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках 2 де
+0403   300C           01446     movlw 0xc                   ; если NumPressKey = c, то вызываем
+0404   0643           01447     xorwf NumPressKey, w;       ; функцию коррекции переменной M1.
+0405   1903           01448     btfsc STATUS, 0x02          ; если нет, проверяем следующее условие
+0406   2???           01449     call correct_M1_minus_A
+                      01450     
+0407   0008           01451     return
+                      01452     
+                      01453     ;----------------------------------------
+                      01454     
+0408                  01455 correct_H2_minus_A              ; функцию коррекции переменной H2.
+0408   03B8           01456     decf ALARM_HH2,1            ; декремент переменной Н2
+0409   302F           01457     movlw 0x2f                  ; Если !=2f, переходим обратно в функцию
+040A   0638           01458     xorwf ALARM_HH2, w          ; correct_А_minus и проверяем там следующее условие
+040B   1D03           01459     btfss STATUS, 0x02
+040C   2???           01460     goto return_COR_H2_A_minus
+040D   3032           01461     movlw       0x32            ; Если переменная = 2f, то присваиваем ей значение 2, т.к. в сутках 2 де
                             сятка часов
-040F   00B8           01457     movwf       ALARM_HH2
-0410                  01458 return_COR_H2_A_minus
-0410   0008           01459     return                      ; и идем обратно в correct_А_minus и проверяем там следующее условие
-                      01460     
-0411                  01461 correct_H1_minus_A              ; функцию коррекции переменной H1.
-0411   03B7           01462     decf ALARM_HH1,1            ; декремент переменной Н1
-0412   302F           01463     movlw 0x2f                  ; Если != 2f, переходим обратно в функцию 
-0413   0637           01464     xorwf ALARM_HH1, w          ; correct_А_minus и проверяем там следующее условие
-                      01465                                         
-0414   1D03           01466     btfss STATUS, 0x02
-0415   2???           01467     goto return_COR_H1_A_minus          
-0416   3032           01468     movlw 0x32                  ; если переменная = 2, то при достижении 2f будем присваивать Н1 = 3.
-0417   0638           01469     xorwf ALARM_HH2, w  
-0418   1903           01470     btfsc STATUS, 0x02
-0419   2???           01471     goto three_H1_minus_A
-041A   3039           01472     movlw       0x39            ; если переменная != 2, то при достижении 2f будем присваивать Н1 = 9. 
-041B   00B7           01473 ta2 movwf       ALARM_HH1
-041C                  01474 return_COR_H1_A_minus
-041C   0008           01475     return
-                      01476     
-041D                  01477 three_H1_minus_A
-041D   3033           01478     movlw 0x33                  ; значение для присваивания при Н2 = 2.
-041E   2???           01479     goto ta2                    ; возврат к метке tа2 для продолжения корректной работы
-                      01480     
-041F                  01481 correct_M2_minus_A              ; функцию коррекции переменной M2.
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 30
+040E   00B8           01462     movwf       ALARM_HH2
+040F                  01463 return_COR_H2_A_minus
+040F   0008           01464     return                      ; и идем обратно в correct_А_minus и проверяем там следующее условие
+                      01465     
+0410                  01466 correct_H1_minus_A              ; функцию коррекции переменной H1.
+0410   03B7           01467     decf ALARM_HH1,1            ; декремент переменной Н1
+0411   302F           01468     movlw 0x2f                  ; Если != 2f, переходим обратно в функцию 
+0412   0637           01469     xorwf ALARM_HH1, w          ; correct_А_minus и проверяем там следующее условие
+                      01470                                         
+0413   1D03           01471     btfss STATUS, 0x02
+0414   2???           01472     goto return_COR_H1_A_minus          
+0415   3032           01473     movlw 0x32                  ; если переменная = 2, то при достижении 2f будем присваивать Н1 = 3.
+0416   0638           01474     xorwf ALARM_HH2, w  
+0417   1903           01475     btfsc STATUS, 0x02
+0418   2???           01476     goto three_H1_minus_A
+0419   3039           01477     movlw       0x39            ; если переменная != 2, то при достижении 2f будем присваивать Н1 = 9. 
+041A   00B7           01478 ta2 movwf       ALARM_HH1
+041B                  01479 return_COR_H1_A_minus
+041B   0008           01480     return
+                      01481     
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 30
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-041F   03BA           01482     decf ALARM_MM2,1
-0420   302F           01483     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 5
-0421   063A           01484     xorwf ALARM_MM2, w;
-0422   1D03           01485     btfss STATUS, 0x02
-0423   2???           01486     goto return_COR_M2_A_minus
-0424   3035           01487     movlw       0x35
-0425   00BA           01488     movwf       ALARM_MM2
-0426                  01489 return_COR_M2_A_minus
-0426   0008           01490     return
-                      01491     
-0427                  01492 correct_M1_minus_A              ; функцию коррекции переменной M1.
-0427   03B9           01493     decf ALARM_MM1,1
-0428   302F           01494     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 10
-0429   0639           01495     xorwf ALARM_MM1, w;
-042A   1D03           01496     btfss STATUS, 0x02
-042B   2???           01497     goto return_COR_M1_A_minus
-042C   3039           01498     movlw       0x39
-042D   00B9           01499     movwf       ALARM_MM1
-042E                  01500 return_COR_M1_A_minus
-042E   0008           01501     return
-                      01502     
-                      01503     ;==============================================
-                      01504     
-042F                  01505 save_A                          ; функция проверки и сохранения времени
-042F   3001           01506     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов      
-0430   2???           01507     call delay                          
-0431   2???           01508     call Keyboard               ;опрос клавиатуры что бы выяснить
-0432   08C1           01509     movf Cnt,1                  ;отжата клавиша или нет
-0433   1D03           01510     btfss STATUS,Z              ;если нет, то циклим
-0434   2???           01511     goto save_A
-0435   300D           01512     movlw 0xd                   ; если происходит переполнение NumPressKey
-0436   0643           01513     xorwf NumPressKey, w        ; значит время заданно корректно во всех ячейках
-0437   1903           01514     btfsc STATUS, 0x02          ; и мы выходим из меню настройки
-0438   2???           01515     goto START                  
-0439   0AC3           01516     incf NumPressKey,1          ; Если NumPressKey не переполнен, то инкрементируем
-043A   2???           01517     goto change_alarm           ; его и возвращаемся в функцию изменения времени
-                      01518     
-043B                  01519 change_AHMS
-043B   3001           01520     movlw 0x1                           
-043C   2???           01521     call delay                  ;Задержка для борьбы с дребезгом контактов
-043D   2???           01522     call Keyboard               ;опрос клавиатуры что бы выяснить
-043E   08C1           01523     movf Cnt,1                  ;отжата клавиша или нет
-043F   1D03           01524     btfss STATUS,Z              ;если нет, то циклим
-0440   2???           01525     goto change_AHMS
-0441   084D           01526     movfw TEMP_ALARM_HH2        ; записываем значения временных переменных в постоянные (NPK 
-0442   00B8           01527     movwf ALARM_HH2             ; необходим для определения ячейки, в которую записываем
-0443   084C           01528     movfw TEMP_ALARM_HH1        ; значение)
-0444   00B7           01529     movwf ALARM_HH1
-0445   084F           01530     movfw TEMP_ALARM_MM2                
-0446   00BA           01531     movwf ALARM_MM2
-0447   084E           01532     movfw TEMP_ALARM_MM1                
-0448   00B9           01533     movwf ALARM_MM1
-0449   2???           01534     goto START                  ; возврат в основной цикл
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 31
+041C                  01482 three_H1_minus_A
+041C   3033           01483     movlw 0x33                  ; значение для присваивания при Н2 = 2.
+041D   2???           01484     goto ta2                    ; возврат к метке tа2 для продолжения корректной работы
+                      01485     
+041E                  01486 correct_M2_minus_A              ; функцию коррекции переменной M2.
+041E   03BA           01487     decf ALARM_MM2,1
+041F   302F           01488     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 5
+0420   063A           01489     xorwf ALARM_MM2, w;
+0421   1D03           01490     btfss STATUS, 0x02
+0422   2???           01491     goto return_COR_M2_A_minus
+0423   3035           01492     movlw       0x35
+0424   00BA           01493     movwf       ALARM_MM2
+0425                  01494 return_COR_M2_A_minus
+0425   0008           01495     return
+                      01496     
+0426                  01497 correct_M1_minus_A              ; функцию коррекции переменной M1.
+0426   03B9           01498     decf ALARM_MM1,1
+0427   302F           01499     movlw 0x2f                  ; Работает так же, только при достижении 2f присваивается 10
+0428   0639           01500     xorwf ALARM_MM1, w;
+0429   1D03           01501     btfss STATUS, 0x02
+042A   2???           01502     goto return_COR_M1_A_minus
+042B   3039           01503     movlw       0x39
+042C   00B9           01504     movwf       ALARM_MM1
+042D                  01505 return_COR_M1_A_minus
+042D   0008           01506     return
+                      01507     
+                      01508     ;==============================================
+                      01509     
+042E                  01510 save_A                          ; функция проверки и сохранения времени
+042E   3001           01511     movlw 0x1                   ;Задержка для борьбы с дребезгом контактов      
+042F   2???           01512     call delay                          
+0430   2???           01513     call Keyboard               ;опрос клавиатуры что бы выяснить
+0431   08C1           01514     movf Cnt,1                  ;отжата клавиша или нет
+0432   1D03           01515     btfss STATUS,Z              ;если нет, то циклим
+0433   2???           01516     goto save_A
+0434   300D           01517     movlw 0xd                   ; если происходит переполнение NumPressKey
+0435   0643           01518     xorwf NumPressKey, w        ; значит время заданно корректно во всех ячейках
+0436   1903           01519     btfsc STATUS, 0x02          ; и мы выходим из меню настройки
+0437   2???           01520     goto START                  
+0438   0AC3           01521     incf NumPressKey,1          ; Если NumPressKey не переполнен, то инкрементируем
+0439   2???           01522     goto change_alarm           ; его и возвращаемся в функцию изменения времени
+                      01523     
+043A                  01524 change_AHMS
+043A   3001           01525     movlw 0x1                           
+043B   2???           01526     call delay                  ;Задержка для борьбы с дребезгом контактов
+043C   2???           01527     call Keyboard               ;опрос клавиатуры что бы выяснить
+043D   08C1           01528     movf Cnt,1                  ;отжата клавиша или нет
+043E   1D03           01529     btfss STATUS,Z              ;если нет, то циклим
+043F   2???           01530     goto change_AHMS
+0440   084D           01531     movfw TEMP_ALARM_HH2        ; записываем значения временных переменных в постоянные (NPK 
+0441   00B8           01532     movwf ALARM_HH2             ; необходим для определения ячейки, в которую записываем
+0442   084C           01533     movfw TEMP_ALARM_HH1        ; значение)
+0443   00B7           01534     movwf ALARM_HH1
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 31
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      01535     
-                      01536     ;==============================================
-                      01537     ;==============================================
-                      01538                             
-                      01539 ;small_delay:                   ; задержка для драйвера
-                      01540 ;    movwf fCOUNTER1
-                      01541 ;    clrwdt
-                      01542 ;    decfsz fCOUNTER1,F
-                      01543 ;    goto $-2
-                      01544 ;    return
-                      01545     
+0444   084F           01535     movfw TEMP_ALARM_MM2                
+0445   00BA           01536     movwf ALARM_MM2
+0446   084E           01537     movfw TEMP_ALARM_MM1                
+0447   00B9           01538     movwf ALARM_MM1
+0448   2???           01539     goto START                  ; возврат в основной цикл
+                      01540     
+                      01541     ;==============================================
+                      01542     ;==============================================
+                      01543                             
+                      01544 ;small_delay:                   ; задержка для драйвера
+                      01545 ;    movwf fCOUNTER1
+                      01546 ;    clrwdt
+                      01547 ;    decfsz fCOUNTER1,F
+                      01548 ;    goto $-2
+                      01549 ;    return
+                      01550     
 Warning[205]: Found directive in column 1. (end)
-                      01546 end  ; конец программы
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 32
+                      01551 end  ; конец программы
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 32
 
 
 SYMBOL TABLE
@@ -1846,7 +1851,7 @@ CCPR2L                            0000001B
 CHS0                              00000003
 CHS1                              00000004
 CHS2                              00000005
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 33
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 33
 
 
 SYMBOL TABLE
@@ -1898,14 +1903,14 @@ Key2                              0000003C
 Key3                              0000003D
 Key4                              0000003E
 Key9                              0000003F
-Keyboard                          00000268
-LCD_one                           00000185
-LCD_two                           000001FF
+Keyboard                          00000267
+LCD_one                           00000184
+LCD_two                           000001FE
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BO                            00000000
 NOT_BOR                           00000000
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 34
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 34
 
 
 SYMBOL TABLE
@@ -1964,7 +1969,7 @@ RA5                               00000005
 RB0                               00000000
 RB1                               00000001
 RB2                               00000002
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 35
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 35
 
 
 SYMBOL TABLE
@@ -2023,7 +2028,7 @@ SPBRG                             00000099
 SPEN                              00000007
 SREN                              00000005
 SSPADD                            00000093
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 36
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 36
 
 
 SYMBOL TABLE
@@ -2082,7 +2087,7 @@ TMR1CS                            00000001
 TMR1H                             0000000F
 TMR1IE                            00000000
 TMR1IF                            00000000
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 37
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 37
 
 
 SYMBOL TABLE
@@ -2141,7 +2146,7 @@ TX8_9                             00000006
 TX9                               00000006
 TX9D                              00000000
 TXD8                              00000000
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 38
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 38
 
 
 SYMBOL TABLE
@@ -2163,13 +2168,13 @@ Z                                 00000002
 _.org_0_014C                      0000014C
 _.org_0_014F                      0000014F
 _.org_0_0151                      00000151
-_.org_0_0157                      00000157
-_.org_0_015E                      0000015E
-_.org_0_0165                      00000165
-_.org_0_016C                      0000016C
-_.org_0_0173                      00000173
-_.org_0_017A                      0000017A
-_.org_0_0181                      00000181
+_.org_0_0156                      00000156
+_.org_0_015D                      0000015D
+_.org_0_0164                      00000164
+_.org_0_016B                      0000016B
+_.org_0_0172                      00000172
+_.org_0_0179                      00000179
+_.org_0_0180                      00000180
 _BODEN_OFF                        00003FBF
 _BODEN_ON                         00003FFF
 _BOREN_OFF                        00003FBF
@@ -2200,7 +2205,7 @@ _PWRTE_OFF                        00003FFF
 _PWRTE_ON                         00003FF7
 _RC_OSC                           00003FFF
 _WDTE_OFF                         00003FFB
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 39
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 39
 
 
 SYMBOL TABLE
@@ -2220,83 +2225,83 @@ bank0                             bcf STATUS,  RP0
 bank1                             bsf STATUS,  RP0
 begin                             00000004
 blinkON                           000000D3
-blink_off_ALARM                   0000024F
-blink_off_H1                      000001AF
-blink_off_H1_A                    00000225
-blink_off_H2                      000001A1
-blink_off_H2_A                    00000217
-blink_off_M1                      000001CB
-blink_off_M1_A                    00000241
-blink_off_M2                      000001BD
-blink_off_M2_A                    00000233
-blink_off_S1                      000001E7
-blink_off_S2                      000001D9
-blink_off_day                     000001F5
-blink_on_ALARM                    0000025C
-blink_on_ALARM_nop                0000025B
-blink_on_H1                       000001B2
-blink_on_H1_A                     00000228
-blink_on_H2                       000001A4
-blink_on_H2_A                     0000021A
-blink_on_M1                       000001CE
-blink_on_M1_A                     00000244
-blink_on_M2                       000001C0
-blink_on_M2_A                     00000236
-blink_on_S1                       000001EA
-blink_on_S2                       000001DC
-blink_on_day                      000001FC
+blink_off_ALARM                   0000024E
+blink_off_H1                      000001AE
+blink_off_H1_A                    00000224
+blink_off_H2                      000001A0
+blink_off_H2_A                    00000216
+blink_off_M1                      000001CA
+blink_off_M1_A                    00000240
+blink_off_M2                      000001BC
+blink_off_M2_A                    00000232
+blink_off_S1                      000001E6
+blink_off_S2                      000001D8
+blink_off_day                     000001F4
+blink_on_ALARM                    0000025B
+blink_on_ALARM_nop                0000025A
+blink_on_H1                       000001B1
+blink_on_H1_A                     00000227
+blink_on_H2                       000001A3
+blink_on_H2_A                     00000219
+blink_on_M1                       000001CD
+blink_on_M1_A                     00000243
+blink_on_M2                       000001BF
+blink_on_M2_A                     00000235
+blink_on_S1                       000001E9
+blink_on_S2                       000001DB
+blink_on_day                      000001FB
 c_nop                             000000A3
-change_AHMS                       0000043B
-change_HMS                        0000035E
-change_alarm                      000003A9
-change_day                        00000371
-change_time                       0000029C
-col1                              00000270
-col2                              0000027B
-col3                              00000284
-correct_A_minus                   000003F2
-correct_A_plus                    000003B5
-correct_H1                        000002CF
-correct_H1_A                      000003D4
-correct_H1_minus                  00000324
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 40
+change_AHMS                       0000043A
+change_HMS                        0000035D
+change_alarm                      000003A8
+change_day                        00000370
+change_time                       0000029B
+col1                              0000026F
+col2                              0000027A
+col3                              00000283
+correct_A_minus                   000003F1
+correct_A_plus                    000003B4
+correct_H1                        000002CE
+correct_H1_A                      000003D3
+correct_H1_minus                  00000323
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 40
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-correct_H1_minus_A                00000411
-correct_H2                        000002C7
-correct_H2_A                      000003CC
-correct_H2_minus                  0000031C
-correct_H2_minus_A                00000409
-correct_M1                        000002E5
-correct_M1_A                      000003EA
-correct_M1_minus                  0000033A
-correct_M1_minus_A                00000427
-correct_M2                        000002DD
-correct_M2_A                      000003E2
-correct_M2_minus                  00000332
-correct_M2_minus_A                0000041F
-correct_S1                        000002F5
-correct_S1_minus                  0000034A
-correct_S2                        000002ED
-correct_S2_minus                  00000342
-correct_T_minus                   000002FD
-correct_T_plus                    000002A8
+correct_H1_minus_A                00000410
+correct_H2                        000002C6
+correct_H2_A                      000003CB
+correct_H2_minus                  0000031B
+correct_H2_minus_A                00000408
+correct_M1                        000002E4
+correct_M1_A                      000003E9
+correct_M1_minus                  00000339
+correct_M1_minus_A                00000426
+correct_M2                        000002DC
+correct_M2_A                      000003E1
+correct_M2_minus                  00000331
+correct_M2_minus_A                0000041E
+correct_S1                        000002F4
+correct_S1_minus                  00000349
+correct_S2                        000002EC
+correct_S2_minus                  00000341
+correct_T_minus                   000002FC
+correct_T_plus                    000002A7
 day_plus_blink                    0000011F
 delay                             0000013B
-delay_five                        00000170
-delay_four                        00000169
-delay_one                         00000154
+delay_five                        0000016F
+delay_four                        00000168
+delay_one                         00000153
 delay_one_sec                     00000145
-delay_seven                       0000017E
-delay_six                         00000177
-delay_three                       00000162
-delay_two                         0000015B
+delay_seven                       0000017D
+delay_six                         00000176
+delay_three                       00000161
+delay_two                         0000015A
 end_ALARM                         000000D9
 end_clock                         000000A9
-end_keyb                          00000291
+end_keyb                          00000290
 exday                             00000115
 fCOUNTER                          00000026
 fCOUNTER1                         00000044
@@ -2308,83 +2313,83 @@ if_T_AT_H2                        000000B8
 if_T_AT_M1                        000000C7
 if_T_AT_M2                        000000C2
 inc_BA                            000000CC
-minus_day_ch                      0000038B
+minus_day_ch                      0000038A
 monday                            000000E5
-nop_end_key                       00000290
-paintH1                           000001A7
-paintH1_A                         0000021D
-paintH2                           00000199
-paintH2_A                         0000020F
-paintM1                           000001C3
-paintM1_A                         00000239
-paintM2                           000001B5
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 41
+nop_end_key                       0000028F
+paintH1                           000001A6
+paintH1_A                         0000021C
+paintH2                           00000198
+paintH2_A                         0000020E
+paintM1                           000001C2
+paintM1_A                         00000238
+paintM2                           000001B4
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 41
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-paintM2_A                         0000022B
-paintS1                           000001DF
-paintS2                           000001D1
-paint_ALARM                       00000247
-plus_day_ch                       0000037D
-printDay                          000001ED
-return_ALARM                      00000267
-return_A_H1                       0000022A
-return_A_H2                       0000021C
-return_A_M1                       00000246
-return_A_M2                       00000238
-return_COR_H1                     000002DA
-return_COR_H1_A                   000003DF
-return_COR_H1_A_minus             0000041C
-return_COR_H1_MIN                 0000032F
-return_COR_H2                     000002CE
-return_COR_H2_A                   000003D3
-return_COR_H2_A_minus             00000410
-return_COR_H2_MIN                 00000323
-return_COR_M1                     000002EC
-return_COR_M1_A                   000003F1
-return_COR_M1_A_minus             0000042E
-return_COR_M1_MIN                 00000341
-return_COR_M2                     000002E4
-return_COR_M2_A                   000003E9
-return_COR_M2_A_minus             00000426
-return_COR_M2_MIN                 00000339
-return_COR_S1                     000002FC
-return_COR_S1_MIN                 00000351
-return_COR_S2                     000002F4
-return_COR_S2_MIN                 00000349
-return_DAY                        000001FE
-return_H1                         000001B4
-return_H2                         000001A6
-return_M1                         000001D0
-return_M2                         000001C2
-return_S1                         000001EC
-return_S2                         000001DE
+paintM2_A                         0000022A
+paintS1                           000001DE
+paintS2                           000001D0
+paint_ALARM                       00000246
+plus_day_ch                       0000037C
+printDay                          000001EC
+return_ALARM                      00000266
+return_A_H1                       00000229
+return_A_H2                       0000021B
+return_A_M1                       00000245
+return_A_M2                       00000237
+return_COR_H1                     000002D9
+return_COR_H1_A                   000003DE
+return_COR_H1_A_minus             0000041B
+return_COR_H1_MIN                 0000032E
+return_COR_H2                     000002CD
+return_COR_H2_A                   000003D2
+return_COR_H2_A_minus             0000040F
+return_COR_H2_MIN                 00000322
+return_COR_M1                     000002EB
+return_COR_M1_A                   000003F0
+return_COR_M1_A_minus             0000042D
+return_COR_M1_MIN                 00000340
+return_COR_M2                     000002E3
+return_COR_M2_A                   000003E8
+return_COR_M2_A_minus             00000425
+return_COR_M2_MIN                 00000338
+return_COR_S1                     000002FB
+return_COR_S1_MIN                 00000350
+return_COR_S2                     000002F3
+return_COR_S2_MIN                 00000348
+return_DAY                        000001FD
+return_H1                         000001B3
+return_H2                         000001A5
+return_M1                         000001CF
+return_M2                         000001C1
+return_S1                         000001EB
+return_S2                         000001DD
 saturday                          00000108
-save_A                            0000042F
-save_T                            00000352
-save_day_ch                       00000399
-save_end_day                      000003A2
+save_A                            0000042E
+save_T                            00000351
+save_day_ch                       00000398
+save_end_day                      000003A1
 sunday                            0000010F
-t1                                000002D5
-t2                                0000032E
-ta1                               000003DA
-ta2                               0000041B
+t1                                000002D4
+t2                                0000032D
+ta1                               000003D9
+ta2                               0000041A
 ten_clock                         0000009A
 ten_clock_five                    00000097
 ten_clock_one                     00000099
-three_H1                          000002DB
-three_H1_A                        000003E0
-MPASM 5.75                          MAIN.ASM   10-30-2017  11:00:08         PAGE 42
+three_H1                          000002DA
+three_H1_A                        000003DF
+MPASM 5.75                          MAIN.ASM   11-2-2017  1:15:58         PAGE 42
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-three_H1_minus                    00000330
-three_H1_minus_A                  0000041D
+three_H1_minus                    0000032F
+three_H1_minus_A                  0000041C
 three_nop                         000000A7
 thursday                          000000FA
 time_plus_blink                   00000116

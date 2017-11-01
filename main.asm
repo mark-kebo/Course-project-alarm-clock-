@@ -483,20 +483,26 @@ BD_Loop
     return
 
 delay_one_sec			; олибровочные задержки
-    movlw       .162		;дл€ корректного времени работы
-    movwf       Reg_1		;программы в зависимости от разных условий
-    movlw       .236		;выполенин€ определенных команд, т.к. в 
-    movwf       Reg_2		;любом случае основной цикл должен выполн€тьс€ 
-    movlw       .5		;за 1 сек
-    movwf       Reg_3
-    decfsz      Reg_1,F
-    goto        $-1
-    clrwdt
-    decfsz      Reg_2,F
-    goto        $-4
-    decfsz      Reg_3,F
-    goto        $-6
-    nop
+;дл€ корректного времени работы
+;программы в зависимости от разных условий
+;выполенин€ определенных команд, т.к. в 
+;любом случае основной цикл должен выполн€тьс€ 
+;за 1 сек
+; «адержка 775 567 машинных циклов
+; «адержка 772 567 машинных циклов
+            movlw       .3
+            movwf       Reg_1
+            movlw       .235
+            movwf       Reg_2
+            movlw       .4
+            movwf       Reg_3
+            decfsz      Reg_1,F
+            goto        $-1
+            clrwdt
+            decfsz      Reg_2,F
+            goto        $-4
+            decfsz      Reg_3,F
+            goto        $-6
     return   
 delay_one
     movlw       .20
